@@ -1,0 +1,29 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q22",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "collection": "question",
+  "couchapp": {},
+  "order": 22,
+  "prompt": "Have you ever repeated a grade? If yes, which grade?",
+  "name": "repeated-grade",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "Grade 1",
+      "value": "Grade 1"
+    },
+    {
+      "label": "Grade 2",
+      "value": "Grade 2"
+    },
+    {
+      "label": "Grade 3",
+      "value": "Grade 3"
+    }
+  ]
+}

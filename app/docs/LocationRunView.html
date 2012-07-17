@@ -1,0 +1,143 @@
+<!DOCTYPE html>  <html> <head>   <title>LocationRunView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               LocationRunView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">LocationRunView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&quot;click </span><span class="err">#</span><span class="s">school_list li&quot;</span> <span class="o">:</span> <span class="s">&quot;autofill&quot;</span>
+    <span class="s">&quot;keyup input&quot;</span> <span class="o">:</span> <span class="s">&quot;showOptions&quot;</span>
+    <span class="s">&quot;click clear&quot;</span> <span class="o">:</span> <span class="s">&quot;clearInputs&quot;</span>
+
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    
+    <span class="vi">@model  = </span><span class="nx">@options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@parent = </span><span class="nx">@options</span><span class="p">.</span><span class="nx">parent</span>
+    
+    <span class="vi">@levels = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;levels&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]</span>
+    
+    <span class="vi">@locations = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;locations&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]</span>
+
+    <span class="vi">@haystack = </span><span class="p">[]</span>
+
+    <span class="k">for</span> <span class="nx">location</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@locations</span>
+      <span class="nx">@haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="k">for</span> <span class="nx">locationData</span> <span class="k">in</span> <span class="nx">location</span>
+        <span class="nx">@haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">push</span> <span class="nx">locationData</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">()</span>
+
+    
+    <span class="nv">template = </span><span class="s">&quot;&lt;li data-index=&#39;{{i}}&#39;&gt;&quot;</span>
+    <span class="k">for</span> <span class="nx">level</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@levels</span>
+      <span class="nx">template</span> <span class="o">+=</span> <span class="s">&quot;{{level_</span><span class="si">#{</span><span class="nx">i</span><span class="si">}</span><span class="s">}}&quot;</span>
+      <span class="nx">template</span> <span class="o">+=</span> <span class="s">&quot; - &quot;</span> <span class="nx">unless</span> <span class="nx">i</span> <span class="o">==</span> <span class="nx">@levels</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span>
+    <span class="nx">template</span> <span class="o">+=</span> <span class="s">&quot;&lt;/li&gt;&quot;</span>
+    
+    <span class="vi">@li = </span><span class="nx">_</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="nx">template</span><span class="p">)</span>
+
+  <span class="nv">clearInputs: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">school_id, </span><span class="err">#</span><span class="s">district, </span><span class="err">#</span><span class="s">province, </span><span class="err">#</span><span class="s">name&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+
+  <span class="nv">autofill: </span><span class="nf">(event) -&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">autofill&quot;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nv">index = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;data-index&quot;</span><span class="p">)</span>
+    <span class="nv">location = </span><span class="nx">@locations</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span>
+    <span class="k">for</span> <span class="nx">level</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@levels</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">level_</span><span class="si">#{</span><span class="nx">i</span><span class="si">}</span><span class="s">&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nx">location</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span>
+
+
+  <span class="nv">showOptions: </span><span class="nf">(event) -&gt;</span>
+    <span class="nv">needle = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">toLowerCase</span><span class="p">()</span>
+    <span class="nv">field = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;data-level&#39;</span><span class="p">))</span>
+    <span class="nv">atLeastOne = </span><span class="kc">false</span>
+    <span class="nv">results = </span><span class="p">[]</span>
+    <span class="k">for</span> <span class="nx">stack</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@haystack</span>
+      <span class="nv">isThere = </span><span class="o">~</span><span class="nx">@haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">field</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">needle</span><span class="p">)</span>
+      <span class="nx">results</span><span class="p">.</span><span class="nx">push</span> <span class="nx">i</span> <span class="k">if</span> <span class="nx">isThere</span>
+      <span class="nv">atLeastOne = </span><span class="kc">true</span> <span class="k">if</span> <span class="nx">isThere</span>
+    
+    <span class="k">for</span> <span class="nx">stack</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@haystack</span>
+      <span class="k">for</span> <span class="nx">otherField</span><span class="p">,</span> <span class="nx">j</span> <span class="k">in</span> <span class="nx">stack</span>
+        <span class="k">if</span> <span class="nx">j</span> <span class="o">==</span> <span class="nx">field</span>
+          <span class="k">continue</span>
+        <span class="nv">isThere = </span><span class="o">~</span><span class="nx">@haystack</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">j</span><span class="p">].</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">needle</span><span class="p">)</span>
+        <span class="nx">results</span><span class="p">.</span><span class="nx">push</span> <span class="nx">i</span> <span class="k">if</span> <span class="nx">isThere</span> <span class="o">&amp;&amp;</span> <span class="o">!~</span><span class="nx">results</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span>
+        <span class="nv">atLeastOne = </span><span class="kc">true</span> <span class="k">if</span> <span class="nx">isThere</span>
+    
+    <span class="k">if</span> <span class="nx">atLeastOne</span>
+      <span class="nv">html = </span><span class="s">&quot;&quot;</span>
+      <span class="k">for</span> <span class="nx">result</span> <span class="k">in</span> <span class="nx">results</span>
+        <span class="nx">html</span> <span class="o">+=</span> <span class="nx">@getLocationLi</span> <span class="nx">result</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">autofill&quot;</span><span class="p">).</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>  
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">school_list&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">html</span>
+
+    <span class="k">else</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">autofill&quot;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+  <span class="nv">getLocationLi: </span><span class="nf">(i) -&gt;</span>
+    <span class="nv">templateInfo = </span><span class="s">&quot;i&quot;</span> <span class="o">:</span> <span class="nx">i</span>
+    <span class="k">for</span> <span class="nx">location</span><span class="p">,</span> <span class="nx">j</span> <span class="k">in</span> <span class="nx">@locations</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+      <span class="nx">templateInfo</span><span class="p">[</span><span class="s">&quot;level_&quot;</span> <span class="o">+</span> <span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">location</span>
+    <span class="k">return</span> <span class="nx">@li</span> <span class="nx">templateInfo</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">schoolListElements = </span><span class="s">&quot;&quot;</span>
+
+    <span class="nv">html = </span><span class="s">&quot;</span>
+<span class="s">      &lt;button class=&#39;clear command&#39;&gt;Clear&lt;/button&gt;</span>
+<span class="s">      &quot;</span><span class="p">;</span>
+    <span class="k">for</span> <span class="nx">level</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@levels</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">        &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;level_</span><span class="si">#{</span><span class="nx">i</span><span class="si">}</span><span class="s">&#39;&gt;</span><span class="si">#{</span><span class="nx">level</span><span class="si">}</span><span class="s">&lt;/label&gt;</span>
+<span class="s">          &lt;input data-level=&#39;</span><span class="si">#{</span><span class="nx">i</span><span class="si">}</span><span class="s">&#39; id=&#39;level_</span><span class="si">#{</span><span class="nx">i</span><span class="si">}</span><span class="s">&#39; value=&#39;&#39;&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">      &quot;</span>
+
+    <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">      &lt;div id=&#39;autofill&#39; style=&#39;display:none&#39;&gt;</span>
+<span class="s">        &lt;h2&gt;Select one from autofill list&lt;/h2&gt;</span>
+<span class="s">        &lt;ul id=&#39;school_list&#39;&gt;</span>
+<span class="s">        &lt;/ul&gt;</span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">    &quot;</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="nx">html</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">getResult: </span><span class="o">-&gt;</span>
+    
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="s">&quot;labels&quot;</span>   <span class="o">:</span> <span class="p">(</span><span class="nx">level</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/[\s-]/g</span><span class="p">,</span><span class="s">&quot;_&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="nx">level</span> <span class="k">in</span> <span class="nx">@levels</span><span class="p">)</span>
+      <span class="s">&quot;location&quot;</span> <span class="o">:</span> <span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">level_</span><span class="si">#{</span><span class="nx">i</span><span class="si">}</span><span class="s">&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">())</span> <span class="k">for</span> <span class="nx">level</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@levels</span><span class="p">)</span>
+    <span class="p">}</span>
+
+  <span class="nv">isValid: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.message&quot;</span><span class="p">).</span><span class="nx">remove</span><span class="p">()</span>
+    <span class="k">for</span> <span class="nx">input</span> <span class="k">in</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">)</span>
+      <span class="k">return</span> <span class="kc">false</span> <span class="k">if</span> <span class="nx">$</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;&quot;</span>
+    <span class="kc">true</span>
+
+  <span class="nv">showErrors: </span><span class="o">-&gt;</span>
+    <span class="k">for</span> <span class="nx">input</span> <span class="k">in</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nx">$</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;&quot;</span>
+        <span class="nx">$</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">after</span> <span class="s">&quot; &lt;span class=&#39;message&#39;&gt;</span><span class="si">#{</span><span class="nx">$</span><span class="p">(</span><span class="s">&#39;label[for=&#39;</span><span class="o">+</span><span class="nx">$</span><span class="p">(</span><span class="nx">input</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;]&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">()</span><span class="si">}</span><span class="s"> cannot be empty&lt;/span&gt;&quot;</span>
+
+  <span class="nv">getSum: </span><span class="o">-&gt;</span>
+    <span class="nv">counts =</span>
+      <span class="nv">correct   : </span><span class="mi">0</span>
+      <span class="nv">incorrect : </span><span class="mi">0</span>
+      <span class="nv">missing   : </span><span class="mi">0</span>
+      <span class="nv">total     : </span><span class="mi">0</span>
+      
+    <span class="k">for</span> <span class="nx">input</span> <span class="k">in</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;input&quot;</span><span class="p">)</span>
+      <span class="nv">$input = </span><span class="nx">$</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span>
+      <span class="nx">counts</span><span class="p">[</span><span class="s">&#39;correct&#39;</span><span class="p">]</span>   <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="nx">$input</span><span class="p">.</span><span class="nx">val</span><span class="p">()</span><span class="o">||</span><span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span>
+      <span class="nx">counts</span><span class="p">[</span><span class="s">&#39;incorrect&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">0</span> <span class="k">if</span> <span class="kc">false</span>
+      <span class="nx">counts</span><span class="p">[</span><span class="s">&#39;missing&#39;</span><span class="p">]</span>   <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="p">(</span><span class="nx">$input</span><span class="p">.</span><span class="nx">val</span><span class="p">()</span><span class="o">||</span><span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&quot;&quot;</span>
+      <span class="nx">counts</span><span class="p">[</span><span class="s">&#39;total&#39;</span><span class="p">]</span>     <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="kc">true</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nv">correct   : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;correct&#39;</span><span class="p">]</span>
+      <span class="nv">incorrect : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;incorrect&#39;</span><span class="p">]</span>
+      <span class="nv">missing   : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;missing&#39;</span><span class="p">]</span>
+      <span class="nv">total     : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;total&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

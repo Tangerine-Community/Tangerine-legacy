@@ -1,0 +1,20 @@
+<!DOCTYPE html>  <html> <head>   <title>Question.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Question.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>This RISC requires view that prefills with common configurations
+binary trinary agreement, validity, boolean</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Question</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span>
+
+  <span class="nv">url: </span><span class="s">&quot;question&quot;</span>
+
+  <span class="nv">config:</span>
+    <span class="nv">types : </span><span class="p">[</span> <span class="s">&quot;multiple&quot;</span><span class="p">,</span> <span class="s">&quot;single&quot;</span><span class="p">,</span> <span class="s">&quot;open&quot;</span> <span class="p">]</span>
+
+  <span class="nv">default:</span>
+    <span class="nv">order  : </span><span class="mi">0</span>
+    <span class="nv">prompt : </span><span class="s">&quot;Is this an example question?&quot;</span>
+    <span class="nv">hint   : </span><span class="s">&quot;[hint or answer]&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>main question types</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">type : </span><span class="s">&quot;single&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>question features</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">otherWriteIn : </span><span class="kc">false</span>
+    <span class="nv">options      : </span><span class="p">[]</span> <span class="c1"># tricky bit, contains `label`,`value` property</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>outside requirements</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">linkedGridScore : </span><span class="mi">0</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Within subtest requirements</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">skipLink        : </span><span class="kc">null</span>
+    <span class="nv">skipRequirement : </span><span class="kc">null</span>
+
+  <span class="nv">initialize: </span><span class="nf">( options )-&gt;</span>
+    
+    
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,0 +1,37 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q32",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "collection": "question",
+  "couchapp": {},
+  "order": 32,
+  "prompt": "In what language(s) does your teacher speak to your class? [Multiple Responses Permitted]",
+  "name": "language-teacher-speaks-to-class",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "English",
+      "value": "English"
+    },
+    {
+      "label": "Wolof",
+      "value": "Wolof"
+    },
+    {
+      "label": "Pular",
+      "value": "Pular"
+    },
+    {
+      "label": "Jola",
+      "value": "Jola"
+    },
+    {
+      "label": "Mandinka",
+      "value": "Mandinka"
+    },
+    {
+      "label": "Other",
+      "value": "Other"
+    }
+  ]
+}

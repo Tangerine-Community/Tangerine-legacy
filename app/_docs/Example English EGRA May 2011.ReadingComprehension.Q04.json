@@ -1,0 +1,27 @@
+{
+  "_id": "Example English EGRA May 2011.ReadingComprehension.Q04",
+  "collection": "question",
+  "subtestId": "Example English EGRA May 2011.ReadingComprehension",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "couchapp": {},
+  "order": 4,
+  "type": "single",
+  "prompt": "How are Modou and Samba feeling today?",
+  "name" : "modou_samba_feeling",
+  "hint": "[happy, they feel good]",
+  "linkedGridScore": 60,
+  "options": [
+    {
+      "label": "Correct",
+      "value": "Correct"
+    },
+    {
+      "label": "Incorrect",
+      "value": "Incorrect"
+    },
+    {
+      "label": "No response",
+      "value": "No response"
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 {
+  "_id" : "Example English EGRA May 2011.Datetime",
   "collection": "subtest",
-  "pageType": "DateTimePage",
-  "pageId": "DateTime",
-  "couchapp": {
-  }
+  "prototype": "datetime",
+  "name" : "Date and Time",
+  "order" : 0,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
+  "couchapp": {}
 }

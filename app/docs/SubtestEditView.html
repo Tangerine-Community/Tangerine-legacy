@@ -1,0 +1,147 @@
+<!DOCTYPE html>  <html> <head>   <title>SubtestEditView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               SubtestEditView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">SubtestEditView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">className: </span><span class="s">&quot;subtest_edit&quot;</span>
+    
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .back_button&#39;</span>         <span class="o">:</span> <span class="s">&#39;goBack&#39;</span>
+    <span class="s">&#39;click .save_subtest&#39;</span>        <span class="o">:</span> <span class="s">&#39;save&#39;</span>
+
+    <span class="s">&#39;click .edit_enumerator&#39;</span>     <span class="o">:</span> <span class="s">&#39;editEnumerator&#39;</span>
+    <span class="s">&#39;click .enumerator_done&#39;</span>     <span class="o">:</span> <span class="s">&#39;doneEnumerator&#39;</span>
+    <span class="s">&#39;click .enumerator_cancel&#39;</span>   <span class="o">:</span> <span class="s">&#39;cancelEnumerator&#39;</span>
+
+    <span class="s">&#39;click .edit_student&#39;</span>        <span class="o">:</span> <span class="s">&#39;editStudent&#39;</span>
+    <span class="s">&#39;click .student_done&#39;</span>        <span class="o">:</span> <span class="s">&#39;doneStudent&#39;</span>
+    <span class="s">&#39;click .student_cancel&#39;</span>      <span class="o">:</span> <span class="s">&#39;cancelStudent&#39;</span>
+
+  <span class="nv">editEnumerator: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.enumerator_help_preview, .edit_enumerator, .enumerator_save_buttons&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;textarea</span><span class="err">#</span><span class="s">enumerator_help&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">escape</span><span class="p">(</span><span class="s">&quot;enumeratorHelp&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span><span class="p">).</span><span class="nx">cleditor</span><span class="p">()</span>
+
+  <span class="nv">doneEnumerator: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="s">&quot;enumeratorHelp&quot;</span> <span class="o">:</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;textarea</span><span class="err">#</span><span class="s">enumerator_help&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(),</span> <span class="nv">wait : </span><span class="kc">true</span> <span class="p">)</span>
+      <span class="nx">@cancelEnumerator</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="p">(</span><span class="s">&quot;save error&quot;</span><span class="p">)</span>
+
+  <span class="nv">cancelEnumerator: </span><span class="o">-&gt;</span>
+    <span class="nv">$preview = </span><span class="nx">$</span><span class="p">(</span><span class="s">&quot;div.enumerator_help_preview&quot;</span><span class="p">)</span>
+    <span class="nx">$preview</span><span class="p">.</span><span class="nx">html</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;enumeratorHelp&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span>
+    <span class="nx">$preview</span><span class="p">.</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;button.edit_enumerator, .enumerator_save_buttons&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nv">cleditor = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">enumerator_help&quot;</span><span class="p">).</span><span class="nx">cleditor</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nx">cleditor</span><span class="p">.</span><span class="nx">$area</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">cleditor</span><span class="p">.</span><span class="nx">$main</span><span class="p">)</span>
+    <span class="nx">cleditor</span><span class="p">.</span><span class="nx">$area</span><span class="p">.</span><span class="nx">removeData</span><span class="p">(</span><span class="s">&quot;cleditor&quot;</span><span class="p">)</span>
+    <span class="nx">cleditor</span><span class="p">.</span><span class="nx">$main</span><span class="p">.</span><span class="nx">remove</span><span class="p">()</span>
+
+  <span class="nv">editStudent: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.student_dialog_preview, .edit_student, .student_save_buttons&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;textarea</span><span class="err">#</span><span class="s">student_dialog&quot;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">escape</span><span class="p">(</span><span class="s">&quot;studentDialog&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span><span class="p">).</span><span class="nx">cleditor</span><span class="p">()</span>
+
+  <span class="nv">doneStudent: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span> <span class="s">&quot;studentDialog&quot;</span> <span class="o">:</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;textarea</span><span class="err">#</span><span class="s">student_dialog&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(),</span> <span class="nv">wait : </span><span class="kc">true</span> <span class="p">)</span>
+      <span class="nx">@cancelStudent</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="p">(</span><span class="s">&quot;save error&quot;</span><span class="p">)</span>
+
+  <span class="nv">cancelStudent: </span><span class="o">-&gt;</span>
+    <span class="nv">$preview = </span><span class="nx">$</span><span class="p">(</span><span class="s">&quot;div.student_dialog_preview&quot;</span><span class="p">)</span>
+    <span class="nx">$preview</span><span class="p">.</span><span class="nx">html</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;studentDialog&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span>
+    <span class="nx">$preview</span><span class="p">.</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;button.edit_student, .student_save_buttons&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nv">cleditor = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">student_dialog&quot;</span><span class="p">).</span><span class="nx">cleditor</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="nx">cleditor</span><span class="p">.</span><span class="nx">$area</span><span class="p">.</span><span class="nx">insertBefore</span><span class="p">(</span><span class="nx">cleditor</span><span class="p">.</span><span class="nx">$main</span><span class="p">)</span>
+    <span class="nx">cleditor</span><span class="p">.</span><span class="nx">$area</span><span class="p">.</span><span class="nx">removeData</span><span class="p">(</span><span class="s">&quot;cleditor&quot;</span><span class="p">)</span>
+    <span class="nx">cleditor</span><span class="p">.</span><span class="nx">$main</span><span class="p">.</span><span class="nx">remove</span><span class="p">()</span>
+
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">close</span><span class="o">?</span><span class="p">()</span>
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@config = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">subtest</span>
+    
+    <span class="vi">@prototypeViews  = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">prototypeViews</span>
+    <span class="vi">@prototypeEditor = </span><span class="k">new</span> <span class="nb">window</span><span class="p">[</span><span class="nx">@prototypeViews</span><span class="p">[</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;prototype&#39;</span><span class="p">][</span><span class="s">&#39;edit&#39;</span><span class="p">]]</span>
+      <span class="nv">model: </span><span class="nx">@model</span>
+      <span class="nv">parent: </span><span class="nx">@</span>
+
+  <span class="nv">goBack: </span><span class="o">=&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;edit/&quot;</span><span class="o">+</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;assessmentId&quot;</span><span class="p">),</span> <span class="kc">true</span>
+
+  <span class="nv">save: </span><span class="nf">(event) -&gt;</span>
+    <span class="nv">prototype = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;prototype&quot;</span><span class="p">)</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">set</span>
+      <span class="nv">name           : </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">subtest_name&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+      <span class="nv">enumeratorHelp : </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">enumerator_help&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+      <span class="nv">studentDialog  : </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">student_dialog&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+      <span class="nv">skippable      : </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">skip_radio input:radio[name=skippable]:checked&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span>
+
+    <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">save</span><span class="o">?</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">isValid</span><span class="o">?</span> <span class="o">&amp;&amp;</span> <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">isValid</span><span class="p">()</span> <span class="o">==</span> <span class="kc">false</span>
+      <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;There are errors on this page&quot;</span>
+      <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">showErrors</span><span class="o">?</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span><span class="nx">wait</span><span class="o">:</span><span class="kc">true</span><span class="p">})</span>
+        <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Subtest Saved&quot;</span>
+        <span class="nx">setTimeout</span> <span class="nx">@goBack</span><span class="p">,</span> <span class="mi">1000</span>
+      <span class="k">else</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;save error&quot;</span>
+        <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Save error&quot;</span>
+      </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Wow I'm bad at using templates</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">name      = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">escape</span> <span class="s">&quot;name&quot;</span>
+    <span class="nv">prototype = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;prototype&quot;</span>
+    <span class="nv">help      = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;enumeratorHelp&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span>
+    <span class="nv">dialog    = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;studentDialog&quot;</span><span class="p">)</span>  <span class="o">||</span> <span class="s">&quot;&quot;</span>
+    <span class="nv">skippable = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;skippable&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">true</span> <span class="o">||</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;skippable&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;button class=&#39;back_button navigation&#39;&gt;Back&lt;/button&gt;&lt;br&gt;</span>
+<span class="s">      &lt;h1&gt;Subtest Editor&lt;/h1&gt;</span>
+<span class="s">      &lt;button class=&#39;save_subtest command&#39;&gt;Done&lt;/button&gt;</span>
+<span class="s">      &lt;div id=&#39;subtest_edit_form&#39;&gt;</span>
+<span class="s">        &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;subtest_name&#39;&gt;Name&lt;/label&gt;</span>
+<span class="s">          &lt;input id=&#39;subtest_name&#39; value=&#39;</span><span class="si">#{</span><span class="nx">name</span><span class="si">}</span><span class="s">&#39;&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;subtest_prototype&#39; title=&#39;This is a basic type of subtest. (e.g. Survey, Grid, Location, Id, Consent). This property is set in assessment builder when you add a subtest. It is unchangeable.&#39;&gt;Prototype&lt;/label&gt;&lt;br&gt;</span>
+<span class="s">          &lt;div class=&#39;info_box&#39;&gt;</span><span class="si">#{</span><span class="nx">prototype</span><span class="si">}</span><span class="s">&lt;/div&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">          &lt;label&gt;Skippable&lt;/label&gt;&lt;br&gt;</span>
+<span class="s">          &lt;div class=&#39;menu_box&#39;&gt;</span>
+<span class="s">            &lt;div id=&#39;skip_radio&#39; class=&#39;buttonset&#39;&gt;</span>
+<span class="s">              &lt;label for=&#39;skip_true&#39;&gt;Yes&lt;/label&gt;&lt;input name=&#39;skippable&#39; type=&#39;radio&#39; value=&#39;true&#39; id=&#39;skip_true&#39; </span><span class="si">#{</span><span class="s">&#39;checked&#39;</span> <span class="k">if</span> <span class="nx">skippable</span><span class="si">}</span><span class="s">&gt;</span>
+<span class="s">              &lt;label for=&#39;skip_false&#39;&gt;No&lt;/label&gt;&lt;input name=&#39;skippable&#39; type=&#39;radio&#39; value=&#39;false&#39; id=&#39;skip_false&#39; </span><span class="si">#{</span><span class="s">&#39;checked&#39;</span> <span class="k">if</span> <span class="o">not</span> <span class="nx">skippable</span><span class="si">}</span><span class="s">&gt;</span>
+<span class="s">            &lt;/div&gt;</span>
+<span class="s">          &lt;/div&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;enumerator_help&#39;&gt;Enumerator help &lt;button class=&#39;edit_enumerator command&#39;&gt;Edit&lt;/button&gt;&lt;/label&gt;</span>
+<span class="s">          &lt;div class=&#39;info_box_wide enumerator_help_preview&#39;&gt;</span><span class="si">#{</span><span class="nx">help</span><span class="si">}</span><span class="s">&lt;/div&gt;</span>
+<span class="s">          &lt;textarea id=&#39;enumerator_help&#39; class=&#39;confirmation&#39;&gt;</span><span class="si">#{</span><span class="nx">help</span><span class="si">}</span><span class="s">&lt;/textarea&gt;</span>
+<span class="s">          &lt;div class=&#39;enumerator_save_buttons confirmation&#39;&gt;</span>
+<span class="s">            &lt;button class=&#39;enumerator_done command&#39;&gt;Save&lt;/button&gt; &lt;button class=&#39;enumerator_cancel command&#39;&gt;Cancel&lt;/button&gt;</span>
+<span class="s">          &lt;/div&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;student_dialog&#39;&gt;Student Dialog &lt;button class=&#39;edit_student command&#39;&gt;Edit&lt;/button&gt;&lt;/label&gt;</span>
+<span class="s">          &lt;div class=&#39;info_box_wide student_dialog_preview&#39;&gt;</span><span class="si">#{</span><span class="nx">dialog</span><span class="si">}</span><span class="s">&lt;/div&gt;</span>
+<span class="s">          &lt;textarea id=&#39;student_dialog&#39; class=&#39;confirmation&#39;&gt;</span><span class="si">#{</span><span class="nx">dialog</span><span class="si">}</span><span class="s">&lt;/textarea&gt;</span>
+<span class="s">          &lt;div class=&#39;student_save_buttons confirmation&#39;&gt;</span>
+<span class="s">            &lt;button class=&#39;student_done command&#39;&gt;Save&lt;/button&gt; &lt;button class=&#39;student_cancel command&#39;&gt;Cancel&lt;/button&gt;</span>
+<span class="s">          &lt;/div&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &lt;div id=&#39;prototype_attributes&#39;&gt;&lt;/div&gt;</span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">      &lt;button class=&#39;save_subtest command&#39;&gt;Done&lt;/button&gt;</span>
+<span class="s">      &quot;</span>
+
+    <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">setElement</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#prototype_attributes&#39;</span><span class="p">)</span>
+    <span class="nx">@prototypeEditor</span><span class="p">.</span><span class="nx">render</span><span class="o">?</span><span class="p">()</span>
+    
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

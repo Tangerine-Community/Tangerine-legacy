@@ -1,0 +1,64 @@
+<!DOCTYPE html>  <html> <head>   <title>NavigationView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               NavigationView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">NavigationView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">el : </span><span class="s">&#39;#navigation&#39;</span>
+
+  <span class="nv">events :</span>
+    <span class="s">&#39;click span#logout_link&#39;</span>  <span class="o">:</span> <span class="s">&#39;logout&#39;</span>
+    <span class="s">&#39;click button&#39;</span>            <span class="o">:</span> <span class="s">&#39;submenuHandler&#39;</span>
+    <span class="s">&#39;click #corner_logo&#39;</span>      <span class="o">:</span> <span class="s">&#39;logoClick&#39;</span>
+    <span class="s">&#39;click #enumerator&#39;</span>       <span class="o">:</span> <span class="s">&#39;enumeratorClick&#39;</span>
+    
+  <span class="nv">enumeratorClick: </span><span class="o">-&gt;</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;account&quot;</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nx">logoClick</span><span class="o">:-&gt;</span> <span class="nx">@router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="kc">true</span>
+  <span class="nv">logout: </span><span class="o">-&gt;</span> <span class="nx">@router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&#39;logout&#39;</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">initialize: </span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">@render</span><span class="p">()</span>
+
+    <span class="vi">@user   = </span><span class="nx">options</span><span class="p">.</span><span class="nx">user</span>
+    <span class="vi">@router = </span><span class="nx">options</span><span class="p">.</span><span class="nx">router</span>
+
+    <span class="nx">@router</span><span class="p">.</span><span class="kc">on</span> <span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="nx">@handleMenu</span>
+    <span class="nx">@user</span><span class="p">.</span><span class="kc">on</span>   <span class="s">&#39;change:authentication&#39;</span><span class="p">,</span> <span class="nx">@handleMenu</span>
+
+  <span class="nv">submenuHandler: </span><span class="nf">(event) -&gt;</span>
+    <span class="nx">vm</span><span class="p">.</span><span class="nx">currentView</span><span class="p">.</span><span class="nx">submenuHandler</span><span class="o">?</span> <span class="nx">event</span>
+
+  <span class="nv">closeSubmenu: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;main_nav&quot;</span><span class="p">).</span><span class="nx">empty</span><span class="p">()</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">    &lt;img id=&#39;corner_logo&#39; src=&#39;images/corner_logo.png&#39;&gt;</span>
+<span class="s">    &lt;span id=&#39;version&#39;&gt;&lt;/span&gt;</span>
+<span class="s">    &lt;nav id=&#39;submenu&#39;&gt;&lt;/nav&gt;</span>
+<span class="s">    &lt;div id=&#39;enumerator_box&#39;&gt;</span>
+<span class="s">      Enumerator &lt;span id=&#39;logout_link&#39;&gt;LOGOUT&lt;/span&gt;</span>
+<span class="s">      &lt;div id=&#39;enumerator&#39;&gt;&lt;/div&gt;</span>
+<span class="s">    &lt;/div&gt;</span>
+<span class="s">    &lt;div id=&#39;current_student&#39;&gt;</span>
+<span class="s">      Student ID</span>
+<span class="s">      &lt;div id=&#39;current_student_id&#39;&gt;&lt;/div&gt;</span>
+<span class="s">    &lt;/div&gt;</span>
+<span class="s">    &quot;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Spin the logo on ajax calls</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;body&quot;</span><span class="p">).</span><span class="nx">ajaxStart</span> <span class="o">-&gt;</span> <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">corner_logo&quot;</span><span class="p">).</span><span class="nx">attr</span> <span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;images/spin_orange.gif&quot;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;body&quot;</span><span class="p">).</span><span class="nx">ajaxStop</span> <span class="o">-&gt;</span>  <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">corner_logo&quot;</span><span class="p">).</span><span class="nx">attr</span> <span class="s">&quot;src&quot;</span><span class="p">,</span> <span class="s">&quot;images/corner_logo.png&quot;</span>
+
+
+  <span class="nv">setStudent: </span><span class="nf">( id ) -&gt;</span>
+    <span class="k">if</span> <span class="nx">id</span> <span class="o">==</span> <span class="s">&quot;&quot;</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#current_student_id&#39;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="nf">(a) -&gt;</span> <span class="nx">$</span><span class="p">(</span><span class="nx">a</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">))</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">current_student&quot;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#current_student_id&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">id</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Admins get a manage button 
+triggered on user changes</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">handleMenu: </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s">&#39;#enumerator&#39;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">@user</span><span class="p">.</span><span class="nx">name</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>@todo put version number someplace
+$.ajax {method: 'GET', dataType: 'text', url: 'version', success: (a, b, c) -> $("#corner_logo").attr("title", c.responseText)</p>             </td>             <td class="code">               <div class="highlight"><pre>    </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>@TODO This needs fixing</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="o">~</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">toString</span><span class="p">().</span><span class="nx">indexOf</span><span class="p">(</span><span class="s">&quot;name=&quot;</span><span class="p">)</span> <span class="k">then</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">logout_link&quot;</span><span class="p">).</span><span class="nx">hide</span><span class="p">()</span> <span class="k">else</span>  <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">logout_link&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">()</span>
+    
+    <span class="nx">@user</span><span class="p">.</span><span class="nx">verify</span>
+      <span class="nv">isRegistered: </span><span class="o">-&gt;</span>
+        <span class="nx">$</span><span class="p">(</span> <span class="s">&#39;#navigation&#39;</span> <span class="p">).</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+      <span class="nv">isUnregistered: </span><span class="o">-&gt;</span>
+        <span class="nx">$</span><span class="p">(</span> <span class="s">&#39;#navigation&#39;</span> <span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

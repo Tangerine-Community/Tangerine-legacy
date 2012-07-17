@@ -1,7 +1,7 @@
 function( doc )
 {
-  if ( doc.dKeys )
+  if ( doc.collection && doc.collection != "result")
   {
-    emit( doc.dKeys, doc );
+    emit( doc.assessmentId.substr(-5,5), doc );
   }
 }

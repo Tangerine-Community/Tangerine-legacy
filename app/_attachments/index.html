@@ -8,78 +8,114 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="apple-touch-icon-precomposed" href="images/TangerineIcon.png"/> 
 
-    <!-- Main Stylesheet -->
-    <link rel="stylesheet" href="css/style.css?v=1">
     <link rel="stylesheet" href="css/tangerine.less.css">
-    <link rel="stylesheet" href="css/tablesorter.css">
-    <link rel="stylesheet" href="css/jquery.cleditor.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/jquery-ui.css">
 
     <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
-    <script src="js-libraries/modernizr-custom.js"></script>
-    <script>Modernizr.mq('(min-width:0)') || document.write('<script src="js-libraries/respond.min.js">\x3C/script>')</script>
+    <script src="js/lib/modernizr-custom.js"></script>
+    <script>Modernizr.mq('(min-width:0)') || document.write('<script src="js/lib/respond.min.js">\x3C/script>')</script>
     <!--script src="http://jsconsole.com/remote.js?5619CB79-A171-4967-9479-ADCF72DF1C44"></script-->
 
   </head> 
   <body>
-
-    <div id='navigation' class="clearfix">
-    </div>
-
-    <div class="ajax_loading"><img src='images/tangerine-spin.gif'>Loading...</div>
-    
+    <div id='navigation' class="clearfix"></div>
     <div id='content'></div>
+    <div id='footer'></div>
 
-    <script src="js-libraries/jquery.js"></script>
-    <script src="js-libraries/mobile_boilerplate.js"></script>
-    <script src="js-libraries/underscore-min.js"></script>
-    <script src="js-libraries/jquery.couch.js"></script>
-    <script src="js-libraries/handlebars.js"></script>
-    <script src="js-libraries/inflection.js"></script>
-    <script src="js-libraries/jquery.ba-bbq.min.js"></script>
-    <script src="js-libraries/jquery-ui-1.8.16.custom.min.js"></script>
-    <script src="js-libraries/jquery.ui.touch-punch.min.js"></script>
-    <script src="js-libraries/backbone.min.js"></script>
-    <script src="js-libraries/backbone-couchdb.js"></script>
-    <script src="js-libraries/sha1.js"></script>
-    <script src="js-libraries/jquery.tablesorter.min.js"></script>
-    <script src="js-libraries/form2js.js"></script>
-    <script src="js-libraries/jquery.toObject.js"></script>
-    <script src="js-libraries/jquery.i18n.js"></script>
-    <script src="js-libraries/js2form.js"></script>
-    <script src="js-libraries/jquery.sparkline.min.js"></script>
-    <script src="js-libraries/moment.min.js"></script>
-    <script src="js-libraries/transcriptionCheckdigit.js"></script>
-    <script src="js-libraries/jquery.cleditor.min.js"></script>
-    <script src="js-libraries/jquery.cookie.js"></script>
+    <script src="js/lib/phonegap.js"></script>
+    <script src="js/lib/jquery.js"></script>
+    <script src="js/lib/underscore.js"></script>
+    <script src="js/lib/sha1.js"></script>
+    <script src="js/lib/jquery.plugins.js"></script>
+    <script src="js/lib/jquery-ui.js"></script>
+    <script src="js/lib/handlebars.js"></script>
+    <script src="js/lib/mobile_boilerplate.js"></script>
+    <script src="js/lib/inflection.js"></script>
+    <script src="js/lib/backbone.js"></script>
+    <script src="js/lib/moment.min.js"></script>
+    <script src="js/lib/backbone-couchdb.js"></script>
+    <script src="js/lib/transcriptionCheckdigit.js"></script>
+    <script src="js/lib/table2CSV.js"></script>
+    <script src="js/lib/base64.js"></script>
+    <script src="js/lib/json2form.js"></script>
 
-    <script src="config.js"></script>
-    <script src="utils.js"></script>
-    <script src="js-libraries/json2form.js"></script>
-    <script src="models/assessment.js"></script>
-    <script src="models/AssessmentCollection.js"></script>
-    <script src="models/jqueryMobilePage.js"></script>
-    <script src="models/result.js"></script>
-    <script src="models/resultCollection.js"></script>
-    <script src="models/timer.js"></script>
-    <script src="models/subtest.js"></script>
-    <script src="models/replicationLogEntry.js"></script>
-    <script src="models/replicationLogEntryCollection.js"></script>
-    <script src="models/User.js"></script>
-    <script src="models/Language.js"></script>
+    <script src="js/helpers.js"></script>
+    <script src="js/config.js"></script>
+
+
+    <script src="js/modules/assessment/Assessment.js"></script>
+    <script src="js/modules/assessment/Assessments.js"></script>
+    <script src="js/modules/assessment/AssessmentListElementView.js"></script>
+    <script src="js/modules/assessment/AssessmentListView.js"></script>
+    <script src="js/modules/assessment/AssessmentEditView.js"></script>
+    <script src="js/modules/assessment/AssessmentRunView.js"></script>
+    <script src="js/modules/assessment/AssessmentImportView.js"></script>
+
+    <script src="js/modules/subtest/Subtest.js"></script>
+    <script src="js/modules/subtest/Subtests.js"></script>
+    <script src="js/modules/subtest/SubtestListEditView.js"></script>
+    <script src="js/modules/subtest/SubtestListElementView.js"></script>
+    <script src="js/modules/subtest/SubtestEditView.js"></script>
+    <script src="js/modules/subtest/SubtestRunView.js"></script>
+
+    <script src="js/modules/subtest/prototypes/ConsentRunView.js"></script>
+    <script src="js/modules/subtest/prototypes/ConsentEditView.js"></script>
+
+    <script src="js/modules/subtest/prototypes/DatetimeRunView.js"></script>
+    <script src="js/modules/subtest/prototypes/DatetimeEditView.js"></script>
+
+    <script src="js/modules/subtest/prototypes/LocationRunView.js"></script>
+    <script src="js/modules/subtest/prototypes/LocationEditView.js"></script>
+
+    <script src="js/modules/subtest/prototypes/SurveyRunView.js"></script>
+    <script src="js/modules/subtest/prototypes/SurveyEditView.js"></script>
+
+    <script src="js/modules/subtest/prototypes/IdRunView.js"></script>
+    <script src="js/modules/subtest/prototypes/IdEditView.js"></script>
+
+    <script src="js/modules/subtest/prototypes/GridRunView.js"></script>
+    <script src="js/modules/subtest/prototypes/GridEditView.js"></script>
+
+    <script src="js/modules/result/Result.js"></script>
+    <script src="js/modules/result/Results.js"></script>
+    <script src="js/modules/result/ResultView.js"></script>
+    <script src="js/modules/result/ResultsView.js"></script>
+    <script src="js/modules/result/ResultSumView.js"></script>
+    <script src="js/modules/result/CSVView.js"></script>
+    <script src="js/modules/result/ReportView.js"></script>
+
+    <script src="js/modules/question/Question.js"></script>
+    <script src="js/modules/question/Questions.js"></script>
+    <script src="js/modules/question/QuestionRunView.js"></script>
+    <script src="js/modules/question/QuestionEditView.js"></script>
+    <script src="js/modules/question/QuestionsEditView.js"></script>
+    <script src="js/modules/question/QuestionsEditListElementView.js"></script>
+
+
+    <script src="js/modules/user/User.js"></script>
+    <script src="js/modules/user/LoginView.js"></script>
+    <script src="js/modules/user/AccountView.js"></script>
+    <script src="js/modules/user/GroupsView.js"></script>
+
+    <script src="js/modules/error/ErrorView.js"></script>
+
+    <script src="js/modules/log/Log.js"></script>
+
+    <script src="js/modules/device/Device.js"></script>
+    <script src="js/modules/device/DeviceView.js"></script>
+
+    <script src="js/modules/dashboard/DashboardView.js"></script>
+
+    <script src="js/modules/language/Language.js"></script>
+
+    <script src="js/modules/viewManager/ViewManager.js"></script>
+
+    <script src="js/modules/navigation/NavigationView.js"></script>
     
-    <script src="views/Navigation.js"></script>
-    <script src="views/LoginView.js"></script>
-    <script src="views/Result.js"></script>
-    <script src="views/Results.js"></script>
-    <script src="views/ManageView.js"></script>
-    <script src="views/AssessmentList.js"></script>
-    <script src="views/AssessmentEditView.js"></script>
-    <script src="views/SubtestEdit.js"></script>
-    <script src="tangerine.js"></script>
-    <script>
-      // iPhone Scale Bug Fix, read this when using http://www.blog.highub.com/mobile-2/a-fix-for-iphone-viewport-scale-bug/
-        MBP.scaleFix();
-    </script>
+    <script src="js/tangerine.js"></script>
+
+    <script>MBP.scaleFix();</script>
 
   </body>
 </html>

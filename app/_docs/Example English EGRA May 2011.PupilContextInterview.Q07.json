@@ -1,0 +1,41 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q07",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "collection": "question",
+  "couchapp": {},
+  "order": 7,
+  "prompt": "Do you practice reading aloud to someone at home? If Yes, in what language(s) do you read? [Multiple Responses Permitted]",
+  "name": "practice-reading-aloud-at-home",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "English",
+      "value": "English"
+    },
+    {
+      "label": "Wolof",
+      "value": "Wolof"
+    },
+    {
+      "label": "Pular",
+      "value": "Pular"
+    },
+    {
+      "label": "Jola",
+      "value": "Jola"
+    },
+    {
+      "label": "Mandinka",
+      "value": "Mandinka"
+    },
+    {
+      "label": "Other",
+      "value": "Other"
+    }
+  ],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

@@ -1,0 +1,25 @@
+{
+  "collection": "question",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "subtestId": "Example English EGRA May 2011.StudentInformation",
+  "_id": "Example English EGRA May 2011.StudentInformation.Q03",
+  "couchapp": {},
+  "order": 3,
+  "prompt": "Class",
+  "name": "class",
+  "type": "single",
+  "options": [
+    {
+      "label": "A",
+      "value": "A"
+    },
+    {
+      "label": "B",
+      "value": "B"
+    },
+    {
+      "label": "C",
+      "value": "C"
+    }
+  ]
+}

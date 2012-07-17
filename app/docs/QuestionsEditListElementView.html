@@ -1,0 +1,48 @@
+<!DOCTYPE html>  <html> <head>   <title>QuestionsEditListElementView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               QuestionsEditListElementView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Provides an "li" tag for the questions edit view</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">QuestionsEditListElementView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">tagName : </span><span class="s">&quot;li&quot;</span>
+  <span class="nv">className : </span><span class="s">&quot;question_list_element&quot;</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .edit&#39;</span>          <span class="o">:</span> <span class="s">&#39;edit&#39;</span>
+    <span class="s">&#39;click .delete&#39;</span>        <span class="o">:</span> <span class="s">&#39;toggleDelete&#39;</span>
+    <span class="s">&#39;click .delete_cancel&#39;</span> <span class="o">:</span> <span class="s">&#39;toggleDelete&#39;</span>
+    <span class="s">&#39;click .delete_delete&#39;</span> <span class="o">:</span> <span class="s">&#39;delete&#39;</span>
+
+  <span class="nv">edit: </span><span class="nf">(event) -&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;question/</span><span class="si">#{</span><span class="nx">@question</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+    <span class="k">return</span> <span class="kc">false</span>
+
+  <span class="nv">toggleDelete: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.delete_confirm&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+  <span class="k">delete</span><span class="o">:</span> <span class="nf">(event) -&gt;</span>
+    <span class="nx">@question</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">remove</span><span class="p">(</span><span class="nx">@question</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+    <span class="nx">@question</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;deleted&quot;</span>
+    <span class="k">return</span> <span class="kc">false</span>
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="vi">@question = </span><span class="nx">options</span><span class="p">.</span><span class="nx">question</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;data-id&quot;</span><span class="p">,</span> <span class="nx">@question</span><span class="p">.</span><span class="nx">id</span><span class="p">)</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;table&gt;</span>
+<span class="s">        &lt;tr&gt;</span>
+<span class="s">          &lt;td&gt;</span>
+<span class="s">            &lt;img src=&#39;images/icon_drag.png&#39; class=&#39;sortable_handle&#39;&gt;</span>
+<span class="s">          &lt;/td&gt;</span>
+<span class="s">          &lt;td&gt;</span>
+<span class="s">            &lt;span&gt;</span><span class="si">#{</span><span class="nx">@question</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;prompt&#39;</span><span class="si">}</span><span class="s">&lt;/span&gt; &lt;span&gt;[&lt;small&gt;</span><span class="si">#{</span><span class="nx">@question</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;name&#39;</span><span class="si">}</span><span class="s">, </span><span class="si">#{</span><span class="nx">@question</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;type&#39;</span><span class="si">}</span><span class="s">&lt;/small&gt;]&lt;/span&gt;</span>
+<span class="s">            &lt;img src=&#39;images/icon_edit.png&#39; class=&#39;link_icon edit&#39;&gt;</span>
+<span class="s">            &lt;img src=&#39;images/icon_delete.png&#39; class=&#39;link_icon delete&#39;&gt;&lt;br&gt;</span>
+<span class="s">            &lt;div class=&#39;confirmation delete_confirm&#39;&gt;</span>
+<span class="s">            &lt;div class=&#39;menu_box&#39;&gt;Confirm&lt;br&gt;&lt;button class=&#39;delete_delete command_red&#39;&gt;Delete&lt;/button&gt;&lt;button class=&#39;delete_cancel command&#39;&gt;Cancel&lt;/button&gt;</span>
+<span class="s">            &lt;/div&gt;</span>
+<span class="s">          &lt;/td&gt;</span>
+<span class="s">        &lt;/tr&gt;</span>
+<span class="s">      &lt;/table&gt;</span>
+<span class="s">      &quot;</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

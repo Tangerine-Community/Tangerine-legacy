@@ -1,55 +1,10 @@
 {
   "collection": "subtest",
-  "pageType": "PhonemePage",
-  "pageId": "Phonemes",
-  "words": [
-    {
-      "word": "up",
-      "phonemes": [
-        "uh",
-        "p"
-      ],
-      "number-of-sounds": "2"
-    },
-    {
-      "word": "am",
-      "phonemes": [
-        "ah",
-        "m"
-      ],
-      "number-of-sounds": "2"
-    },
-    {
-      "word": "is",
-      "phonemes": [
-        "i",
-        "z"
-      ],
-      "number-of-sounds": "2"
-    },
-    {
-      "word": "top",
-      "phonemes": [
-        "t",
-        "o",
-        "p"
-      ],
-      "number-of-sounds": "3"
-    },
-    {
-      "word": "thank",
-      "phonemes": [
-        "th",
-        "a",
-        "ng",
-        "k"
-      ],
-      "number-of-sounds": "3"
-    }
-  ],
+  "prototype": "survey",
+  "name" : "Phonemes",
+  "order" : 6,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
   "_id": "Example English EGRA May 2011.Phonemes",
- 
- 
   "couchapp": {
   }
 }

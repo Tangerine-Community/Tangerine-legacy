@@ -1,0 +1,27 @@
+{
+  "_id": "Example English EGRA May 2011.ReadingComprehension.Q02",
+  "collection": "question",
+  "subtestId": "Example English EGRA May 2011.ReadingComprehension",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "couchapp": {},
+  "order": 2,
+  "type": "single",
+  "prompt": "What does Samba do after he wakes up?",
+  "name" : "samba_after_waking",
+  "hint": "[puts on his shoes, gets ready]",
+  "linkedGridScore": 42,
+  "options": [
+    {
+      "label": "Correct",
+      "value": "Correct"
+    },
+    {
+      "label": "Incorrect",
+      "value": "Incorrect"
+    },
+    {
+      "label": "No response",
+      "value": "No response"
+    }
+  ]
+}

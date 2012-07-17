@@ -1,0 +1,32 @@
+<!DOCTYPE html>  <html> <head>   <title>GroupsView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               GroupsView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">GroupsView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .account&#39;</span> <span class="o">:</span> <span class="s">&#39;gotoAccount&#39;</span>
+    <span class="s">&#39;click .goto&#39;</span>    <span class="o">:</span> <span class="s">&#39;gotoGroup&#39;</span>
+
+  <span class="nv">gotoAccount: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;account&quot;</span><span class="p">,</span> <span class="kc">true</span>
+  
+  <span class="nv">gotoGroup: </span><span class="nf">(event) -&gt;</span>
+    <span class="nv">group = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;data-group&quot;</span><span class="p">)</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;assessments/</span><span class="si">#{</span><span class="nx">group</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+    
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">groups = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;groups&quot;</span><span class="p">)</span>
+    <span class="nv">html = </span><span class="s">&quot;</span>
+<span class="s">      &lt;button class=&#39;account navigation&#39;&gt;Account&lt;/button&gt;</span>
+<span class="s">      &lt;h1&gt;Groups&lt;/h1&gt;</span>
+<span class="s">    &quot;</span>
+
+    <span class="k">if</span> <span class="nx">groups</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;You are not yet a member of a group. Go to Account to join a group.&quot;</span>
+    <span class="k">else</span> 
+      <span class="k">for</span> <span class="nx">group</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">groups</span>
+        <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;button class=&#39;command goto&#39; data-group=&#39;</span><span class="si">#{</span><span class="nx">_</span><span class="p">.</span><span class="nx">escape</span><span class="p">(</span><span class="nx">group</span><span class="p">)</span><span class="si">}</span><span class="s">&#39;&gt;</span><span class="si">#{</span><span class="nx">group</span><span class="si">}</span><span class="s">&lt;/button&gt;&quot;</span>
+
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="nx">html</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,8 +1,0 @@
-{
-  "collection" : "subtest",
-  "_id":"Quick EGMA.Results",
-  "pageType": "ResultsPage",
-  "pageId": "Results",
-  "couchapp": {
-  }
-}

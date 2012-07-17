@@ -1,0 +1,34 @@
+<!DOCTYPE html>  <html> <head>   <title>DeviceView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               DeviceView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">DeviceView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click #context input&#39;</span> <span class="o">:</span> <span class="s">&#39;set&#39;</span>
+    <span class="s">&#39;click #continue&#39;</span> <span class="o">:</span> <span class="s">&#39;continue&#39;</span>
+
+
+  <span class="k">continue</span><span class="o">:</span> <span class="o">-&gt;</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">set: </span><span class="o">-&gt;</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;input:radio[name=context]:checked&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">set</span>
+      <span class="s">&#39;context&#39;</span><span class="o">:</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;input:radio[name=context]:checked&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+    
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;h1&gt;Tangerine Setup&lt;/h1&gt;</span>
+<span class="s">      &lt;p&gt;Please select your configuration:&lt;/p&gt;</span>
+<span class="s">      &lt;div class=&#39;label_value buttonset&#39; id=&#39;context&#39;&gt;</span>
+<span class="s">        &lt;label for=&#39;context_cloud&#39;&gt;cloud&lt;/label&gt;&lt;input id=&#39;context_cloud&#39; name=&#39;context&#39; type=&#39;radio&#39; value=&#39;cloud&#39; </span><span class="si">#{</span><span class="s">&#39;checked&#39;</span> <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;context&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;cloud&#39;</span><span class="si">}</span><span class="s">&gt;</span>
+<span class="s">        &lt;label for=&#39;context_mobile&#39;&gt;mobile&lt;/label&gt;&lt;input id=&#39;context_mobile&#39; name=&#39;context&#39; type=&#39;radio&#39; value=&#39;mobile&#39; </span><span class="si">#{</span><span class="s">&#39;checked&#39;</span> <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;context&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;mobile&#39;</span><span class="si">}</span><span class="s">&gt;</span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">      &lt;button id=&#39;continue&#39;&gt;continue&lt;/button&gt;</span>
+<span class="s">    &quot;</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

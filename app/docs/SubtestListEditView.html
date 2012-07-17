@@ -1,0 +1,28 @@
+<!DOCTYPE html>  <html> <head>   <title>SubtestListEditView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               SubtestListEditView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">SubtestListEditView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  <span class="nv">tagName : </span><span class="s">&quot;ul&quot;</span>
+  
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@views = </span><span class="p">[]</span>
+
+  <span class="nv">render: </span><span class="o">=&gt;</span>
+    <span class="nx">@closeViews</span><span class="p">()</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">sort</span><span class="p">()</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">each</span> <span class="p">(</span><span class="nx">subtest</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nv">oneView = </span><span class="k">new</span> <span class="nx">SubtestListElementView</span>
+        <span class="nv">model : </span><span class="nx">subtest</span>
+      <span class="nx">@views</span><span class="p">.</span><span class="nx">push</span> <span class="nx">oneView</span>
+      <span class="nx">oneView</span><span class="p">.</span><span class="nx">render</span><span class="p">()</span>
+      <span class="nx">oneView</span><span class="p">.</span><span class="kc">on</span> <span class="s">&quot;subtest:delete&quot;</span><span class="p">,</span> <span class="nx">@deleteSubtest</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="nx">oneView</span><span class="p">.</span><span class="nx">el</span>
+
+  <span class="nv">deleteSubtest: </span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">remove</span> <span class="nx">model</span>
+    <span class="nx">model</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+    
+  <span class="nv">closeViews: </span><span class="o">-&gt;</span>
+    <span class="k">for</span> <span class="nx">view</span> <span class="k">in</span> <span class="nx">@views</span>
+      <span class="nx">view</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+    <span class="vi">@views = </span><span class="p">[]</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

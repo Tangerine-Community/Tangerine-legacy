@@ -1,0 +1,91 @@
+<!DOCTYPE html>  <html> <head>   <title>AssessmentRunView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               AssessmentRunView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">AssessmentRunView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@abortAssessment = </span><span class="kc">false</span>
+    <span class="vi">@index = </span><span class="mi">0</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="nx">@initializeViews</span><span class="p">()</span>
+
+  <span class="nv">initializeViews: </span><span class="o">-&gt;</span>
+    <span class="vi">@subtestViews = </span><span class="p">[]</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">sort</span><span class="p">()</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">each</span> <span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="o">=&gt;</span>
+      <span class="nx">@subtestViews</span><span class="p">.</span><span class="nx">push</span> <span class="k">new</span> <span class="nx">SubtestRunView</span> 
+        <span class="nv">model  : </span><span class="nx">model</span>
+        <span class="nv">parent : </span><span class="nx">@</span>
+    <span class="vi">@result = </span><span class="k">new</span> <span class="nx">Result</span>
+      <span class="nv">assessmentId   : </span><span class="nx">@model</span><span class="p">.</span><span class="nx">id</span>
+      <span class="nv">assessmentName : </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
+      <span class="nv">blank          : </span><span class="kc">true</span>
+      <span class="nv">starttime     : </span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getTime</span><span class="p">()</span>
+    <span class="nv">resultView = </span><span class="k">new</span> <span class="nx">ResultView</span>
+        <span class="nv">model          : </span><span class="nx">@result</span>
+        <span class="nv">assessment     : </span><span class="nx">@model</span>
+        <span class="nv">assessmentView : </span><span class="nx">@</span>
+    <span class="nx">@subtestViews</span><span class="p">.</span><span class="nx">push</span> <span class="nx">resultView</span>
+  
+  <span class="nv">render: </span><span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>this prevents doubling up results
+the inefficiency is that it gets called twice the first time</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">@index</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">@result</span><span class="o">?</span>
+      <span class="nx">@initializeViews</span><span class="p">()</span>
+      
+    <span class="nv">currentView = </span><span class="nx">@subtestViews</span><span class="p">[</span><span class="nx">@index</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="s">&quot;&lt;h1&gt;Oops...&lt;/h1&gt;&lt;p&gt;This assessment is blank. Perhaps you meant to add some subtests.&lt;/p&gt;&quot;</span>
+    <span class="k">else</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">        &lt;h1&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;name&#39;</span><span class="si">}</span><span class="s">&lt;/h1&gt;</span>
+<span class="s">        &lt;div id=&#39;progress&#39;&gt;&lt;/div&gt;</span>
+<span class="s">      &quot;</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#progress&#39;</span><span class="p">).</span><span class="nx">progressbar</span> <span class="nv">value : </span><span class="p">(</span> <span class="p">(</span> <span class="nx">@index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span> <span class="o">*</span> <span class="mi">100</span> <span class="p">)</span>
+      <span class="nx">currentView</span><span class="p">.</span><span class="kc">on</span> <span class="s">&quot;rendered&quot;</span><span class="p">,</span> <span class="nx">@onSubtestRendered</span>
+      <span class="nx">currentView</span><span class="p">.</span><span class="nx">render</span><span class="p">()</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="nx">currentView</span><span class="p">.</span><span class="nx">el</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">onSubtestRendered: </span><span class="o">=&gt;</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="k">for</span> <span class="nx">view</span> <span class="k">in</span> <span class="nx">@subtestViews</span>
+      <span class="nx">view</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+    <span class="nx">@result</span><span class="p">.</span><span class="nx">clear</span><span class="p">()</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">current_student_id&quot;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">,</span> <span class="o">-&gt;</span> <span class="nx">$</span><span class="p">(</span><span class="nx">@</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">())</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">current_student&quot;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    
+  <span class="nv">abort: </span><span class="o">-&gt;</span>
+    <span class="vi">@abortAssessment = </span><span class="kc">true</span>
+    <span class="nx">@next</span><span class="p">()</span>
+
+  <span class="nv">skip: </span><span class="o">-&gt;</span>
+    <span class="nv">currentView = </span><span class="nx">@subtestViews</span><span class="p">[</span><span class="nx">@index</span><span class="p">]</span>
+    <span class="nx">@result</span><span class="p">.</span><span class="nx">add</span>
+      <span class="nv">name      : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
+      <span class="nv">data      : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">getSkipped</span><span class="p">()</span>
+      <span class="nv">subtestId : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span>
+      <span class="nv">sum       : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">getSum</span><span class="p">()</span>
+    <span class="nx">currentView</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+    <span class="nx">@index</span><span class="o">++</span> <span class="nx">unless</span> <span class="nx">@abortAssessment</span> <span class="o">==</span> <span class="kc">true</span>
+    <span class="vi">@index = </span><span class="nx">@subtestViews</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="nx">@abortAssessment</span> <span class="o">==</span> <span class="kc">true</span>
+    <span class="nx">@render</span><span class="p">()</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">scrollTo</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+  <span class="nv">next: </span><span class="o">-&gt;</span>
+    <span class="nv">currentView = </span><span class="nx">@subtestViews</span><span class="p">[</span><span class="nx">@index</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nx">currentView</span><span class="p">.</span><span class="nx">isValid</span><span class="p">()</span>
+      <span class="nx">@result</span><span class="p">.</span><span class="nx">add</span>
+        <span class="nv">name      : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
+        <span class="nv">data      : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">getResult</span><span class="p">()</span>
+        <span class="nv">subtestId : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">id</span>
+        <span class="nv">prototype : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;prototype&quot;</span>
+        <span class="nv">sum       : </span><span class="nx">currentView</span><span class="p">.</span><span class="nx">getSum</span><span class="p">()</span>
+      <span class="nx">currentView</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+      <span class="nx">@index</span><span class="o">++</span> <span class="nx">unless</span> <span class="nx">@abortAssessment</span> <span class="o">==</span> <span class="kc">true</span>
+      <span class="vi">@index = </span><span class="nx">@subtestViews</span><span class="p">.</span><span class="nx">length</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="nx">@abortAssessment</span> <span class="o">==</span> <span class="kc">true</span>
+      <span class="nx">@render</span><span class="p">()</span>
+      <span class="nb">window</span><span class="p">.</span><span class="nx">scrollTo</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">else</span>
+      <span class="nx">currentView</span><span class="p">.</span><span class="nx">showErrors</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

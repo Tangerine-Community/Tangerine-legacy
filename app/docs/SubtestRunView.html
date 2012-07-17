@@ -1,0 +1,87 @@
+<!DOCTYPE html>  <html> <head>   <title>SubtestRunView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               SubtestRunView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">SubtestRunView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+  
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .next&#39;</span>         <span class="o">:</span> <span class="s">&#39;next&#39;</span>
+    <span class="s">&#39;click .subtest_help&#39;</span> <span class="o">:</span> <span class="s">&#39;toggleHelp&#39;</span>
+    <span class="s">&#39;click .skip&#39;</span>         <span class="o">:</span> <span class="s">&#39;skip&#39;</span>
+
+  <span class="nv">toggleHelp: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.enumerator_help&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@protoViews  = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">prototypeViews</span>
+    <span class="vi">@model       = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@parent      = </span><span class="nx">options</span><span class="p">.</span><span class="nx">parent</span>
+
+    <span class="vi">@prototypeRendered = </span><span class="kc">false</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>in case we hit a back button accidentally
+window.onbeforeunload = => "Assessment is still running"</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">enumeratorHelp = </span><span class="k">if</span> <span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;enumeratorHelp&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="k">then</span> <span class="s">&quot;&lt;button class=&#39;subtest_help command&#39;&gt;help&lt;/button&gt;&lt;div class=&#39;enumerator_help&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;enumeratorHelp&#39;</span><span class="si">}</span><span class="s">&lt;/div&gt;&quot;</span> <span class="k">else</span> <span class="s">&quot;&quot;</span>
+    <span class="nv">studentDialog  = </span><span class="k">if</span> <span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;studentDialog&quot;</span><span class="p">)</span>  <span class="o">||</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="k">then</span> <span class="s">&quot;&lt;div class=&#39;student_dialog&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;studentDialog&#39;</span><span class="si">}</span><span class="s">&lt;/div&gt;&quot;</span> <span class="k">else</span> <span class="s">&quot;&quot;</span>
+    <span class="nv">skipButton = </span><span class="s">&quot;&lt;button class=&#39;skip navigation&#39;&gt;Skip&lt;/button&gt;&quot;</span>
+    <span class="nv">skippable = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;skippable&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">true</span> <span class="o">||</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;skippable&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;h2&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;name&#39;</span><span class="si">}</span><span class="s">&lt;/h2&gt;</span>
+<span class="s">      </span><span class="si">#{</span><span class="nx">enumeratorHelp</span><span class="si">}</span><span class="s"></span>
+<span class="s">      </span><span class="si">#{</span><span class="nx">studentDialog</span><span class="si">}</span><span class="s"></span>
+<span class="s">    &quot;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Use prototype specific views here</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@prototypeView = </span><span class="k">new</span> <span class="nb">window</span><span class="p">[</span><span class="nx">@protoViews</span><span class="p">[</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&#39;prototype&#39;</span><span class="p">][</span><span class="s">&#39;run&#39;</span><span class="p">]]</span>
+      <span class="nv">model: </span><span class="nx">@model</span>
+      <span class="nv">parent: </span><span class="nx">@</span>
+    <span class="nx">@prototypeView</span><span class="p">.</span><span class="kc">on</span> <span class="s">&quot;rendered&quot;</span><span class="p">,</span> <span class="nx">@onPrototypeRendered</span>
+    <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">render</span><span class="p">()</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">el</span>
+    <span class="vi">@prototypeRendered = </span><span class="kc">true</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="s">&quot;&lt;button class=&#39;next navigation&#39;&gt;Next&lt;/button&gt;</span><span class="si">#{</span><span class="k">if</span> <span class="nx">skippable</span> <span class="k">then</span> <span class="nx">skipButton</span> <span class="k">else</span> <span class="s">&quot;&quot;</span> <span class="si">}</span><span class="s">&quot;</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">onPrototypeRendered: </span><span class="o">=&gt;</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">getGridScore: </span><span class="o">-&gt;</span>
+    <span class="nv">link = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;gridLinkId&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&quot;&quot;</span>
+    <span class="k">if</span> <span class="nx">link</span> <span class="o">==</span> <span class="s">&quot;&quot;</span> <span class="k">then</span> <span class="k">throw</span> <span class="s">&quot;subtest grid link unspecified&quot;</span><span class="p">;</span> <span class="k">return</span>
+    <span class="nv">grid = </span><span class="nx">@parent</span><span class="p">.</span><span class="nx">model</span><span class="p">.</span><span class="nx">subtests</span><span class="p">.</span><span class="nx">get</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;gridLinkId&quot;</span><span class="p">)</span>
+    <span class="nv">gridScore = </span><span class="nx">@parent</span><span class="p">.</span><span class="nx">result</span><span class="p">.</span><span class="nx">getGridScore</span> <span class="nx">grid</span><span class="p">.</span><span class="nx">id</span>
+    <span class="nx">gridScore</span> 
+
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="nx">@prototypeView</span><span class="o">?</span><span class="p">.</span><span class="nx">close</span><span class="o">?</span><span class="p">()</span>
+
+  <span class="nv">isValid: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="o">not</span> <span class="nx">@prototypeRendered</span> <span class="k">then</span> <span class="k">return</span> <span class="kc">false</span>
+    <span class="k">if</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">isValid</span><span class="o">?</span>
+      <span class="k">return</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">isValid</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="k">return</span> <span class="kc">false</span>
+    <span class="kc">true</span>
+
+  <span class="nv">showErrors: </span><span class="o">-&gt;</span>
+    <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">showErrors</span><span class="p">()</span>
+
+  <span class="nv">getSum: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">getSum</span><span class="o">?</span>
+      <span class="k">return</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">getSum</span><span class="p">()</span>
+    <span class="k">else</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>maybe a better fallback</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">return</span> <span class="p">{</span><span class="nx">correct</span><span class="o">:</span><span class="mi">0</span><span class="p">,</span><span class="nx">incorrect</span><span class="o">:</span><span class="mi">0</span><span class="p">,</span><span class="nx">missing</span><span class="o">:</span><span class="mi">0</span><span class="p">,</span><span class="nx">total</span><span class="o">:</span><span class="mi">0</span><span class="p">}</span>
+
+  <span class="nv">abort: </span><span class="o">-&gt;</span>
+    <span class="nx">@parent</span><span class="p">.</span><span class="nx">abort</span><span class="p">()</span>
+
+  <span class="nv">getResult: </span><span class="o">-&gt;</span>
+    <span class="k">return</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">getResult</span><span class="p">()</span>
+
+  <span class="nv">getSkipped: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">getSkipped</span><span class="o">?</span>
+      <span class="k">return</span> <span class="nx">@prototypeView</span><span class="p">.</span><span class="nx">getSkipped</span><span class="p">()</span>
+    <span class="k">else</span>
+      <span class="k">throw</span> <span class="s">&quot;Prototype skipping not implemented&quot;</span>
+
+  <span class="nv">next: </span><span class="o">-&gt;</span>
+    <span class="nx">@parent</span><span class="p">.</span><span class="nx">next</span><span class="p">()</span>
+  
+  <span class="nv">skip: </span><span class="o">-&gt;</span>
+    <span class="nx">@parent</span><span class="p">.</span><span class="nx">skip</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

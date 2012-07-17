@@ -1,0 +1,33 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q05",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "collection": "question",
+  "couchapp": {},
+  "order": 5,
+  "prompt": "Are you currently attending any form of Islamic Schooling?",
+  "name": "islamic-schooling",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "Madrassa",
+      "value": "Madrassa"
+    },
+    {
+      "label": "Daara/Karanta",
+      "value": "Daara/Karanta"
+    },
+    {
+      "label": "Maglis",
+      "value": "Maglis"
+    },
+    {
+      "label": "Other",
+      "value": "Other"
+    }
+  ],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

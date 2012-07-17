@@ -1,8 +1,0 @@
-{
-  "collection" : "subtest",
-  "_id": "Tangerine Class.StudentId",
-  "pageType": "StudentIdPage",
-  "pageId": "StudentId",
-  "couchapp": {
-  }
-}

@@ -1,0 +1,21 @@
+{
+  "collection": "question",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "subtestId": "Example English EGRA May 2011.StudentInformation",
+  "_id": "Example English EGRA May 2011.StudentInformation.Q01",
+  "couchapp": {},
+  "order": 1,
+  "prompt": "Multigrade class",
+  "name": "multigraded_class",
+  "type": "single",
+  "options": [
+    {
+      "label": "Yes",
+      "value": "Yes"
+    },
+    {
+      "label": "No",
+      "value": "No"
+    }
+  ]
+}

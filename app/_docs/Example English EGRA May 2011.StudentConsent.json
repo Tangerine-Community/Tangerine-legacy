@@ -1,9 +1,11 @@
 {
   "collection": "subtest",
   "_id": "Example English EGRA May 2011.StudentConsent",
-  "pageType": "ConsentPage",
-  "pageId": "StudentConsent",
-  "content": "Request consent: <br/> <b>Let me tell you why I am here today. I work with the Ministry of Education and we are trying to understand how children learn to read.  You were picked by chance, like in a raffle or lottery. We would like your help in this. But you do not have to take part if you do not want to.<li>We are going to play a reading game.  I am going to ask you to read letters, words and a short story out loud.<li>Using this stopwatch, I will see how long it takes you to read.<li>This is NOT a test and it will not affect your grade at school.<li>I will also ask you other questions about your family, like what language your family uses at home and some of the things your family has.<li>I will NOT write down your name so no one will know these are your answers.<li>Once again, you do not have to participate if you do not wish to.  Once we begin, if you would rather not answer a question, that’s all right.<li>Do you have any questions? Are you ready to get started?</li>\n<br/>      <form>      <div data-role='fieldcontain'>          <fieldset data-role='controlgroup' data-type='horizontal'>            <legend>Does the child consent?</legend>              <label for='consent-yes'>Yes, continue</label>              <input type='radio' name='childConsents' id='consent-yes' value='true' />              <label for='consent-no'>No, stop</label>              <input type='radio' name='childConsents' id='consent-no' value='true' />          </fieldset>      </div>      </form>",
+  "prototype": "consent",
+  "name" : "Student Consent",
+  "order" : 3,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
+  "studentDialog": "Request consent: <br/> <b>Let me tell you why I am here today. I work with the Ministry of Education and we are trying to understand how children learn to read.  You were picked by chance, like in a raffle or lottery. We would like your help in this. But you do not have to take part if you do not want to.<li>We are going to play a reading game.  I am going to ask you to read letters, words and a short story out loud.<li>Using this stopwatch, I will see how long it takes you to read.<li>This is NOT a test and it will not affect your grade at school.<li>I will also ask you other questions about your family, like what language your family uses at home and some of the things your family has.<li>I will NOT write down your name so no one will know these are your answers.<li>Once again, you do not have to participate if you do not wish to.  Once we begin, if you would rather not answer a question, that’s all right.<li>Do you have any questions? Are you ready to get started?</li>\n<br/></div>",
   "couchapp": {
   }
 }

@@ -1,56 +1,26 @@
-<!DOCTYPE html>  <html> <head>   <title>Result.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Result.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">ResultView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
-  <span class="nv">initialize: </span><span class="o">-&gt;</span>
+<!DOCTYPE html>  <html> <head>   <title>Result.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Result.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Result</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span>
 
-  <span class="nv">template: </span><span class="nx">Handlebars</span><span class="p">.</span><span class="nx">compile</span> <span class="s">&quot;</span>
-<span class="s">    &lt;table class=&#39;tablesorter&#39;&gt;</span>
-<span class="s">      &lt;thead&gt;</span>
-<span class="s">        &lt;tr&gt;</span>
-<span class="s">          &lt;th&gt;&lt;/th&gt;</span>
-<span class="s">          &lt;th&gt;Category&lt;/th&gt;</span>
-<span class="s">          &lt;th&gt;Result&lt;/th&gt;</span>
-<span class="s">        &lt;/tr&gt;</span>
-<span class="s">      &lt;/thead&gt;</span>
-<span class="s">      &lt;tbody&gt;</span>
-<span class="s">        {{{tbody}}}</span>
-<span class="s">      &lt;/tbody&gt;</span>
-<span class="s">    &lt;/table&gt;</span>
-<span class="s">    &lt;script&gt;</span>
-<span class="s">    &lt;/script&gt;</span>
-<span class="s">  &quot;</span>
+  <span class="nv">url: </span><span class="s">&quot;result&quot;</span>
+  </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>name : currentView.model.get "name"
+data : currentView.getResult()
+subtestId : currentView.model.id
+sum : currentView.getSum()
+  { correct, incorrect, missing, total }</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>could use defaults but it messes things up</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">if</span> <span class="nx">options</span><span class="p">.</span><span class="nx">blank</span> <span class="o">==</span> <span class="kc">true</span>
+      <span class="nx">@set</span>
+        <span class="nv">subtestData : </span><span class="p">[]</span>
+      <span class="nx">@unset</span> <span class="s">&quot;blank&quot;</span> <span class="c1"># options automatically get added to the model. Lame.</span>
 
-  <span class="nv">el: </span><span class="nx">$</span><span class="p">(</span><span class="s">&#39;#content&#39;</span><span class="p">)</span>
+  <span class="nv">add: </span><span class="nf">( subtestDataElement ) -&gt;</span>
+    <span class="nv">subtestData = </span><span class="nx">@get</span> <span class="s">&#39;subtestData&#39;</span>
+    <span class="nx">subtestData</span><span class="p">.</span><span class="nx">push</span> <span class="nx">subtestDataElement</span>
+    <span class="nx">@set</span> 
+      <span class="s">&#39;subtestData&#39;</span> <span class="o">:</span> <span class="nx">subtestData</span>
+      <span class="s">&#39;timestamp&#39;</span>   <span class="o">:</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getTime</span><span class="p">()</span>
+      <span class="s">&#39;enumerator&#39;</span>  <span class="o">:</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span>
 
-  <span class="nv">render: </span><span class="o">=&gt;</span>
-    <span class="k">return</span> <span class="nx">@template</span>
-      <span class="nv">tbody: </span><span class="nx">@tableRows</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">subtestResults</span><span class="p">())</span>
 
-  <span class="nv">tableRows: </span><span class="nf">(resultCollection) -&gt;</span>
-    <span class="nv">rows = </span><span class="k">for</span> <span class="nx">key</span><span class="p">,</span><span class="nx">value</span> <span class="k">of</span> <span class="nx">resultCollection</span>
-      <span class="nv">chart = </span><span class="s">&quot;&quot;</span>
-      <span class="nv">chart = </span><span class="s">&#39;♂&#39;</span> <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="s">&#39;Male&#39;</span>
-      <span class="nv">chart = </span><span class="s">&#39;♀&#39;</span> <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="s">&#39;Female&#39;</span>
-
-      <span class="nv">key = </span><span class="nx">key</span><span class="p">.</span><span class="nx">underscore</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/_/g</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">)</span>
-
-      <span class="k">if</span> <span class="nx">value</span><span class="p">.</span><span class="nx">itemsCorrect</span><span class="o">?</span> <span class="o">and</span> <span class="nx">value</span><span class="p">.</span><span class="nx">attempted</span><span class="o">?</span>
-        <span class="nv">chart = </span><span class="s">&quot;&lt;span class=&#39;sparkline&#39;&gt;</span><span class="si">#{</span><span class="nx">value</span><span class="p">.</span><span class="nx">total</span><span class="o">-</span><span class="nx">value</span><span class="p">.</span><span class="nx">attempted</span><span class="si">}</span><span class="s">,</span><span class="si">#{</span><span class="nx">value</span><span class="p">.</span><span class="nx">attempted</span> <span class="o">-</span> <span class="nx">value</span><span class="p">.</span><span class="nx">itemsCorrect</span><span class="si">}</span><span class="s">,</span><span class="si">#{</span><span class="nx">value</span><span class="p">.</span><span class="nx">itemsCorrect</span><span class="si">}</span><span class="s">&lt;/span&gt;&quot;</span>
-        <span class="nv">value = </span><span class="s">&quot;</span><span class="si">#{</span><span class="nx">value</span><span class="p">.</span><span class="nx">itemsCorrect</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">value</span><span class="p">.</span><span class="nx">attempted</span><span class="si">}</span><span class="s">&quot;</span>
-      <span class="k">else</span>
-        <span class="nv">value = </span><span class="nx">moment</span><span class="p">(</span><span class="nx">value</span><span class="p">).</span><span class="nx">format</span><span class="p">(</span><span class="s">&quot;Do MMM HH:mm&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nx">value</span><span class="p">.</span><span class="nx">getMonth</span>
-        <span class="nv">value = </span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="k">if</span> <span class="k">typeof</span> <span class="nx">value</span> <span class="o">==</span> <span class="s">&quot;object&quot;</span>
-      <span class="s">&quot;</span>
-<span class="s">      &lt;tr&gt;</span>
-<span class="s">        &lt;td&gt;</span>
-<span class="s">          </span><span class="si">#{</span><span class="nx">chart</span><span class="si">}</span><span class="s"></span>
-<span class="s">        &lt;/td&gt;</span>
-<span class="s">        &lt;td&gt;</span>
-<span class="s">          </span><span class="si">#{</span><span class="nx">key</span><span class="si">}</span><span class="s"></span>
-<span class="s">        &lt;/td&gt;</span>
-<span class="s">        &lt;td&gt;</span>
-<span class="s">          </span><span class="si">#{</span><span class="nx">value</span><span class="si">}</span><span class="s"></span>
-<span class="s">        &lt;/td&gt;</span>
-<span class="s">      &lt;/tr&gt;</span>
-<span class="s">      &quot;</span>
-    <span class="k">return</span> <span class="nx">rows</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+  <span class="nv">getGridScore: </span><span class="nf">(id) -&gt;</span>
+    <span class="k">for</span> <span class="nx">datum</span> <span class="k">in</span> <span class="nx">@get</span> <span class="s">&#39;subtestData&#39;</span>
+      <span class="k">return</span> <span class="nb">parseInt</span><span class="p">(</span><span class="nx">datum</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">attempted</span><span class="p">)</span> <span class="k">if</span> <span class="nx">datum</span><span class="p">.</span><span class="nx">subtestId</span> <span class="o">==</span> <span class="nx">id</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

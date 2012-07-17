@@ -1,0 +1,295 @@
+<!DOCTYPE html>  <html> <head>   <title>GridRunView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               GridRunView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">GridRunView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">className: </span><span class="s">&quot;grid_prototype&quot;</span>
+
+  <span class="nv">events: </span><span class="k">if</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">kindle</span> <span class="k">then</span> <span class="p">{</span>
+    <span class="s">&#39;touchstart .grid_element&#39;</span> <span class="o">:</span> <span class="s">&#39;gridClick&#39;</span>
+    <span class="s">&#39;touchstart .end_of_grid_line&#39;</span> <span class="o">:</span> <span class="s">&#39;endOfGridLineClick&#39;</span>
+    <span class="s">&#39;click .grid_mode input&#39;</span>   <span class="o">:</span> <span class="s">&#39;updateMode&#39;</span>
+    <span class="s">&#39;click .start_time&#39;</span>        <span class="o">:</span> <span class="s">&#39;startTimer&#39;</span>
+    <span class="s">&#39;click .stop_time&#39;</span>         <span class="o">:</span> <span class="s">&#39;stopTimer&#39;</span>
+    <span class="s">&#39;click .restart&#39;</span>         <span class="o">:</span> <span class="s">&#39;restartTimer&#39;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="s">&#39;click .end_of_grid_line&#39;</span> <span class="o">:</span> <span class="s">&#39;endOfGridLineClick&#39;</span>
+    <span class="s">&#39;click .grid_element&#39;</span>    <span class="o">:</span> <span class="s">&#39;gridClick&#39;</span>
+    <span class="s">&#39;click .grid_mode input&#39;</span> <span class="o">:</span> <span class="s">&#39;updateMode&#39;</span>
+    <span class="s">&#39;click .start_time&#39;</span>      <span class="o">:</span> <span class="s">&#39;startTimer&#39;</span>
+    <span class="s">&#39;click .stop_time&#39;</span>       <span class="o">:</span> <span class="s">&#39;stopTimer&#39;</span>
+    <span class="s">&#39;click .restart&#39;</span>         <span class="o">:</span> <span class="s">&#39;restartTimer&#39;</span>
+  <span class="p">}</span>
+  
+  <span class="nv">restartTimer: </span><span class="o">-&gt;</span>
+    <span class="nx">@resetVariables</span><span class="p">()</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.element_wrong&quot;</span><span class="p">).</span><span class="nx">removeClass</span> <span class="s">&quot;element_wrong&quot;</span>
+
+
+  <span class="nv">gridClick: </span><span class="nf">(event) -&gt;</span>
+    <span class="nx">@modeHandlers</span><span class="p">[</span><span class="nx">@mode</span><span class="p">]</span><span class="o">?</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span>
+
+  <span class="nv">markHandler: </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nv">$target = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">)</span>
+    <span class="nv">index = </span><span class="nx">$target</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;data-index&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">@lastAttempted</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">index</span> <span class="o">&gt;</span> <span class="nx">@lastAttempted</span>
+      <span class="k">return</span>
+    <span class="nx">@markElement</span><span class="p">(</span><span class="nx">index</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">@autostop</span> <span class="o">!=</span> <span class="mi">0</span>
+      <span class="nx">@checkAutostop</span><span class="p">()</span>
+      
+  <span class="nv">checkAutostop: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@timeRunning</span>
+      <span class="nv">autoCount = </span><span class="mi">0</span>
+      <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">..</span><span class="nx">@autostop</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nx">@gridOutput</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;correct&quot;</span> <span class="k">then</span> <span class="k">break</span>
+        <span class="nx">autoCount</span><span class="o">++</span>
+      <span class="k">if</span> <span class="nx">@autostopped</span> <span class="o">==</span> <span class="kc">false</span>
+        <span class="k">if</span> <span class="nx">autoCount</span> <span class="o">==</span> <span class="nx">@autostop</span> <span class="k">then</span> <span class="nx">@autostopTest</span><span class="p">()</span>
+      <span class="k">if</span> <span class="nx">@autostopped</span> <span class="o">==</span> <span class="kc">true</span> <span class="o">&amp;&amp;</span> <span class="nx">autoCount</span> <span class="o">&lt;</span> <span class="nx">@autostop</span> <span class="o">&amp;&amp;</span> <span class="nx">@undoable</span> <span class="o">==</span> <span class="kc">true</span> <span class="k">then</span> <span class="nx">@unAutostopTest</span><span class="p">()</span>
+
+  <span class="nv">markElement: </span><span class="nf">(index, value = null) -&gt;</span>
+    <span class="nv">$target = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;div.grid_element[data-index=</span><span class="si">#{</span><span class="nx">index</span><span class="si">}</span><span class="s">]&quot;</span><span class="p">)</span>
+    <span class="nx">@markRecord</span><span class="p">.</span><span class="nx">push</span> <span class="nx">index</span>
+    <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="kc">null</span>
+      <span class="nx">@gridOutput</span><span class="p">[</span><span class="nx">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="k">if</span> <span class="p">(</span><span class="nx">@gridOutput</span><span class="p">[</span><span class="nx">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;correct&quot;</span> <span class="o">||</span> <span class="nx">@autostopped</span><span class="p">)</span> <span class="k">then</span> <span class="s">&quot;incorrect&quot;</span> <span class="k">else</span> <span class="s">&quot;correct&quot;</span>
+      <span class="nx">$target</span><span class="p">.</span><span class="nx">toggleClass</span> <span class="s">&quot;element_wrong&quot;</span>
+    <span class="k">else</span>
+      <span class="k">if</span> <span class="o">!</span><span class="nx">@autostopped</span> <span class="o">||</span> <span class="nx">value</span> <span class="o">==</span> <span class="s">&quot;correct&quot;</span>
+        <span class="nx">@gridOutput</span><span class="p">[</span><span class="nx">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span>
+        <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="s">&quot;incorrect&quot;</span>
+          <span class="nx">$target</span><span class="p">.</span><span class="nx">addClass</span> <span class="s">&quot;element_wrong&quot;</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="nx">value</span> <span class="o">==</span> <span class="s">&quot;correct&quot;</span>
+          <span class="nx">$target</span><span class="p">.</span><span class="nx">removeClass</span> <span class="s">&quot;element_wrong&quot;</span>
+        
+  <span class="nv">endOfGridLineClick: </span><span class="nf">(event) -&gt;</span>
+    <span class="k">if</span> <span class="nx">@mode</span> <span class="o">==</span> <span class="s">&quot;mark&quot;</span>
+      <span class="nv">$target = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nx">$target</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="s">&quot;element_wrong&quot;</span><span class="p">)</span> 
+        <span class="nx">$target</span><span class="p">.</span><span class="nx">removeClass</span> <span class="s">&quot;element_wrong&quot;</span> 
+        <span class="nv">value = </span><span class="s">&quot;correct&quot;</span>
+        <span class="nv">index = </span><span class="nx">$target</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;data-index&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="nx">index</span><span class="p">..(</span><span class="nx">index</span><span class="o">-</span><span class="p">(</span><span class="nx">@columns</span><span class="o">-</span><span class="mi">1</span><span class="p">))]</span>
+          <span class="nx">@markElement</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">value</span>
+      <span class="k">else</span> <span class="k">if</span> <span class="o">!</span><span class="nx">$target</span><span class="p">.</span><span class="nx">hasClass</span><span class="p">(</span><span class="s">&quot;element_wrong&quot;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">@autostopped</span>
+        <span class="nx">$target</span><span class="p">.</span><span class="nx">addClass</span> <span class="s">&quot;element_wrong&quot;</span>
+        <span class="nv">value = </span><span class="s">&quot;incorrect&quot;</span>
+        <span class="nv">index = </span><span class="nx">$target</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;data-index&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="nx">index</span><span class="p">..(</span><span class="nx">index</span><span class="o">-</span><span class="p">(</span><span class="nx">@columns</span><span class="o">-</span><span class="mi">1</span><span class="p">))]</span>
+          <span class="nx">@markElement</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">value</span>
+      <span class="k">if</span> <span class="nx">@autostop</span> <span class="o">!=</span> <span class="mi">0</span>
+        <span class="nx">@checkAutostop</span><span class="p">()</span>
+
+  <span class="nv">lastHandler: </span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nv">$target = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">)</span>
+    <span class="nv">index = </span><span class="nx">$target</span><span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;data-index&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">index</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="nx">@gridOutput</span><span class="p">.</span><span class="nx">lastIndexOf</span><span class="p">(</span><span class="s">&quot;incorrect&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;table.grid .element_last&quot;</span><span class="p">).</span><span class="nx">removeClass</span> <span class="s">&quot;element_last&quot;</span>
+      <span class="nx">$target</span><span class="p">.</span><span class="nx">addClass</span> <span class="s">&quot;element_last&quot;</span>
+      <span class="vi">@lastAttempted = </span><span class="nx">index</span>
+
+  <span class="nv">startTimer: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@timerStopped</span> <span class="o">==</span> <span class="kc">false</span> <span class="o">&amp;&amp;</span> <span class="nx">@timeRunning</span> <span class="o">==</span> <span class="kc">false</span>
+      <span class="nx">@updateMode</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;mark&quot;</span>
+      <span class="vi">@interval = </span><span class="nx">setInterval</span><span class="p">(</span><span class="nx">@updateCountdown</span><span class="p">,</span><span class="mi">1000</span> <span class="p">)</span>
+      <span class="vi">@startTime = </span><span class="nx">@getTime</span><span class="p">()</span>
+      <span class="vi">@timeRunning = </span><span class="kc">true</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;table.disabled&quot;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;disabled&quot;</span><span class="p">)</span>
+      <span class="nx">@updateCountdown</span><span class="p">()</span>
+
+  <span class="nv">stopTimer: </span><span class="nf">(event, message = false) -&gt;</span>
+    <span class="k">if</span> <span class="nx">@timeRunning</span> <span class="o">==</span> <span class="kc">true</span>
+      <span class="nx">Utils</span><span class="p">.</span><span class="nx">flash</span><span class="p">()</span>
+      <span class="nx">clearInterval</span> <span class="nx">@interval</span>
+      <span class="vi">@stopTime = </span><span class="nx">@getTime</span><span class="p">()</span>
+      <span class="vi">@timeRunning = </span><span class="kc">false</span>
+      <span class="vi">@timerStopped = </span><span class="kc">true</span>
+      <span class="nx">@updateCountdown</span><span class="p">()</span>
+      <span class="nx">@updateMode</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;last&quot;</span>
+      <span class="k">if</span> <span class="nx">message</span>
+        <span class="nx">Utils</span><span class="p">.</span><span class="nx">topAlert</span> <span class="nx">message</span>
+      <span class="k">else</span>
+        <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Please mark &lt;br&gt;last item attempted&quot;</span>
+
+  <span class="nv">autostopTest: </span><span class="o">-&gt;</span>
+    <span class="nx">Utils</span><span class="p">.</span><span class="nx">flash</span><span class="p">()</span>
+    <span class="nx">clearInterval</span> <span class="nx">@interval</span>
+    <span class="vi">@stopTime = </span><span class="nx">@getTime</span><span class="p">()</span>
+    <span class="vi">@autostopped = </span><span class="kc">true</span>
+    <span class="vi">@timerStopped = </span><span class="kc">true</span>
+    <span class="vi">@timeRunning = </span><span class="kc">false</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.grid_element&quot;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="nx">@autostop</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nx">@autostop</span><span class="p">).</span><span class="nx">addClass</span> <span class="s">&quot;element_last&quot;</span> <span class="c1">#jquery is weird sometimes</span>
+    <span class="vi">@lastAttempted = </span><span class="nx">@autostop</span>
+    <span class="vi">@timeout = </span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">@removeUndo</span><span class="p">,</span> <span class="mi">3000</span><span class="p">)</span> <span class="c1"># give them 3 seconds to undo</span>
+    <span class="nx">Utils</span><span class="p">.</span><span class="nx">topAlert</span> <span class="s">&quot;Autostop activated. Discontinue test.&quot;</span>
+
+  <span class="nv">removeUndo: </span><span class="o">=&gt;</span>
+    <span class="vi">@undoable = </span><span class="kc">false</span>
+    <span class="nx">@updateMode</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;disabled&quot;</span>
+    <span class="nx">clearTimeout</span><span class="p">(</span><span class="nx">@timeout</span><span class="p">)</span>
+
+  <span class="nv">unAutostopTest: </span><span class="o">-&gt;</span>
+    <span class="vi">@interval = </span><span class="nx">setInterval</span><span class="p">(</span><span class="nx">@updateCountdown</span><span class="p">,</span><span class="mi">1000</span> <span class="p">)</span>
+    <span class="nx">@updateCountdown</span><span class="p">()</span>
+    <span class="vi">@autostopped = </span><span class="kc">false</span>
+    <span class="vi">@lastAttempted = </span><span class="mi">0</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.grid_element&quot;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="nx">@autostop</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="nx">@autostop</span><span class="p">).</span><span class="nx">removeClass</span> <span class="s">&quot;element_last&quot;</span>
+    <span class="vi">@timeRunning = </span><span class="kc">true</span>
+    <span class="nx">@updateMode</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;mark&quot;</span>
+    <span class="nx">Utils</span><span class="p">.</span><span class="nx">topAlert</span> <span class="s">&quot;Autostop removed. Continue.&quot;</span>
+
+  <span class="nv">updateCountdown: </span><span class="o">=&gt;</span>
+    <span class="vi">@timeElapsed = </span><span class="nx">@getTime</span><span class="p">()</span> <span class="o">-</span> <span class="nx">@startTime</span>
+    <span class="vi">@timeRemaining = </span><span class="nx">@timer</span> <span class="o">-</span> <span class="nx">@timeElapsed</span>
+    
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.timer&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">@timeRemaining</span>
+    <span class="k">if</span> <span class="nx">@timeRemaining</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="nx">@timeRunning</span> <span class="o">==</span> <span class="kc">true</span> <span class="k">then</span> <span class="nx">@stopTimer</span> <span class="kc">null</span><span class="p">,</span> <span class="s">&quot;Time&lt;br&gt;&lt;br&gt;Please mark&lt;br&gt;last item attempted&quot;</span>
+
+  <span class="nv">updateMode: </span><span class="p">(</span><span class="nx">event</span><span class="p">,</span> <span class="nx">mode</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="k">if</span> <span class="nx">mode</span><span class="o">?</span>
+      <span class="vi">@mode = </span><span class="nx">mode</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">grid_mode :radio[value=</span><span class="si">#{</span><span class="nx">mode</span><span class="si">}</span><span class="s">]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">grid_mode&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">).</span><span class="nx">click</span> <span class="nx">@updateMode</span>
+      <span class="k">return</span>
+    <span class="vi">@mode = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="nx">unless</span> <span class="nx">@autostopped</span>
+
+  <span class="nv">getTime: </span><span class="o">-&gt;</span>
+    <span class="nb">Math</span><span class="p">.</span><span class="nx">round</span><span class="p">((</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">getTime</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+
+  <span class="nv">resetVariables: </span><span class="o">-&gt;</span>
+
+    <span class="vi">@markRecord = </span><span class="p">[]</span>
+
+    <span class="vi">@timerStopped = </span><span class="kc">false</span>
+
+    <span class="vi">@startTime = </span><span class="mi">0</span>
+    <span class="vi">@stopTime  = </span><span class="mi">0</span>
+    <span class="vi">@timeElapsed = </span><span class="mi">0</span>
+    <span class="vi">@timeRemaining = </span><span class="nx">@timer</span>
+    <span class="vi">@lastAttempted = </span><span class="mi">0</span>
+
+    <span class="vi">@interval = </span><span class="kc">null</span>
+
+    <span class="vi">@undoable = </span><span class="kc">true</span>
+
+    <span class="vi">@timeRunning = </span><span class="kc">false</span>
+
+    <span class="vi">@timer    = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;timer&quot;</span><span class="p">))</span> <span class="o">||</span> <span class="mi">0</span>
+    <span class="vi">@items    = </span><span class="nx">_</span><span class="p">.</span><span class="nx">compact</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;items&quot;</span><span class="p">))</span> <span class="c1"># mild sanitization, happens at save too</span>
+    <span class="vi">@mode     = </span><span class="s">&quot;disabled&quot;</span>
+    <span class="vi">@gridOutput = </span><span class="p">[]</span>
+    <span class="k">for</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@items</span>
+      <span class="nx">@gridOutput</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;correct&#39;</span>
+    <span class="vi">@columns  = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;columns&quot;</span><span class="p">))</span> <span class="o">||</span> <span class="mi">0</span>
+
+    <span class="vi">@autostop = </span><span class="nb">parseInt</span><span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;autostop&quot;</span><span class="p">))</span> <span class="o">||</span> <span class="mi">0</span>
+    <span class="vi">@autostopped = </span><span class="kc">false</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.grid_element&quot;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;element_wrong&quot;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;element_last&quot;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s">&quot;disabled&quot;</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;table&quot;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s">&quot;disabled&quot;</span><span class="p">)</span>
+    
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.timer&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">@timer</span>
+    
+    <span class="nx">@updateMode</span><span class="p">(</span><span class="nx">@mode</span><span class="p">)</span>
+
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+
+    <span class="vi">@totalTime = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;timer&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="mi">0</span>
+
+    <span class="vi">@modeHandlers =</span>
+      <span class="nv">mark : </span><span class="nx">@markHandler</span>
+      <span class="nv">last : </span><span class="nx">@lastHandler</span>
+      <span class="nv">disabled : </span><span class="nx">$</span><span class="p">.</span><span class="nx">noop</span>
+      
+    <span class="vi">@model  = </span><span class="nx">@options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@parent = </span><span class="nx">@options</span><span class="p">.</span><span class="nx">parent</span>
+
+    <span class="nx">@resetVariables</span><span class="p">()</span>
+
+    <span class="vi">@gridElement = </span><span class="nx">_</span><span class="p">.</span><span class="nx">template</span> <span class="s">&quot;&lt;td&gt;&lt;div data-label=&#39;{{label}}&#39; data-index=&#39;{{i}}&#39; class=&#39;grid_element&#39;&gt;{{label}}&lt;/div&gt;&lt;/td&gt;&quot;</span>
+    <span class="vi">@endOfGridLine = </span><span class="nx">_</span><span class="p">.</span><span class="nx">template</span> <span class="s">&quot;&lt;td&gt;&lt;div data-index=&#39;{{i}}&#39; class=&#39;end_of_grid_line&#39;&gt;*&lt;/div&gt;&lt;/td&gt;&quot;</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">done = </span><span class="mi">0</span>
+    <span class="nv">html = </span><span class="s">&quot;</span>
+<span class="s">    </span>
+<span class="s">    &lt;div class=&#39;timer_wrapper&#39;&gt;&lt;button class=&#39;start_time time&#39;&gt;Start&lt;/button&gt;&lt;div class=&#39;timer&#39;&gt;</span><span class="si">#{</span><span class="nx">@timer</span><span class="si">}</span><span class="s">&lt;/div&gt;&lt;/div&gt;</span>
+<span class="s">    &lt;table class=&#39;grid disabled&#39;&gt;&quot;</span>
+    <span class="nx">loop</span>
+      <span class="k">break</span> <span class="k">if</span> <span class="nx">done</span> <span class="o">&gt;</span> <span class="nx">@items</span><span class="p">.</span><span class="nx">length</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;tr&gt;&quot;</span>
+      <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">..</span><span class="nx">@columns</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nx">done</span> <span class="o">&lt;</span> <span class="nx">@items</span><span class="p">.</span><span class="nx">length</span>
+          <span class="nx">html</span> <span class="o">+=</span> <span class="nx">@gridElement</span> <span class="p">{</span> <span class="nv">label : </span><span class="nx">_</span><span class="p">.</span><span class="nx">escape</span><span class="p">(</span><span class="nx">@items</span><span class="p">[</span><span class="nx">done</span><span class="p">]),</span> <span class="nv">i: </span><span class="nx">done</span><span class="o">+</span><span class="mi">1</span> <span class="p">}</span>
+        <span class="nx">done</span><span class="o">++</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="nx">@endOfGridLine</span><span class="p">({</span><span class="nx">i</span><span class="o">:</span><span class="nx">done</span><span class="p">})</span> <span class="k">if</span> <span class="nx">done</span> <span class="o">&lt;</span> <span class="p">(</span> <span class="nx">@items</span><span class="p">.</span><span class="nx">length</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">)</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;/tr&gt;&quot;</span>
+    <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;/table&gt;</span>
+<span class="s">    </span>
+<span class="s">    &lt;div class=&#39;timer_wrapper&#39;&gt;&lt;button class=&#39;stop_time time&#39;&gt;Stop&lt;/button&gt;&lt;div class=&#39;timer&#39;&gt;</span><span class="si">#{</span><span class="nx">@timer</span><span class="si">}</span><span class="s">&lt;/div&gt;&lt;/div&gt;</span>
+<span class="s">    &lt;div&gt;</span>
+<span class="s">          &lt;button class=&#39;restart command&#39;&gt;Restart&lt;/button&gt;</span>
+<span class="s">          &lt;br&gt;</span>
+<span class="s">    &lt;/div&gt;</span>
+<span class="s">    </span>
+<span class="s">    &lt;div id=&#39;grid_mode&#39; class=&#39;question buttonset clearfix&#39;&gt;</span>
+<span class="s">      &lt;label&gt;Input mode&lt;/label&gt;&lt;br&gt;</span>
+<span class="s">      &lt;label for=&#39;mark&#39;&gt;Mark&lt;/label&gt;</span>
+<span class="s">      &lt;input name=&#39;grid_mode&#39; id=&#39;mark&#39; type=&#39;radio&#39; value=&#39;mark&#39; checked=&#39;checked&#39;&gt;</span>
+<span class="s">      &lt;label for=&#39;last_attempted&#39;&gt;Last attempted&lt;/label&gt;</span>
+<span class="s">      &lt;input name=&#39;grid_mode&#39; id=&#39;last_attempted&#39; type=&#39;radio&#39; value=&#39;last&#39;&gt;</span>
+<span class="s">    &lt;/div&gt;</span>
+
+<span class="s">    &quot;</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="nx">html</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+    
+  <span class="nv">isValid: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@lastAttempted</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">then</span> <span class="k">return</span> <span class="kc">false</span>
+    <span class="k">if</span> <span class="nx">@timeRunning</span> <span class="o">==</span> <span class="kc">true</span> <span class="k">then</span> <span class="k">return</span> <span class="kc">false</span>
+    <span class="kc">true</span>
+    
+  <span class="nv">showErrors: </span><span class="o">-&gt;</span>
+    <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Please touch&lt;br&gt;last item read.&quot;</span> <span class="k">if</span> <span class="nx">@lastAttempted</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Time still running.&quot;</span> <span class="k">if</span> <span class="nx">@timeRuning</span> <span class="o">==</span> <span class="kc">true</span>
+  
+  <span class="nv">getResult: </span><span class="o">-&gt;</span>
+    <span class="nv">itemResults = </span><span class="p">[]</span>
+    <span class="k">for</span> <span class="nx">item</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@items</span>
+      <span class="k">if</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">@lastAttempted</span>
+        <span class="nx">itemResults</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">@gridOutput</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+      <span class="k">else</span>
+        <span class="nx">itemResults</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;missing&quot;</span>
+
+    <span class="nv">result =</span>
+      <span class="s">&quot;auto_stop&quot;</span>     <span class="o">:</span> <span class="nx">@autostopped</span>
+      <span class="s">&quot;attempted&quot;</span>     <span class="o">:</span> <span class="nx">@lastAttempted</span>
+      <span class="s">&quot;items&quot;</span>         <span class="o">:</span> <span class="nx">itemResults</span>
+      <span class="s">&quot;time_remain&quot;</span>   <span class="o">:</span> <span class="nx">@timeRemaining</span>
+      <span class="s">&quot;mark_record&quot;</span>   <span class="o">:</span> <span class="nx">@markRecord</span>
+      <span class="s">&quot;variable_name&quot;</span> <span class="o">:</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;variableName&quot;</span><span class="p">)</span>
+
+  <span class="nv">getSkippedResult: </span><span class="o">-&gt;</span>
+    <span class="k">return</span> <span class="s">&quot;skipped&quot;</span>
+
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">@interval</span><span class="p">)</span>
+
+  <span class="nv">getSum: </span><span class="o">-&gt;</span>
+    <span class="nv">counts =</span>
+      <span class="nv">correct   : </span><span class="mi">0</span>
+      <span class="nv">incorrect : </span><span class="mi">0</span>
+      <span class="nv">missing   : </span><span class="nx">@items</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">@lastAttempted</span>
+      <span class="nv">total     : </span><span class="nx">@items</span><span class="p">.</span><span class="nx">length</span>
+
+    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">@gridOutput</span>
+      <span class="nx">counts</span><span class="p">[</span><span class="s">&#39;correct&#39;</span><span class="p">]</span>   <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nx">i</span> <span class="o">==</span> <span class="s">&quot;correct&quot;</span>
+      <span class="nx">counts</span><span class="p">[</span><span class="s">&#39;incorrect&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="nx">i</span> <span class="o">==</span> <span class="s">&quot;incorrect&quot;</span>
+      
+    <span class="k">return</span> <span class="p">{</span>
+      <span class="nv">correct   : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;correct&#39;</span><span class="p">]</span>
+      <span class="nv">incorrect : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;incorrect&#39;</span><span class="p">]</span>
+      <span class="nv">missing   : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;missing&#39;</span><span class="p">]</span>
+      <span class="nv">total     : </span><span class="nx">counts</span><span class="p">[</span><span class="s">&#39;total&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,0 +1,37 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q04",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "collection": "question",
+  "couchapp": {},
+  "order": 4,
+  "prompt": "Did you attend any form of education before starting Grade 1? If YES, what kind?",
+  "name": "education-before-grade-1",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "Nursery",
+      "value": "Nursery"
+    },
+    {
+      "label": "Madrassa",
+      "value": "Madrassa"
+    },
+    {
+      "label": "Daara/Karanta",
+      "value": "Daara/Karanta"
+    },
+    {
+      "label": "Maglis",
+      "value": "Maglis"
+    },
+    {
+      "label": "Other",
+      "value": "Other"
+    }
+  ],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

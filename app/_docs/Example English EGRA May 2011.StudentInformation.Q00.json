@@ -1,0 +1,25 @@
+{
+  "collection": "question",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "subtestId": "Example English EGRA May 2011.StudentInformation",
+  "_id": "Example English EGRA May 2011.StudentInformation.Q00",
+  "couchapp": {},
+  "order": 0,
+  "prompt": "School Shift",
+  "name": "school_shift",
+  "type": "single",
+  "options": [
+    {
+      "label": "Full day",
+      "value": "full_day"
+    },
+    {
+      "label": "Morning",
+      "value": "morning"
+    },
+    {
+      "label": "Afternoon",
+      "value": "afternoon"
+    }
+  ]
+}

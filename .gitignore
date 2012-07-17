@@ -24,3 +24,4 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 build.properties
+Android-Couchbase-Callback/assets/tangerine.couch

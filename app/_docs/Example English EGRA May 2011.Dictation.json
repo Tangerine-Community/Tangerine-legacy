@@ -1,10 +1,10 @@
 {
-  "collection": "subtest",
-  "pageType": "Dictation",
-  "pageId": "Dictation",
   "_id": "Example English EGRA May 2011.Dictation",
-  "message": "Enter the text exactly as written by the student",
- 
+  "collection": "subtest",
+  "name" : "Dictation",
+  "prototype": "survey",
+  "order" : 12,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
   "couchapp": {
   }
 }

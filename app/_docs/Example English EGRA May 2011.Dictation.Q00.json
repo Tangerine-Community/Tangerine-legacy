@@ -1,0 +1,12 @@
+{
+  "_id": "Example English EGRA May 2011.Dictation.Q00",
+  "subtestId": "Example English EGRA May 2011.Dictation",
+  "prompt": "Enter the text exactly as written by the student",
+  "type": "open",
+  "order" : 0,
+  "name": "student_text",
+  "collection": "question",
+  "couchapp": {},
+  "options": [],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

@@ -1,0 +1,25 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q17",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "collection": "question",
+  "couchapp": {},
+  "order": 17,
+  "prompt": "Car, Suzuki pickup, jeep or tractor?",
+  "name": "car-suzuki-pickup-jeep-tractor",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "Yes",
+      "value": "Yes"
+    },
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "No response",
+      "value": "No response"
+    }
+  ],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

@@ -1,0 +1,21 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q28",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "collection": "question",
+  "couchapp": {},
+  "order": 28,
+  "prompt": "Did you have eat a meal or snack at break time at school yesterday [or last school day]?",
+  "name": "eat-meal-snack-at-break",
+  "type": "single",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "Yes",
+      "value": "Yes"
+    }
+  ]
+}

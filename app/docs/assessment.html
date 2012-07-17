@@ -1,201 +1,73 @@
-<!DOCTYPE html>  <html> <head>   <title>assessment.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               assessment.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <p>Global assessment object</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nv">$.assessment = </span><span class="kc">null</span>
+<!DOCTYPE html>  <html> <head>   <title>Assessment.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Assessment.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Assessment</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span>
 
-<span class="k">class</span> <span class="nx">Assessment</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Model</span>
+  <span class="nv">url: </span><span class="s">&#39;assessment&#39;</span>
 
-  <span class="nv">url: </span><span class="s">&#39;/assessment&#39;</span>
-  
-  <span class="nv">initialize: </span><span class="o">-&gt;</span>
+  <span class="nv">initialize: </span><span class="nf">(options={}) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>this collection doesn't get saved
+changes update the subtest view, it keeps order</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="vi">@subtests = </span><span class="k">new</span> <span class="nx">Subtests</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Hijacked success() for later
+fetchs all subtests for the assessment</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">fetch: </span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span>
+    <span class="nv">oldSuccess = </span><span class="nx">options</span><span class="p">.</span><span class="nx">success</span>
+    <span class="nv">options.success = </span><span class="p">(</span><span class="nx">model</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nv">allSubtests = </span><span class="k">new</span> <span class="nx">Subtests</span>
+        <span class="nx">allSubtests</span><span class="p">.</span><span class="nx">fetch</span>
+          <span class="nv">key: </span><span class="nx">@id</span>
+          <span class="nv">success: </span><span class="p">(</span><span class="nx">collection</span><span class="p">)</span> <span class="o">=&gt;</span>
+            <span class="vi">@subtests = </span><span class="nx">collection</span>
+            <span class="nx">@subtests</span><span class="p">.</span><span class="nx">maintainOrder</span><span class="p">()</span>
+            <span class="nx">oldSuccess</span><span class="o">?</span> <span class="nx">@</span>
+    <span class="nx">Assessment</span><span class="p">.</span><span class="nx">__super__</span><span class="p">.</span><span class="nx">fetch</span><span class="p">.</span><span class="nx">call</span> <span class="nx">@</span><span class="p">,</span> <span class="nx">options</span>
 
+  <span class="nv">duplicate: </span><span class="nf">(assessmentAttributes, subtestAttributes, questionAttributes, callback) -&gt;</span>
 
-  <span class="nv">replicate: </span><span class="nf">(target,options) -&gt;</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">message&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Syncing to </span><span class="si">#{</span><span class="nx">target</span><span class="si">}</span><span class="s">&quot;</span>
-    <span class="nv">replicationLogEntry = </span><span class="k">new</span> <span class="nx">ReplicationLogEntry</span>
-      <span class="nv">timestamp: </span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">()</span>
-      <span class="nv">source: </span><span class="nx">@get</span> <span class="s">&quot;_id&quot;</span>
-      <span class="nv">target: </span><span class="nx">target</span>
-    <span class="nx">replicationLogEntry</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>TODO TEST that this actually works! (filtered replication!)</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">ajaxOptions =</span>
-      <span class="nv">success: </span><span class="o">-&gt;</span>
-        <span class="nx">options</span><span class="p">.</span><span class="nx">success</span><span class="p">()</span>
-      <span class="nv">error: </span><span class="nf">(res) -&gt;</span>
-        <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">message&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Error: </span><span class="si">#{</span><span class="nx">res</span><span class="si">}</span><span class="s">&quot;</span>
-    <span class="nv">replicationOptions =</span>
-      <span class="nv">filter: </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">design_doc_name</span> <span class="o">+</span> <span class="s">&quot;/resultFilter&quot;</span>
-      <span class="nv">query_params:</span>
-        <span class="nv">assessmentId: </span><span class="nx">@get</span> <span class="s">&quot;_id&quot;</span>
-    <span class="nx">$</span><span class="p">.</span><span class="nx">couch</span><span class="p">.</span><span class="nx">replicate</span><span class="p">(</span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">database_name</span><span class="p">,</span> <span class="nx">target</span><span class="p">,</span> <span class="nx">ajaxOptions</span><span class="p">,</span> <span class="nx">replicationOptions</span><span class="p">)</span>
+    <span class="nv">originalId = </span><span class="nx">@id</span>
 
-  <span class="nv">lastCloudReplication: </span><span class="nf">(options) -&gt;</span>
-    <span class="nv">assessmentId = </span><span class="nx">@get</span> <span class="s">&quot;id&quot;</span>
-    <span class="nv">replicationLogEntryCollection  = </span><span class="k">new</span> <span class="nx">ReplicationLogEntryCollection</span><span class="p">()</span>
-    <span class="nx">replicationLogEntryCollection</span><span class="p">.</span><span class="nx">fetch</span>
-      <span class="nv">success: </span><span class="o">-&gt;</span>
-        <span class="nv">mostRecentReplicationLogEntry = </span><span class="nx">replicationLogEntryCollection</span><span class="p">.</span><span class="nx">first</span><span class="p">()</span> <span class="c1"># just for initialization</span>
-        <span class="nx">replicationLogEntryCollection</span><span class="p">.</span><span class="nx">each</span> <span class="nf">(replicationLogEntry) -&gt;</span>
-          <span class="k">return</span> <span class="nx">unless</span> <span class="nx">replicationLogEntry</span><span class="p">.</span><span class="nx">source</span> <span class="o">is</span> <span class="nx">assessmentId</span>
-          <span class="nv">mostRecentReplicationLogEntry = </span><span class="nx">replicationLogEntry</span> <span class="k">if</span> <span class="nx">replicationLogEntry</span><span class="p">.</span><span class="nx">timestamp</span> <span class="o">&gt;</span> <span class="nx">mostRecentReplicationLogEntry</span><span class="p">.</span><span class="nx">timestamp</span>
-        <span class="k">if</span> <span class="nx">mostRecentReplicationLogEntry</span>
-          <span class="nx">options</span><span class="o">?</span><span class="p">.</span><span class="nx">success</span><span class="o">?</span><span class="p">(</span><span class="nx">mostRecentReplicationLogEntry</span><span class="p">)</span>
-        <span class="k">else</span>
-          <span class="nx">options</span><span class="o">?</span><span class="p">.</span><span class="nx">error</span><span class="o">?</span><span class="p">()</span>
-
-
-  <span class="nv">fetch: </span><span class="p">(</span><span class="nx">options</span><span class="p">)</span> <span class="o">=&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Whenever we fetch data we need to take the result and setup the assessment object before doing the callback
-this probably belongs in the constructor/initialization code</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">superOptions = </span><span class="nx">options</span>
-    <span class="nv">superOptions = </span>
-      <span class="nv">success: </span><span class="o">=&gt;</span>
-        <span class="nx">@changeName</span> <span class="nx">@get</span> <span class="s">&quot;name&quot;</span>
-        <span class="nv">pages = </span><span class="p">[]</span>
-        <span class="nv">urlPaths = </span><span class="nx">@get</span> <span class="s">&quot;urlPathsForPages&quot;</span>
-        <span class="k">if</span> <span class="nx">urlPaths</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span>
-          <span class="k">for</span> <span class="nx">urlPath</span> <span class="k">in</span> <span class="nx">urlPaths</span>
-            <span class="nv">url = </span><span class="s">&quot;/</span><span class="si">#{</span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">config</span><span class="p">.</span><span class="nx">db_name</span><span class="si">}</span><span class="s">/</span><span class="si">#{</span><span class="nx">urlPath</span><span class="si">}</span><span class="s">&quot;</span>
-            <span class="nx">JQueryMobilePage</span><span class="p">.</span><span class="nx">loadFromHTTP</span> <span class="p">{</span><span class="nv">url: </span><span class="nx">url</span><span class="p">,</span> <span class="nv">async: </span><span class="kc">false</span><span class="p">},</span> <span class="p">(</span><span class="nx">page</span><span class="p">)</span> <span class="o">=&gt;</span>
-              <span class="nv">page.assessment = </span><span class="k">this</span>
-              <span class="nx">pages</span><span class="p">.</span><span class="nx">push</span> <span class="nx">page</span>
-          <span class="nx">@setPages</span><span class="p">(</span><span class="nx">pages</span><span class="p">)</span>
-        <span class="nx">options</span><span class="o">?</span><span class="p">.</span><span class="nx">success</span><span class="p">()</span>
-        <span class="k">if</span> <span class="nx">@get</span><span class="p">(</span><span class="s">&quot;languageName&quot;</span><span class="p">)</span><span class="o">?</span>
-          <span class="nx">@set</span>
-            <span class="s">&quot;language&quot;</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">Language</span>
-              <span class="nv">_id : </span><span class="s">&quot;Language.&quot;</span> <span class="o">+</span> <span class="nx">@get</span> <span class="s">&quot;languageName&quot;</span>
-
-    <span class="k">super</span><span class="p">(</span><span class="nx">superOptions</span><span class="p">)</span>
-
-  <span class="nv">changeName: </span><span class="nf">(newName) -&gt;</span>
-    <span class="vi">@name = </span><span class="nx">newName</span>
-    <span class="vi">@urlPath = </span><span class="s">&quot;Assessment.</span><span class="si">#{</span><span class="nx">@name</span><span class="si">}</span><span class="s">&quot;</span>
-    <span class="vi">@urlPathsForPages = </span><span class="p">[]</span>
-    <span class="k">if</span> <span class="nx">@pages</span><span class="o">?</span>
-      <span class="k">for</span> <span class="nx">page</span> <span class="k">in</span> <span class="nx">@pages</span>
-        <span class="nv">page.urlPath = </span><span class="nx">@urlPath</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span>
-        <span class="nx">@urlPathsForPages</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">urlPath</span><span class="p">)</span>
-
-  <span class="nv">targetDatabase: </span><span class="o">-&gt;</span>
-    <span class="nv">name = </span><span class="nx">@name</span> <span class="o">||</span> <span class="nx">@get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
-    <span class="nx">name</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">dasherize</span><span class="p">()</span>
-  
-  <span class="nv">setPages: </span><span class="nf">(pages) -&gt;</span>
-    <span class="vi">@pages = </span><span class="nx">pages</span>
-    <span class="vi">@urlPathsForPages = </span><span class="p">[]</span>
-    <span class="k">for</span> <span class="nx">page</span><span class="p">,</span> <span class="nx">index</span> <span class="k">in</span> <span class="nx">@pages</span>
-      <span class="nv">page.assessment = </span><span class="k">this</span>
-      <span class="nv">page.pageNumber = </span><span class="nx">index</span>
-      <span class="nv">page.previousPage = </span><span class="nx">@pages</span><span class="p">[</span><span class="nx">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="nx">unless</span> <span class="nx">index</span> <span class="o">==</span> <span class="mi">0</span>
-      <span class="nv">page.nextPage = </span><span class="nx">@pages</span><span class="p">[</span><span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="nx">unless</span> <span class="nx">@pages</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span>
-      <span class="nv">page.urlScheme = </span><span class="nx">@urlScheme</span>
-      <span class="nv">page.urlPath = </span><span class="nx">@urlPath</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span>
-      <span class="nx">@urlPathsForPages</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">page</span><span class="p">.</span><span class="nx">urlPath</span><span class="p">)</span>
-
-  <span class="nv">getPage: </span><span class="nf">(pageId) -&gt;</span>
-    <span class="k">for</span> <span class="nx">page</span> <span class="k">in</span> <span class="nx">@pages</span>
-      <span class="k">return</span> <span class="nx">page</span> <span class="k">if</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span> <span class="o">is</span> <span class="nx">pageId</span>
-
-  <span class="nv">insertPage: </span><span class="nf">(page, pageNumber) -&gt;</span>
-    <span class="nx">@pages</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">pageNumber</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="nx">page</span><span class="p">)</span>
-    <span class="nx">@setPages</span><span class="p">(</span><span class="nx">@pages</span><span class="p">)</span>
-
-  <span class="nv">loginPage: </span><span class="o">-&gt;</span>
-    <span class="nx">$</span><span class="p">.</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-  <span class="nv">currentUser: </span><span class="o">-&gt;</span>
-    <span class="k">return</span> <span class="nx">@loginPage</span><span class="p">().</span><span class="nx">results</span><span class="p">().</span><span class="nx">username</span>
-
-  <span class="nv">currentPassword: </span><span class="o">-&gt;</span>
-    <span class="k">return</span> <span class="nx">@loginPage</span><span class="p">().</span><span class="nx">results</span><span class="p">().</span><span class="nx">password</span>
-
-  <span class="nv">hasUserAuthenticated: </span><span class="o">-&gt;</span>
-    <span class="nv">loginResults = </span><span class="nx">@loginPage</span><span class="p">().</span><span class="nx">results</span><span class="p">()</span>
-    <span class="k">return</span> <span class="nx">loginResults</span><span class="p">.</span><span class="nx">username</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span> <span class="o">and</span> <span class="nx">loginResults</span><span class="p">.</span><span class="nx">password</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span>
-
-  <span class="nv">result: </span><span class="nf">(pageId) -&gt;</span>
-    <span class="k">for</span> <span class="nx">page</span> <span class="k">in</span> <span class="nx">@pages</span>
-      <span class="k">return</span> <span class="nx">page</span><span class="p">.</span><span class="nx">results</span><span class="p">()</span> <span class="k">if</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span> <span class="o">==</span> <span class="nx">pageId</span>
-
-  <span class="nv">results: </span><span class="o">-&gt;</span>
-    <span class="nv">results = </span><span class="p">{}</span>
-    <span class="k">for</span> <span class="nx">page</span> <span class="k">in</span> <span class="nx">@pages</span>
-      <span class="nx">results</span><span class="p">[</span><span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span><span class="p">]</span> <span class="o">=</span> <span class="nx">page</span><span class="p">.</span><span class="nx">results</span><span class="p">()</span>
-      <span class="nx">results</span><span class="p">[</span><span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span><span class="p">][</span><span class="s">&quot;subtestType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">page</span><span class="p">.</span><span class="nx">pageType</span>
-    <span class="nv">results.timestamp = </span><span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">valueOf</span><span class="p">()</span>
-    <span class="nv">results.enumerator = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
-    <span class="nv">results.assessmentId = </span><span class="nx">@get</span><span class="p">(</span><span class="s">&quot;_id&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nx">results</span>
-
-  <span class="nv">saveResults: </span><span class="nf">(callback) -&gt;</span>
-    <span class="nv">result = </span><span class="k">new</span> <span class="nx">Result</span><span class="p">(</span><span class="nx">@results</span><span class="p">())</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">save</span> <span class="p">{},</span>
-      <span class="nv">success: </span><span class="nf">(model, results) -&gt;</span>
-        <span class="nx">callback</span><span class="o">?</span><span class="p">(</span><span class="nx">model</span><span class="p">,</span> <span class="nx">results</span><span class="p">)</span>
-      <span class="nv">error: </span><span class="o">=&gt;</span>
-        <span class="nx">alert</span> <span class="s">&quot;Results NOT saved - do you have permission to save?&quot;</span>
-        <span class="k">throw</span> <span class="s">&quot;Could not save result </span><span class="si">#{</span><span class="nx">@results</span><span class="p">()</span><span class="si">}</span><span class="s">&quot;</span>
-
-  <span class="nv">resetURL: </span><span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>document.location.origin + document.location.pathname + document.location.search</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">pathname</span> <span class="o">+</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span>
-
-  <span class="nv">reset: </span><span class="o">-&gt;</span>
-    <span class="nb">document</span><span class="p">.</span><span class="nv">location = </span><span class="nx">@resetURL</span><span class="p">()</span>
+    <span class="nv">newModel = </span><span class="nx">@clone</span><span class="p">()</span>
+    <span class="nx">newModel</span><span class="p">.</span><span class="nx">set</span> <span class="nx">assessmentAttributes</span>
+    <span class="nx">newModel</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;_id&quot;</span><span class="p">,</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">guid</span><span class="p">()</span>
+    <span class="nx">newModel</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;wait&quot;</span><span class="o">:</span><span class="kc">true</span><span class="p">})</span>
     
-  <span class="nv">onReady: </span><span class="nf">(callback) -&gt;</span>
-    <span class="nv">maxTries = </span><span class="mi">10</span>
-    <span class="nv">timesTried = </span><span class="mi">0</span>
-    <span class="nv">checkIfLoading = </span><span class="o">=&gt;</span>
-      <span class="nx">timesTried</span><span class="o">++</span>
-      <span class="k">if</span> <span class="nx">@loading</span>
-        <span class="k">throw</span> <span class="s">&quot;Timeout error while waiting for assessment: </span><span class="si">#{</span><span class="nx">@name</span><span class="si">}</span><span class="s">&quot;</span> <span class="k">if</span> <span class="nx">timesTried</span> <span class="o">&gt;=</span> <span class="nx">maxTries</span>
-        <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">checkIfLoading</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-        <span class="k">return</span>
-      <span class="k">for</span> <span class="nx">page</span> <span class="k">in</span> <span class="nx">@pages</span>
-        <span class="k">if</span> <span class="nx">page</span><span class="p">.</span><span class="nx">loading</span>
-          <span class="k">throw</span> <span class="s">&quot;Timeout error while waiting for page: </span><span class="si">#{</span><span class="nx">page</span><span class="p">.</span><span class="nx">pageId</span><span class="si">}</span><span class="s">&quot;</span> <span class="k">if</span> <span class="nx">timesTried</span> <span class="o">&gt;=</span> <span class="nx">maxTries</span>
-          <span class="nx">setTimeout</span><span class="p">(</span><span class="nx">checkIfLoading</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
-          <span class="k">return</span>
-      <span class="nx">callback</span><span class="p">()</span>
-    <span class="k">return</span> <span class="nx">checkIfLoading</span><span class="p">()</span>
+    <span class="nv">questions = </span><span class="k">new</span> <span class="nx">Questions</span>
+    <span class="nx">questions</span><span class="p">.</span><span class="nx">fetch</span>
+      <span class="nv">success: </span><span class="p">(</span> <span class="nx">questions</span> <span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nv">filteredQuestions = </span><span class="nx">questions</span><span class="p">.</span><span class="nx">where</span> <span class="p">{</span> <span class="s">&quot;assessmentId&quot;</span> <span class="o">:</span> <span class="nx">originalId</span> <span class="p">}</span>
+        <span class="nv">subtests = </span><span class="k">new</span> <span class="nx">Subtests</span>
+        <span class="nx">subtests</span><span class="p">.</span><span class="nx">fetch</span>
+          <span class="nv">key: </span><span class="nx">originalId</span>
+          <span class="nv">success: </span><span class="p">(</span> <span class="nx">subtests</span> <span class="p">)</span> <span class="o">=&gt;</span>
+        
+            <span class="nv">filteredSubtests = </span><span class="nx">subtests</span><span class="p">.</span><span class="nx">models</span>
+            <span class="nv">subtestIdMap = </span><span class="p">{}</span>
+            <span class="nv">newSubtests = </span><span class="p">[]</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>link new subtests to new assessment</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">for</span> <span class="nx">model</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">filteredSubtests</span>
+              <span class="nv">newSubtest = </span><span class="nx">model</span><span class="p">.</span><span class="nx">clone</span><span class="p">()</span>
+              <span class="nx">newSubtest</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;assessmentId&quot;</span><span class="p">,</span> <span class="nx">newModel</span><span class="p">.</span><span class="nx">id</span>
+              <span class="nv">newSubtestId = </span><span class="nx">Utils</span><span class="p">.</span><span class="nx">guid</span><span class="p">()</span>
+              <span class="nx">subtestIdMap</span><span class="p">[</span><span class="nx">newSubtest</span><span class="p">.</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="nx">newSubtestId</span>
+              <span class="nx">newSubtest</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;_id&quot;</span><span class="p">,</span> <span class="nx">newSubtestId</span>
+              <span class="nx">newSubtests</span><span class="p">.</span><span class="nx">push</span> <span class="nx">newSubtest</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>update the links to other subtests</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">for</span> <span class="nx">model</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">newSubtests</span>
+              <span class="nv">gridId = </span><span class="nx">model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span> <span class="s">&quot;gridLinkId&quot;</span> <span class="p">)</span>
+              <span class="k">if</span> <span class="p">(</span> <span class="nx">gridId</span> <span class="o">||</span> <span class="s">&quot;&quot;</span> <span class="p">)</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span>
+                <span class="nx">model</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;gridLinkId&quot;</span><span class="p">,</span> <span class="nx">subtestIdMap</span><span class="p">[</span><span class="nx">gridId</span><span class="p">]</span>
+              <span class="nx">model</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
 
-  <span class="nv">render: </span><span class="o">-&gt;</span>
-    <span class="nx">@onReady</span> <span class="o">=&gt;</span>
-      <span class="nv">$.assessment = </span><span class="k">this</span>
-      <span class="nx">@pages</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">render</span><span class="p">()</span>
+            <span class="nv">newQuestions = </span><span class="p">[]</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>link questions to new subtest</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">for</span> <span class="nx">question</span> <span class="k">in</span> <span class="nx">filteredQuestions</span>
+              <span class="nv">newQuestion = </span><span class="nx">question</span><span class="p">.</span><span class="nx">clone</span><span class="p">()</span>
+              <span class="nv">oldId = </span><span class="nx">newQuestion</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;subtestId&quot;</span>
+              <span class="nx">newQuestion</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;assessmentId&quot;</span><span class="p">,</span> <span class="nx">newModel</span><span class="p">.</span><span class="nx">id</span>
+              <span class="nx">newQuestion</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;_id&quot;</span><span class="p">,</span> <span class="nx">Utils</span><span class="p">.</span><span class="nx">guid</span><span class="p">()</span> 
+              <span class="nx">newQuestion</span><span class="p">.</span><span class="nx">set</span> <span class="s">&quot;subtestId&quot;</span><span class="p">,</span> <span class="nx">subtestIdMap</span><span class="p">[</span><span class="nx">oldId</span><span class="p">]</span>
+              <span class="nx">newQuestions</span><span class="p">.</span><span class="nx">push</span> <span class="nx">newQuestion</span>
+              <span class="nx">newQuestion</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+            
+            <span class="nx">callback</span><span class="p">()</span>
 
-  <span class="nv">flash: </span><span class="o">-&gt;</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&#39;.controls&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&#39;.toggle-grid-with-timer td&#39;</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;div[data-role=header]&quot;</span><span class="p">).</span><span class="nx">toggleClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;div[data-role=footer]&quot;</span><span class="p">).</span><span class="nx">toggleClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-    <span class="nx">setTimeout</span><span class="p">(</span><span class="o">-&gt;</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&#39;body&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&#39;.controls&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&#39;.toggle-grid-with-timer td&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&quot;div[data-role=header]&quot;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&quot;div[data-role=footer]&quot;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&quot;flash&quot;</span><span class="p">)</span>
-    <span class="p">,</span><span class="mi">2000</span><span class="p">)</span>
-
-  <span class="nv">toPaper: </span><span class="nf">(callback) -&gt;</span>
-    <span class="nx">@onReady</span> <span class="o">=&gt;</span>
-      <span class="nv">result = </span><span class="k">for</span> <span class="nx">page</span><span class="p">,</span><span class="nx">i</span> <span class="k">in</span> <span class="nx">@pages</span>
-        <span class="s">&quot;&lt;div class=&#39;subtest </span><span class="si">#{</span><span class="nx">page</span><span class="p">.</span><span class="nx">pageType</span><span class="si">}</span><span class="s">&#39;&gt;&lt;h1&gt;</span><span class="si">#{</span><span class="nx">page</span><span class="p">.</span><span class="nx">name</span><span class="p">()</span><span class="si">}</span><span class="s">&lt;/h1&gt;&quot;</span> <span class="o">+</span> <span class="nx">page</span><span class="p">.</span><span class="nx">toPaper</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;&lt;/div&gt;&quot;</span>
-      <span class="nv">result = </span><span class="nx">result</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&quot;&lt;div class=&#39;page-break&#39;&gt;&lt;hr/&gt;&lt;/div&gt;&quot;</span><span class="p">)</span>
-      <span class="nx">callback</span><span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="k">if</span> <span class="nx">callback</span><span class="o">?</span>
-      <span class="k">return</span> <span class="nx">result</span>
-
-  <span class="nv">handleURLParameters: </span><span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Fill in forms from GET parameters
-Taken from:
-http://stackoverflow.com/questions/901115/get-querystring-values-in-javascript</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">return</span> <span class="k">if</span> <span class="nx">@urlParams</span><span class="o">?</span>
-    <span class="vi">@urlParams = </span><span class="p">{}</span>
-    <span class="nv">a = </span><span class="sr">/\+/g</span>
-    <span class="nv">r = </span><span class="sr">/([^&amp;=]+)=?([^&amp;]*)/g</span>
-    <span class="nv">d = </span><span class="nf">(s) -&gt;</span>
-      <span class="k">return</span> <span class="nb">decodeURIComponent</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="p">))</span>
-    <span class="nv">q = </span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">while</span> <span class="p">(</span><span class="nv">e = </span><span class="nx">r</span><span class="p">.</span><span class="nx">exec</span><span class="p">(</span><span class="nx">q</span><span class="p">))</span>
-      <span class="nx">@urlParams</span><span class="p">[</span><span class="nx">d</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="nx">d</span><span class="p">(</span><span class="nx">e</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-
-    <span class="k">for</span> <span class="nx">param</span><span class="p">,</span><span class="nx">value</span> <span class="k">of</span> <span class="nx">@urlParams</span>
-      <span class="nx">$</span><span class="p">(</span><span class="s">&quot;input</span><span class="err">#</span><span class="si">#{</span><span class="nx">param</span><span class="si">}</span><span class="s">&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nx">@urlParams</span><span class="p">.</span><span class="nx">newAssessment</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>TODO Refactor</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">unless</span> <span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">currentPage</span><span class="p">.</span><span class="nx">pageId</span> <span class="o">==</span> <span class="s">&quot;DateTime&quot;</span> <span class="o">or</span> <span class="nx">$</span><span class="p">.</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">currentPage</span><span class="p">.</span><span class="nx">pageId</span> <span class="o">==</span> <span class="s">&quot;Login&quot;</span><span class="p">)</span>
-        <span class="nx">$</span><span class="p">.</span><span class="nx">mobile</span><span class="p">.</span><span class="nx">changePage</span><span class="p">(</span><span class="s">&quot;DateTime&quot;</span><span class="p">)</span> <span class="nx">unless</span> <span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">currentPage</span><span class="p">.</span><span class="nx">pageId</span> <span class="o">==</span> <span class="s">&quot;DateTime&quot;</span> <span class="o">or</span> <span class="nx">$</span><span class="p">.</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">currentPage</span><span class="p">.</span><span class="nx">pageId</span> <span class="o">==</span> <span class="s">&quot;Login&quot;</span><span class="p">)</span>
-        <span class="nb">document</span><span class="p">.</span><span class="nv">location = </span><span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">href</span>
+  <span class="nv">destroy: </span><span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>remove children</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">assessmentId = </span><span class="nx">@id</span>
+    <span class="nv">subtests = </span><span class="k">new</span> <span class="nx">Subtests</span>
+    <span class="nx">subtests</span><span class="p">.</span><span class="nx">fetch</span>
+      <span class="nv">key: </span><span class="nx">assessmentId</span>
+      <span class="nv">success: </span><span class="nf">(collection) -&gt;</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">pop</span><span class="p">().</span><span class="nx">destroy</span><span class="p">()</span> <span class="k">while</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">length</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="nv">questions = </span><span class="k">new</span> <span class="nx">Questions</span>
+    <span class="nx">questions</span><span class="p">.</span><span class="nx">fetch</span>
+      <span class="nv">success: </span><span class="nf">(collection) -&gt;</span>
+        <span class="k">for</span> <span class="nx">model</span> <span class="k">in</span> <span class="nx">collection</span><span class="p">.</span><span class="nx">where</span> <span class="p">{</span> <span class="s">&quot;assessmentId&quot;</span> <span class="o">:</span> <span class="nx">assessmentId</span> <span class="p">}</span>
+          <span class="nx">model</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>remove model</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">super</span><span class="p">()</span>
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

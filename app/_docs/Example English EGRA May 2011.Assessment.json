@@ -1,22 +1,8 @@
 {
   "name": "Example English EGRA May 2011",
   "_id": "Example English EGRA May 2011.Assessment",
-  "urlPathsForPages": [
-    "Example English EGRA May 2011.DateTime",
-    "Example English EGRA May 2011.School",
-    "Example English EGRA May 2011.StudentConsent",
-    "Example English EGRA May 2011.StudentInformation",
-    "Example English EGRA May 2011.Letters",
-    "Example English EGRA May 2011.Phonemes",
-    "Example English EGRA May 2011.FamiliarWords",
-    "Example English EGRA May 2011.InventedWords",
-    "Example English EGRA May 2011.OralPassageReading",
-    "Example English EGRA May 2011.ReadingComprehension",
-    "Example English EGRA May 2011.ListeningComprehension",
-    "Example English EGRA May 2011.Dictation",
-    "Example English EGRA May 2011.PupilContextInterview",
-    "Example English EGRA May 2011.Results"
-  ],
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
+  "group" : "public",
   "collection" : "assessment",
   "couchapp": {
   }

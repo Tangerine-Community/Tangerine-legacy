@@ -1,0 +1,29 @@
+{
+  "collection": "question",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "subtestId": "Example English EGRA May 2011.StudentInformation",
+  "_id": "Example English EGRA May 2011.StudentInformation.Q02",
+  "couchapp": {},
+  "order": 2,
+  "prompt": "Grade",
+  "name": "grade",
+  "type": "single",
+  "options": [
+    {
+      "label": "1st",
+      "value": 1
+    },
+    {
+      "label": "2nd",
+      "value": 2
+    },
+    {
+      "label": "3rd",
+      "value": 3
+    },
+    {
+      "label": "4th",
+      "value": 4
+    }
+  ]
+}

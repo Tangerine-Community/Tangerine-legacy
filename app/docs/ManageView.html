@@ -50,14 +50,12 @@
       <span class="nv">docName = </span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
       <span class="nv">docId   = </span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;_id&quot;</span><span class="p">)</span>
 
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;is archived&quot;</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;archived&quot;</span><span class="p">)</span>
       <span class="nv">archiveStatus = </span><span class="k">if</span>  <span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;archived&quot;</span><span class="p">)</span> <span class="k">then</span> <span class="s">&quot; class=&#39;archived_assessment&#39; &quot;</span> <span class="k">else</span> <span class="s">&quot;&quot;</span>
       <span class="nv">safeDocName   = </span><span class="nx">docName</span><span class="p">.</span><span class="nx">toLowerCase</span><span class="p">().</span><span class="nx">dasherize</span><span class="p">()</span>
 
       <span class="nx">@temp</span><span class="p">.</span><span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
 <span class="s">      &lt;li id=&#39;</span><span class="si">#{</span><span class="nx">safeDocName</span><span class="si">}</span><span class="s">&#39;&gt;&lt;span</span><span class="si">#{</span><span class="nx">archiveStatus</span><span class="si">}</span><span class="s">&gt;</span><span class="si">#{</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span><span class="si">}</span><span class="s">&lt;/span&gt; </span>
-<span class="s">        &lt;a href=&#39;</span><span class="err">#</span><span class="s">results/</span><span class="si">#{</span><span class="nx">docName</span><span class="si">}</span><span class="s">&#39;&gt;&lt;img class=&#39;icon&#39; src=&#39;images/icon_result.png&#39;&gt;&lt;/a&gt;</span>
+<span class="s">        &lt;a href=&#39;</span><span class="err">#</span><span class="s">results/</span><span class="si">#{</span><span class="nx">docId</span><span class="si">}</span><span class="s">&#39;&gt;&lt;img class=&#39;icon&#39; src=&#39;images/icon_result.png&#39;&gt;&lt;/a&gt;</span>
 <span class="s">        &lt;a href=&#39;</span><span class="err">#</span><span class="s">edit/assessment/</span><span class="si">#{</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&#39;&gt;&lt;img class=&#39;icon&#39; src=&#39;images/icon_edit.png&#39;&gt;&lt;/a&gt; </span>
 <span class="s">        &lt;img class=&#39;icon_delete delete_assessment_confirm&#39; src=&#39;images/icon_delete.png&#39;&gt;</span>
 <span class="s">        &lt;span class=&#39;delete_confirm&#39;&gt;Are you sure? &lt;button data-docName=&#39;</span><span class="si">#{</span><span class="nx">docId</span><span class="si">}</span><span class="s">&#39;class=&#39;delete_assessment_yes&#39;&gt;Yes&lt;/button&gt;&lt;button class=&#39;delete_assessment_no&#39;&gt;No&lt;/button&gt;&lt;/span&gt;</span>
@@ -82,16 +80,14 @@
     <span class="nv">assessment = </span><span class="k">new</span> <span class="nx">Assessment</span>
       <span class="nv">name: </span><span class="nx">name</span>
       <span class="nv">_id: </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="nx">name</span>
-      <span class="nv">urlPathsForPages: </span><span class="p">[]</span>
+      <span class="nv">subtestIds: </span><span class="p">[]</span>
       <span class="nv">subtests: </span><span class="p">[]</span>
 
     <span class="nx">assessment</span><span class="p">.</span><span class="nx">save</span> <span class="kc">null</span><span class="p">,</span>
       <span class="nv">success: </span><span class="o">=&gt;</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;saved assessment, adding to collection&quot;</span>
         <span class="nx">@collection</span><span class="p">.</span><span class="nx">add</span> <span class="nx">assessment</span>
         <span class="nx">@hideNewAssessmentForm</span><span class="p">()</span>
       <span class="nv">error: </span><span class="o">-&gt;</span>
-        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;error saving assessment&quot;</span>
         <span class="nx">$</span><span class="p">(</span><span class="s">&#39;#assessment_name_error&#39;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&#39;error&#39;</span>
         <span class="nv">messages = </span><span class="nx">$</span><span class="p">(</span><span class="s">&quot;&lt;span class=&#39;error&#39;&gt;Invalid new assessment&lt;/span&gt;&quot;</span><span class="p">)</span>
         <span class="nx">$</span><span class="p">(</span><span class="s">&#39;button:contains(Add)&#39;</span><span class="p">).</span><span class="nx">after</span><span class="p">(</span><span class="nx">messages</span><span class="p">)</span>
@@ -102,7 +98,6 @@
     <span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.delete_confirm&quot;</span><span class="p">).</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">);</span>
 
   <span class="nv">deleteAfirmative: </span><span class="nf">(event) -&gt;</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;trying to get &quot;</span> <span class="o">+</span> <span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;data-docName&quot;</span><span class="p">)</span>
     <span class="nv">assessment = </span><span class="nx">@collection</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;data-docName&quot;</span><span class="p">))</span>
     <span class="nx">assessment</span><span class="p">.</span><span class="nx">destroy</span>
       <span class="nv">success: </span><span class="o">=&gt;</span>

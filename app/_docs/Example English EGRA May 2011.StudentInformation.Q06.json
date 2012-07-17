@@ -1,0 +1,21 @@
+{
+  "collection": "question",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "subtestId": "Example English EGRA May 2011.StudentInformation",
+  "_id": "Example English EGRA May 2011.StudentInformation.Q06",
+  "couchapp": {},
+  "order": 5,
+  "prompt": "Gender",
+  "name": "gender",
+  "type": "single",
+  "options": [
+    {
+      "label": "Female",
+      "value": "female"
+    },
+    {
+      "label": "Male",
+      "value": "male"
+    }
+  ]
+}

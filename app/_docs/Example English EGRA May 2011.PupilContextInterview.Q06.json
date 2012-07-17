@@ -1,0 +1,41 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q06",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "collection": "question",
+  "couchapp": {},
+  "order": 6,
+  "prompt": "Do you have any reading books at home? If Yes, in what language(s)?",
+  "name": "reading-books-at-home",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "English",
+      "value": "English"
+    },
+    {
+      "label": "Wolof",
+      "value": "Wolof"
+    },
+    {
+      "label": "Pular",
+      "value": "Pular"
+    },
+    {
+      "label": "Jola",
+      "value": "Jola"
+    },
+    {
+      "label": "Mandinka",
+      "value": "Mandinka"
+    },
+    {
+      "label": "Other",
+      "value": "Other"
+    }
+  ],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

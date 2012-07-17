@@ -31,25 +31,27 @@
     <span class="nv">assessmentCollection = </span><span class="k">new</span> <span class="nx">AssessmentCollection</span><span class="p">()</span>
     <span class="nx">assessmentCollection</span><span class="p">.</span><span class="nx">fetch</span>
       <span class="nv">success: </span><span class="o">=&gt;</span>
+
+        <span class="nv">archivedAssessments = </span><span class="p">[]</span>
         <span class="nv">assessmentDetails = </span><span class="p">{}</span>
         <span class="nx">assessmentCollection</span><span class="p">.</span><span class="nx">each</span> <span class="p">(</span><span class="nx">assessment</span><span class="p">)</span> <span class="o">=&gt;</span>
-          <span class="k">return</span> <span class="k">if</span> <span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;archived&quot;</span><span class="p">)</span> <span class="o">is</span> <span class="kc">true</span>
-          <span class="nx">assessmentDetails</span><span class="p">[</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span>
-            <span class="nv">id : </span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;_id&quot;</span> 
-            <span class="nv">name : </span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
-            <span class="nv">enumerator : </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
-            <span class="nv">number_completed : </span><span class="mi">0</span>
+          <span class="k">if</span> <span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;archived&quot;</span><span class="p">)</span> <span class="o">is</span> <span class="kc">true</span>
+            <span class="nx">archivedAssessments</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;_id&quot;</span><span class="p">)</span>
+          <span class="k">else</span>
+            <span class="nx">assessmentDetails</span><span class="p">[</span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span>
+              <span class="nv">id : </span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;_id&quot;</span> 
+              <span class="nv">name : </span><span class="nx">assessment</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
+              <span class="nv">enumerator : </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
+              <span class="nv">number_completed : </span><span class="mi">0</span>
 
         <span class="nv">resultCollection = </span><span class="k">new</span> <span class="nx">ResultCollection</span><span class="p">()</span>
         <span class="nx">resultCollection</span><span class="p">.</span><span class="nx">fetch</span>
           <span class="nv">success: </span><span class="o">=&gt;</span>
             <span class="nx">resultCollection</span><span class="p">.</span><span class="nx">each</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="o">=&gt;</span>
-              <span class="k">return</span> <span class="nx">unless</span> <span class="nx">result</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;enumerator&quot;</span><span class="p">)</span> <span class="o">is</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
-              <span class="nx">assessmentDetails</span><span class="p">[</span><span class="nx">result</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;assessmentId&quot;</span> <span class="p">][</span><span class="s">&quot;number_completed&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+              <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;enumerator&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">))</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">archivedAssessments</span><span class="p">,</span> <span class="nx">result</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;assessmentId&quot;</span><span class="p">))</span> <span class="o">==-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="nx">assessmentDetails</span><span class="p">[</span><span class="nx">result</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;assessmentId&quot;</span><span class="p">)][</span><span class="s">&quot;number_completed&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
             <span class="nx">_</span><span class="p">.</span><span class="nx">each</span> <span class="nx">assessmentDetails</span><span class="p">,</span> <span class="p">(</span><span class="nx">value</span><span class="p">,</span><span class="nx">key</span><span class="p">)</span> <span class="o">=&gt;</span>
-              <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="s">&quot;value&quot;</span>
-              <span class="nx">console</span><span class="p">.</span><span class="nx">log</span> <span class="nx">value</span>
               <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">assessments tbody&quot;</span><span class="p">).</span><span class="nx">append</span> <span class="nx">@templateTableRow</span> <span class="nx">value</span>
 
             <span class="nx">$</span><span class="p">(</span><span class="s">&#39;table&#39;</span><span class="p">).</span><span class="nx">tablesorter</span><span class="p">()</span>

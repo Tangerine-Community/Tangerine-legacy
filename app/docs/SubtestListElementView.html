@@ -1,0 +1,42 @@
+<!DOCTYPE html>  <html> <head>   <title>SubtestListElementView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               SubtestListElementView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">SubtestListElementView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">tagName : </span><span class="s">&quot;li&quot;</span>
+  <span class="nv">className : </span><span class="s">&quot;subtest_element&quot;</span>
+  <span class="nv">events: </span>
+    <span class="s">&#39;click .icon_edit&#39;</span>     <span class="o">:</span> <span class="s">&#39;edit&#39;</span>
+    <span class="s">&quot;click .icon_delete&quot;</span>   <span class="o">:</span> <span class="s">&quot;toggleDeleteConfirm&quot;</span>
+    <span class="s">&quot;click .delete_cancel&quot;</span> <span class="o">:</span> <span class="s">&quot;toggleDeleteConfirm&quot;</span>
+    <span class="s">&quot;click .delete_delete&quot;</span> <span class="o">:</span> <span class="s">&quot;delete&quot;</span>
+
+  <span class="nv">toggleDeleteConfirm: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.delete_confirm&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">);</span> <span class="kc">false</span>
+  <span class="k">delete</span><span class="o">:</span> <span class="o">-&gt;</span> <span class="nx">@trigger</span> <span class="s">&quot;subtest:delete&quot;</span><span class="p">,</span> <span class="nx">@model</span><span class="p">;</span> <span class="kc">false</span>
+
+  <span class="nv">edit: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;subtest/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>This is for $.sortable. Don't remove.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">@$el</span><span class="p">.</span><span class="nx">attr</span> <span class="s">&quot;data-id&quot;</span><span class="p">,</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">id</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">subtestName   = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
+    <span class="nv">prototype     = </span><span class="s">&quot;[</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;prototype&quot;</span><span class="p">)</span><span class="si">}</span><span class="s">]&quot;</span>
+    <span class="nv">iconDrag      = </span><span class="s">&quot;&lt;img src=&#39;images/icon_drag.png&#39; class=&#39;sortable_handle&#39;&gt;&quot;</span>
+    <span class="nv">iconEdit      = </span><span class="s">&quot;&lt;img src=&#39;images/icon_edit.png&#39; class=&#39;icon_edit&#39;&gt;&quot;</span>
+    <span class="nv">iconDelete    = </span><span class="s">&quot;&lt;img src=&#39;images/icon_delete.png&#39; class=&#39;icon_delete&#39;&gt;&quot;</span>
+    <span class="nv">deleteConfirm = </span><span class="s">&quot;&lt;br&gt;&lt;span class=&#39;delete_confirm&#39;&gt;&lt;div class=&#39;menu_box&#39;&gt;Confirm &lt;button class=&#39;delete_delete command_red&#39;&gt;Delete&lt;/button&gt; &lt;button class=&#39;delete_cancel command&#39;&gt;Cancel&lt;/button&gt;&lt;/div&gt;&lt;/span&gt;&quot;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;table&gt;&lt;tr&gt;</span>
+<span class="s">      &lt;td&gt;</span><span class="si">#{</span><span class="nx">iconDrag</span><span class="si">}</span><span class="s">&lt;/td&gt;</span>
+<span class="s">      &lt;td&gt;</span>
+<span class="s">        </span><span class="si">#{</span><span class="nx">subtestName</span><span class="si">}</span><span class="s"></span>
+<span class="s">        </span><span class="si">#{</span><span class="nx">prototype</span><span class="si">}</span><span class="s"></span>
+<span class="s">        </span><span class="si">#{</span><span class="nx">iconEdit</span><span class="si">}</span><span class="s"></span>
+<span class="s">        </span><span class="si">#{</span><span class="nx">iconDelete</span><span class="si">}</span><span class="s"></span>
+<span class="s">        </span><span class="si">#{</span><span class="nx">deleteConfirm</span><span class="si">}</span><span class="s"></span>
+<span class="s">      &lt;/td&gt;</span>
+<span class="s">      &lt;/tr&gt;&lt;/table&gt;</span>
+<span class="s">    &quot;</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

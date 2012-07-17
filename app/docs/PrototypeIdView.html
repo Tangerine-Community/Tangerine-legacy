@@ -1,0 +1,49 @@
+<!DOCTYPE html>  <html> <head>   <title>PrototypeIdView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               PrototypeIdView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">PrototypeIdView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">className: </span><span class="s">&quot;id&quot;</span>
+  
+  <span class="nv">events:</span>
+    <span class="s">&#39;click #generate&#39;</span> <span class="o">:</span> <span class="s">&#39;generate&#39;</span>
+    <span class="s">&#39;change #student_id&#39;</span> <span class="o">:</span> <span class="s">&#39;setValidator&#39;</span>
+  
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@model  = </span><span class="nx">@options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@parent = </span><span class="nx">@options</span><span class="p">.</span><span class="nx">parent</span>
+    <span class="vi">@validator = </span><span class="k">new</span> <span class="nx">CheckDigit</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">    &lt;form&gt;</span>
+<span class="s">      &lt;label for=&#39;student_id&#39;&gt;Random Identifier&lt;/label&gt;</span>
+<span class="s">      &lt;input id=&#39;student_id&#39; name=&#39;student_id&#39;&gt;</span>
+<span class="s">      &lt;button id=&#39;generate&#39; class=&#39;command&#39;&gt;Generate&lt;/button&gt;</span>
+<span class="s">      &lt;div class=&#39;messages&#39;&gt;&lt;/div&gt;</span>
+<span class="s">    &lt;/form&gt;&quot;</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">getSum: </span><span class="o">-&gt;</span>
+    <span class="nv">correct   : </span><span class="mi">1</span>
+    <span class="nv">incorrect : </span><span class="mi">0</span>
+    <span class="nv">missing   : </span><span class="mi">0</span>
+    <span class="nv">total     : </span><span class="mi">1</span>
+
+  <span class="nv">setValidator: </span><span class="o">-&gt;</span>
+    <span class="nx">@validator</span><span class="p">.</span><span class="nx">set</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#student_id&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+
+  <span class="nv">isValid: </span><span class="o">-&gt;</span>
+    <span class="nx">@setValidator</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">false</span> <span class="k">if</span> <span class="o">not</span> <span class="nx">@validator</span><span class="p">.</span><span class="nx">isValid</span><span class="p">()</span>
+    <span class="nx">@updateNavigation</span><span class="p">()</span>
+    
+  <span class="nv">showErrors: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.messages&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">@validator</span><span class="p">.</span><span class="nx">getErrors</span><span class="p">().</span><span class="nx">join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">)</span>
+
+  <span class="nv">generate: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.messages&quot;</span><span class="p">).</span><span class="nx">empty</span><span class="p">()</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#student_id&#39;</span><span class="p">).</span><span class="nx">val</span> <span class="nx">@validator</span><span class="p">.</span><span class="nx">generate</span><span class="p">()</span>
+    <span class="kc">false</span>
+
+  <span class="nv">updateNavigation: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">nav</span><span class="p">.</span><span class="nx">setStudent</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#student_id&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

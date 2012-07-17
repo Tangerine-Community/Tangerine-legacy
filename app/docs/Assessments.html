@@ -1,0 +1,12 @@
+<!DOCTYPE html>  <html> <head>   <title>Assessments.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Assessments.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">Assessments</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Collection</span>
+  <span class="nv">model: </span><span class="nx">Assessment</span>
+  <span class="nv">url: </span><span class="s">&#39;/assessment&#39;</span>
+
+  <span class="nv">comparator : </span><span class="nf">(model) -&gt;</span>
+    <span class="nx">model</span><span class="p">.</span><span class="nx">get</span> <span class="s">&quot;name&quot;</span>
+
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="k">if</span> <span class="nx">options</span><span class="o">?</span><span class="p">.</span><span class="nx">group</span> <span class="k">then</span> <span class="vi">@group = </span><span class="nx">options</span><span class="p">.</span><span class="nx">group</span>
+  
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

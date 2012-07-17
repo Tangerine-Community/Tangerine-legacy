@@ -1,0 +1,74 @@
+<!DOCTYPE html>  <html> <head>   <title>AccountView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               AccountView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">AccountView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .leave&#39;</span>       <span class="o">:</span> <span class="s">&#39;leaveGroup&#39;</span>
+    <span class="s">&#39;click .join_cancel&#39;</span> <span class="o">:</span> <span class="s">&#39;joinToggle&#39;</span>
+    <span class="s">&#39;click .join&#39;</span>        <span class="o">:</span> <span class="s">&#39;joinToggle&#39;</span>
+    <span class="s">&#39;click .join_group&#39;</span>  <span class="o">:</span> <span class="s">&#39;join&#39;</span>
+    <span class="s">&#39;click .back&#39;</span>        <span class="o">:</span> <span class="s">&#39;goBack&#39;</span>
+
+
+  <span class="nv">goBack: </span><span class="o">-&gt;</span>
+    <span class="nb">window</span><span class="p">.</span><span class="nx">history</span><span class="p">.</span><span class="nx">back</span><span class="p">()</span>
+
+  <span class="nv">joinToggle: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.join, .join_confirmation&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">group_name&quot;</span><span class="p">).</span><span class="nx">val</span> <span class="s">&quot;&quot;</span>
+
+  <span class="nv">join: </span><span class="o">-&gt;</span>
+    <span class="nv">group = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">group_name&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\s|-/g</span><span class="p">,</span> <span class="s">&quot;_&quot;</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/[^a-zA-Z0-9_&#39;&quot;]/g</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="k">if</span> <span class="nx">group</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span>
+    
+    <span class="nx">@user</span><span class="p">.</span><span class="nx">joinGroup</span> <span class="nx">group</span>
+    <span class="nx">@joinToggle</span><span class="p">()</span>
+    <span class="nx">@render</span><span class="p">()</span>
+
+  <span class="nv">leaveGroup: </span><span class="nf">(event) -&gt;</span>
+    <span class="nv">group = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">attr</span><span class="p">(</span><span class="s">&#39;data-group&#39;</span><span class="p">)</span>
+    <span class="nx">@user</span><span class="p">.</span><span class="nx">leaveGroup</span> <span class="nx">group</span>
+    <span class="nx">@render</span><span class="p">()</span>
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="vi">@user = </span><span class="nx">options</span><span class="p">.</span><span class="nx">user</span>
+  
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">html = </span><span class="s">&quot;</span>
+<span class="s">      &lt;button class=&#39;back navigation&#39;&gt;Back&lt;/button&gt;</span>
+<span class="s">      &lt;h1&gt;Account&lt;/h1&gt;</span>
+<span class="s">      &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">        &lt;label&gt;Name&lt;/label&gt;</span>
+<span class="s">        &lt;p&gt;</span><span class="si">#{</span><span class="nx">@user</span><span class="p">.</span><span class="nx">name</span><span class="si">}</span><span class="s">&lt;/p&gt;</span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">      &lt;div class=&#39;label_value menu_box&#39;&gt;</span>
+<span class="s">        &lt;label&gt;Groups&lt;/label&gt;</span>
+<span class="s">        &lt;ul&gt;</span>
+<span class="s">    &quot;</span>
+    <span class="k">for</span> <span class="nx">group</span> <span class="k">in</span> <span class="p">(</span><span class="nx">@user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;groups&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[])</span>
+        <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;li data-group=&#39;</span><span class="si">#{</span><span class="nx">group</span><span class="si">}</span><span class="s">&#39;&gt;</span><span class="si">#{</span><span class="nx">group</span><span class="si">}</span><span class="s"> &lt;button class=&#39;command leave&#39;&gt;Leave&lt;/button&gt;&lt;/li&gt;&quot;</span>
+    <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">        &lt;/ul&gt;</span>
+<span class="s">        &lt;button class=&#39;command join&#39;&gt;Join or create a group&lt;/button&gt;</span>
+<span class="s">        &lt;div class=&#39;confirmation join_confirmation&#39;&gt;</span>
+<span class="s">          &lt;input id=&#39;group_name&#39; placeholder=&#39;Group name&#39;&gt;</span>
+<span class="s">          &lt;small&gt;Please be specific.&lt;br&gt;</span>
+<span class="s">          Good examples: MalawiJun2012, MikeTestGroup2012, EGRAGroup2012&lt;br&gt;</span>
+<span class="s">          Bad examples: group, test, mine&lt;/small&gt;&lt;br&gt;</span>
+<span class="s">          &lt;button class=&#39;command join_group&#39;&gt;Join Group&lt;/button&gt;</span>
+<span class="s">          &lt;button class=&#39;command join_cancel&#39;&gt;Cancel&lt;/button&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">      &lt;/div&gt;&lt;br&gt;</span>
+<span class="s">      &lt;!--button class=&#39;command confirmation&#39;&gt;Report a bug&lt;/button&gt;</span>
+<span class="s">      &lt;div class=&#39;confirmation&#39; id=&#39;bug&#39;&gt;</span>
+<span class="s">        &lt;label for=&#39;where&#39;&gt;What broke?</span>
+<span class="s">        &lt;input id=&#39;where&#39; placeholder=&#39;where&#39;&gt;</span>
+<span class="s">        &lt;label for=&#39;where&#39;&gt;What happened?</span>
+<span class="s">        &lt;input id=&#39;where&#39; placeholder=&#39;what&#39;&gt;</span>
+<span class="s">        &lt;label for=&#39;where&#39;&gt;What should have happened?</span>
+<span class="s">        &lt;input id=&#39;should&#39; placeholder=&#39;should&#39;&gt;</span>
+<span class="s">        &lt;button&gt;Send&lt;/button&gt;</span>
+<span class="s">      &lt;/div--&gt;</span>
+<span class="s">      &quot;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="nx">html</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

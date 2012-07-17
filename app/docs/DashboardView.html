@@ -1,0 +1,26 @@
+<!DOCTYPE html>  <html> <head>   <title>DashboardView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               DashboardView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">DashboardView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">initialize: </span><span class="o">-&gt;</span>
+    <span class="vi">@assessments = </span><span class="k">new</span> <span class="nx">AssessmentListView</span>
+      <span class="nv">isAdmin : </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">isAdmin</span>
+      <span class="nv">submenu : </span><span class="kc">false</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;h1&gt;Dashboard&lt;/h1&gt;</span>
+<span class="s">      &lt;div id=&#39;dash_buttons&#39; class=&#39;buttonset&#39;&gt;</span>
+<span class="s">        &lt;input type=&#39;radio&#39; id=&#39;assessment&#39; name=&#39;dash_nav&#39; checked&gt;&lt;label for=&#39;assessment&#39;&gt;assessments&lt;/label&gt;</span>
+<span class="s">        &lt;input type=&#39;radio&#39; id=&#39;account&#39; name=&#39;dash_nav&#39;&gt;&lt;label for=&#39;account&#39;&gt;account&lt;/label&gt;</span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">      &lt;div id=&#39;dash_assessments&#39; class=&#39;column&#39;&gt;&lt;/div&gt;</span>
+<span class="s">      &lt;div id=&#39;dash_account&#39; class=&#39;column&#39;&gt;&lt;/div&gt;</span>
+<span class="s">      &quot;</span>
+
+    <span class="nx">@assessments</span><span class="p">.</span><span class="nx">setElement</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span> <span class="s">&quot;</span><span class="err">#</span><span class="s">dash_assessments&quot;</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+    
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="nx">@assessments</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

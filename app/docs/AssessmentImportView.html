@@ -1,0 +1,75 @@
+<!DOCTYPE html>  <html> <head>   <title>AssessmentImportView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               AssessmentImportView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">AssessmentImportView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events: </span>
+    <span class="s">&#39;click .import&#39;</span> <span class="o">:</span> <span class="s">&#39;import&#39;</span>
+    <span class="s">&#39;click .back&#39;</span>   <span class="o">:</span> <span class="s">&#39;back&#39;</span>
+
+  <span class="nv">back: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="kc">true</span>
+    <span class="kc">false</span>
+
+  <span class="nv">import: </span><span class="o">-&gt;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>This is supposed to work
+   $.couch.db("tangerine").compact
+     complete: (a,b,c) =>
+       console.log "compact"
+       console.log [a,b,c]</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">dKey = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">d_key&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.status&quot;</span><span class="p">).</span><span class="nx">fadeIn</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">progress&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Looking for </span><span class="si">#{</span><span class="nx">dKey</span><span class="si">}</span><span class="s">&quot;</span>
+    <span class="nv">repOps = </span>
+      <span class="s">&#39;filter&#39;</span> <span class="o">:</span> <span class="s">&#39;tangerine/importFilter&#39;</span>
+      <span class="s">&#39;create_target&#39;</span> <span class="o">:</span> <span class="kc">true</span>
+      <span class="s">&#39;query_params&#39;</span> <span class="o">:</span>
+        <span class="s">&#39;downloadKey&#39;</span> <span class="o">:</span> <span class="nx">dKey</span>
+
+    <span class="nv">opts =</span>
+      <span class="nv">success: </span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">progress&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Import successful &lt;h3&gt;Imported&lt;/h3&gt;&quot;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>this next step is just a test to see everything is there...
+maybe it doesn't need to. Kind of impressive though.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nx">$</span><span class="p">.</span><span class="nx">couch</span><span class="p">.</span><span class="nx">db</span><span class="p">(</span><span class="s">&quot;tangerine&quot;</span><span class="p">).</span><span class="nx">view</span> <span class="s">&quot;tangerine/byDKey&quot;</span><span class="p">,</span>
+          <span class="nv">keys: </span><span class="p">[</span><span class="nx">dKey</span><span class="p">]</span>
+          <span class="nv">success: </span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="o">=&gt;</span>
+            <span class="nv">questions = </span><span class="mi">0</span>
+            <span class="nv">assessments = </span><span class="mi">0</span>
+            <span class="nv">subtests = </span><span class="mi">0</span>
+            <span class="nv">assessmentName = </span><span class="s">&quot;&quot;</span>
+            <span class="k">for</span> <span class="nx">datum</span> <span class="k">in</span> <span class="nx">data</span><span class="p">.</span><span class="nx">rows</span>
+              <span class="nv">doc = </span><span class="nx">datum</span><span class="p">.</span><span class="nx">value</span>
+              <span class="nx">subtests</span><span class="o">++</span> <span class="k">if</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">collection</span> <span class="o">==</span> <span class="s">&#39;subtest&#39;</span>
+              <span class="nx">questions</span><span class="o">++</span> <span class="k">if</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">collection</span> <span class="o">==</span> <span class="s">&#39;question&#39;</span>  
+              <span class="nv">assessmentName = </span><span class="nx">doc</span><span class="p">.</span><span class="nx">name</span> <span class="k">if</span> <span class="nx">doc</span><span class="p">.</span><span class="nx">collection</span> <span class="o">==</span> <span class="s">&#39;assessment&#39;</span>
+            <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">progress&quot;</span><span class="p">).</span><span class="nx">append</span> <span class="s">&quot;</span>
+<span class="s">              &lt;div&gt;</span><span class="si">#{</span><span class="nx">assessmentName</span><span class="si">}</span><span class="s">&lt;/div&gt;</span>
+<span class="s">              &lt;div&gt;Subtests - </span><span class="si">#{</span><span class="nx">subtests</span><span class="si">}</span><span class="s">&lt;/div&gt;</span>
+<span class="s">              &lt;div&gt;Questions - </span><span class="si">#{</span><span class="nx">questions</span><span class="si">}</span><span class="s">&lt;/div&gt;&quot;</span>
+
+          <span class="nv">error: </span><span class="nf">(a, b ,c) -&gt;</span>
+            <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">progress&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;&lt;div&gt;Error after data imported&lt;/div&gt;&lt;div&gt;</span><span class="si">#{</span><span class="nx">a</span><span class="si">}</span><span class="s">&lt;/div&gt;&lt;div&gt;</span><span class="si">#{</span><span class="nx">b</span><span class="si">}</span><span class="s">&quot;</span>
+
+      <span class="nv">error: </span><span class="p">(</span><span class="nx">a</span><span class="p">,</span><span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">progress&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;&lt;div&gt;Import error&lt;/div&gt;&lt;div&gt;</span><span class="si">#{</span><span class="nx">a</span><span class="si">}</span><span class="s">&lt;/div&gt;&lt;div&gt;</span><span class="si">#{</span><span class="nx">b</span><span class="si">}</span><span class="s">&quot;</span>
+    
+    <span class="nx">$</span><span class="p">.</span><span class="nx">couch</span><span class="p">.</span><span class="nx">replicate</span> <span class="s">&quot;http://tangerine.iriscouch.com:5984/tangerine&quot;</span><span class="p">,</span> <span class="s">&quot;tangerine&quot;</span><span class="p">,</span> <span class="nx">opts</span><span class="p">,</span> <span class="nx">repOps</span>
+
+
+    <span class="kc">false</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">    &lt;button class=&#39;back&#39;&gt;Back&lt;/button&gt;</span>
+
+<span class="s">    &lt;h1&gt;Tangerine Central Import&lt;/h1&gt;</span>
+<span class="s">    &lt;div class=&#39;question&#39;&gt;</span>
+<span class="s">      &lt;label for=&#39;d_key&#39;&gt;Download key&lt;/label&gt;</span>
+<span class="s">      &lt;input id=&#39;d_key&#39; value=&#39;&#39;&gt;</span>
+<span class="s">      &lt;button class=&#39;import&#39;&gt;Import&lt;/button&gt;</span>
+<span class="s">    &lt;/div&gt;</span>
+
+<span class="s">    &lt;div class=&#39;confirmation status&#39;&gt;</span>
+<span class="s">      &lt;h2&gt;Status&lt;h2&gt;</span>
+<span class="s">      &lt;div class=&#39;info_box&#39; id=&#39;progress&#39;&gt;&lt;/div&gt;</span>
+<span class="s">    &lt;/div&gt;</span>
+
+<span class="s">    &quot;</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,0 +1,91 @@
+<!DOCTYPE html>  <html> <head>   <title>AssessmentListElementView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               AssessmentListElementView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">AssessmentListElementView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">tagName : </span><span class="s">&quot;li&quot;</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .edit&#39;</span>                      <span class="o">:</span> <span class="s">&#39;gotoEdit&#39;</span>
+    <span class="s">&#39;click .results&#39;</span>                   <span class="o">:</span> <span class="s">&#39;gotoResults&#39;</span>
+    <span class="s">&#39;click .run&#39;</span>                       <span class="o">:</span> <span class="s">&#39;gotoRun&#39;</span>
+    <span class="s">&#39;click .assessment_menu_toggle&#39;</span>    <span class="o">:</span> <span class="s">&#39;assessmentMenuToggle&#39;</span>
+    <span class="s">&#39;click .admin_name&#39;</span>                <span class="o">:</span> <span class="s">&#39;assessmentMenuToggle&#39;</span>
+    <span class="s">&#39;click .assessment_delete&#39;</span>         <span class="o">:</span> <span class="s">&#39;assessmentDeleteToggle&#39;</span>
+    <span class="s">&#39;click .assessment_delete_cancel&#39;</span>  <span class="o">:</span> <span class="s">&#39;assessmentDeleteToggle&#39;</span>
+    <span class="s">&#39;click .assessment_delete_confirm&#39;</span> <span class="o">:</span> <span class="s">&#39;assessmentDelete&#39;</span>
+    <span class="s">&#39;click .copy&#39;</span>                      <span class="o">:</span> <span class="s">&#39;copyToGroup&#39;</span>
+    <span class="s">&#39;click .duplicate&#39;</span>                 <span class="o">:</span> <span class="s">&#39;duplicate&#39;</span>
+
+  <span class="nx">initialize</span><span class="o">:</span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@parent = </span><span class="nx">options</span><span class="p">.</span><span class="nx">parent</span>
+    <span class="vi">@isAdmin = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">isAdmin</span><span class="p">()</span>
+    <span class="vi">@isPublic = </span><span class="nx">options</span><span class="p">.</span><span class="nx">isPublic</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+
+  <span class="nv">gotoEdit: </span><span class="o">-&gt;</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;edit/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+  <span class="nv">gotoResults: </span><span class="o">-&gt;</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;results/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+  <span class="nv">gotoRun: </span><span class="o">-&gt;</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;run/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">duplicate: </span><span class="o">-&gt;</span>
+    <span class="nv">newName = </span><span class="s">&quot;Copy of &quot;</span> <span class="o">+</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">)</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">duplicate</span> <span class="p">{</span> <span class="nv">name : </span><span class="nx">newName</span> <span class="p">},</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="o">=&gt;</span>
+      <span class="nx">@render</span><span class="p">()</span>
+      <span class="nx">@parent</span><span class="p">.</span><span class="nx">refresh</span><span class="p">()</span>
+
+  <span class="nv">copyToGroup: </span><span class="o">-&gt;</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">duplicate</span> <span class="p">{</span><span class="nx">group</span><span class="o">:</span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;groups&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]},</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="o">=&gt;</span>
+      <span class="nx">@render</span><span class="p">()</span>
+      <span class="nx">@parent</span><span class="p">.</span><span class="nx">refresh</span><span class="p">()</span>
+
+  <span class="nv">assessmentMenuToggle: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.assessment_menu_toggle&#39;</span><span class="p">).</span><span class="nx">toggleClass</span> <span class="s">&#39;icon_down&#39;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.assessment_menu&#39;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+  <span class="nv">assessmentDeleteToggle: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.assessment_delete_confirm&quot;</span><span class="p">).</span><span class="nx">fadeToggle</span><span class="p">(</span><span class="mi">250</span><span class="p">);</span> <span class="kc">false</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>deep non-gerneric delete</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nv">assessmentDelete: </span><span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>remove from collection</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">@$el</span><span class="p">.</span><span class="nx">fadeOut</span> <span class="mi">250</span><span class="p">,</span> <span class="o">=&gt;</span> 
+      <span class="nx">@parent</span><span class="p">.</span><span class="nx">collection</span><span class="p">.</span><span class="nx">remove</span> <span class="nx">@model</span>
+      <span class="nx">@model</span><span class="p">.</span><span class="nx">destroy</span><span class="p">()</span>
+
+          
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">archiveClass    = </span><span class="k">if</span> <span class="p">(</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;archived&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="kc">true</span> <span class="o">or</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;archived&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">)</span> <span class="k">then</span> <span class="s">&quot; archived_assessment&quot;</span> <span class="k">else</span> <span class="s">&quot;&quot;</span>
+    <span class="nv">copyButton      = </span><span class="s">&quot;&lt;button class=&#39;copy command&#39;&gt;Copy to group&lt;/button&gt;&quot;</span>
+    <span class="nv">toggleButton    = </span><span class="s">&quot;&lt;span class=&#39;assessment_menu_toggle icon_ryte&#39;&gt; &lt;/span&gt;&quot;</span>
+    <span class="nv">deleteButton    = </span><span class="s">&quot;&lt;img class=&#39;assessment_delete link_icon&#39; title=&#39;Delete&#39; src=&#39;images/icon_delete.png&#39;&gt;&lt;br&gt;&lt;span class=&#39;assessment_delete_confirm&#39;&gt;&lt;div class=&#39;menu_box&#39;&gt;Confirm &lt;button class=&#39;assessment_delete_yes command_red&#39;&gt;Delete&lt;/button&gt; &lt;button class=&#39;assessment_delete_cancel command&#39;&gt;Cancel&lt;/button&gt;&lt;/div&gt;&lt;/span&gt;&quot;</span>
+    <span class="nv">duplicateButton = </span><span class="s">&quot;&lt;img class=&#39;link_icon duplicate&#39; title=&#39;Duplicate&#39; src=&#39;images/icon_duplicate.png&#39;&gt;&quot;</span>
+    <span class="nv">editButton      = </span><span class="s">&quot;&lt;img class=&#39;link_icon edit&#39; title=&#39;Edit&#39; src=&#39;images/icon_edit.png&#39;&gt;&quot;</span>
+    <span class="nv">resultsButton   = </span><span class="s">&quot;&lt;img class=&#39;link_icon results&#39; title=&#39;Results&#39; src=&#39;images/icon_results.png&#39;&gt;&quot;</span>
+    <span class="nv">runButton       = </span><span class="s">&quot;&lt;img class=&#39;link_icon run&#39; title=&#39;Run&#39; src=&#39;images/icon_run.png&#39;&gt;&quot;</span>
+    <span class="nv">name            = </span><span class="s">&quot;&lt;span class=&#39;name clickable &#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">&lt;/span&gt;&quot;</span>
+    <span class="nv">adminName       = </span><span class="s">&quot;&lt;span class=&#39;admin_name clickable </span><span class="si">#{</span><span class="nx">archiveClass</span><span class="si">}</span><span class="s">&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">&lt;/span&gt;&quot;</span>
+    <span class="nv">resultCount     = </span><span class="s">&quot;&lt;span class=&#39;resultCount&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;resultCount&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&#39;0&#39;</span><span class="si">}</span><span class="s"> results&lt;/span&gt;&quot;</span>
+
+    <span class="k">if</span> <span class="nx">@isAdmin</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>admin standard</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nv">html = </span><span class="s">&quot;</span>
+<span class="s">        &lt;div&gt;</span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">toggleButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">adminName</span><span class="si">}</span><span class="s"> </span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">      &quot;</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Admin on mobile</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">if</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">mobile</span>
+        <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">          &lt;div class=&#39;assessment_menu&#39;&gt;</span>
+<span class="s">            </span><span class="si">#{</span><span class="nx">runButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">            </span><span class="si">#{</span><span class="nx">resultsButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">            </span><span class="si">#{</span><span class="nx">deleteButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">          &lt;/div&gt;</span>
+<span class="s">        &quot;</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>not on mobile</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">else</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>admin and public</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">if</span> <span class="nx">@isPublic</span>
+          <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">            &lt;div class=&#39;assessment_menu&#39;&gt;</span>
+<span class="s">              </span><span class="si">#{</span><span class="nx">copyButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">            &lt;/div&gt;</span>
+<span class="s">          &quot;</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>admin and group</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">else</span>
+          <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">            &lt;div class=&#39;assessment_menu&#39;&gt;</span>
+<span class="s">              </span><span class="si">#{</span><span class="nx">runButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">              </span><span class="si">#{</span><span class="nx">resultsButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">              </span><span class="si">#{</span><span class="nx">editButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">              </span><span class="si">#{</span><span class="nx">duplicateButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">              </span><span class="si">#{</span><span class="nx">deleteButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">            &lt;/div&gt;</span>
+<span class="s">          &quot;</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>enumerator user</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">else</span>
+      <span class="nv">html = </span><span class="s">&quot;&lt;div&gt;</span><span class="si">#{</span><span class="nx">runButton</span><span class="si">}#{</span><span class="nx">name</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="nx">resultsButton</span><span class="si">}</span><span class="s">&lt;/div&gt;&quot;</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="nx">html</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

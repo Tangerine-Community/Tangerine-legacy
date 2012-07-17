@@ -1,88 +1,87 @@
 {
-  "collection": "subtest",
-  "pageType": "SchoolPage",
-  "pageId": "School",
-  "schools": [
-    {
-      "name": "Lilongwe",
-      "district": "Lilongwe",
-      "schoolId": "1142",
-      "province": "Central"
-    },
-    {
-      "name": "Blantyre",
-      "district": "Blantyre",
-      "schoolId": "2142",
-      "province": "Blantyre"
-    },
-    {
-      "name": "Dedza",
-      "district": "Dedza",
-      "schoolId": "2742",
-      "province": "Central"
-    },
-    {
-      "name": "Mzuzu",
-      "district": "Mzuzu",
-      "schoolId": "9742",
-      "province": "North"
-    },
-    {
-      "name": "Anderson",
-      "district": "Washoe",
-      "schoolId": "2442",
-      "province": "Nevada"
-    },
-    {
-      "name": "Jessie Beck",
-      "district": "Washoe",
-      "schoolId": "2443",
-      "province": "Nevada"
-    },
-    {
-      "name": "Swope",
-      "district": "Washoe",
-      "schoolId": "442",
-      "province": "Nevada"
-    },
-    {
-      "name": "Pine",
-      "district": "Washoe",
-      "schoolId": "4412",
-      "province": "Nevada"
-    },
-    {
-      "name": "Manogue",
-      "district": "Washoe",
-      "schoolId": "42",
-      "province": "Nevada"
-    },
-    {
-      "name": "Reno",
-      "district": "Carson",
-      "schoolId": "142",
-      "province": "Nevada"
-    },
-    {
-      "name": "Carson",
-      "district": "Carson",
-      "schoolId": "144",
-      "province": "Nevada"
-    },
-    {
-      "name": "Truckee",
-      "district": "Sierras",
-      "schoolId": "242",
-      "province": "California"
-    }
-  ],
   "_id": "Example English EGRA May 2011.School",
-  "nameText": "Name",
-  "schoolIdText": "ID",
- 
- 
-  "districtText": "District",
-  "provinceText": "Province",
+  "collection": "subtest",
+  "prototype": "location",
+  "name" : "School ID",
+  "order" : 2,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
+  "locations": [
+    [
+      "Central",
+      "Lilongwe",
+      "Lilongwe",
+      "1142"
+    ],
+    [
+      "Blantyre",
+      "Blantyre",
+      "Blantyre",
+      "2142"
+    ],
+    [
+      "Central",
+      "Dedza",
+      "Dedza",
+      "2742"
+    ],
+    [
+      "North",
+      "Mzuzu",
+      "Mzuzu",
+      "9742"
+    ],
+    [
+      "Nevada",
+      "Washoe",
+      "Anderson",
+      "2442"
+    ],
+    [
+      "Nevada",
+      "Washoe",
+      "Jessie Beck",
+      "2443"
+    ],
+    [
+      "Nevada",
+      "Washoe",
+      "442",
+      "Swope"
+    ],
+    [
+      "Nevada",
+      "Washoe",
+      "Pine",
+      "4412"
+    ],
+    [
+      "Nevada",
+      "Washoe",
+      "Manogue",
+      "42"
+    ],
+    [
+      "Nevada",
+      "Carson",
+      "Reno",
+      "142"
+    ],
+    [
+      "Nevada",
+      "Carson",
+      "Carson",
+      "144"
+    ],
+    [
+      "California",
+      "Sierras",
+      "Truckee",
+      "242"
+    ]
+  ],
+  "levels" : [
+    "Province", "District", "Name", "ID"
+  ],
   "couchapp": {
   }
 }

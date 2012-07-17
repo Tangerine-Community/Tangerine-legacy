@@ -1,94 +1,10 @@
 {
-  "collection": "subtest",
   "_id": "Example English EGRA May 2011.StudentInformation",
-  "pageType": "StudentInformationPage",
-  "pageId": "StudentInformation",
+  "collection": "subtest",
+  "prototype": "survey",
+  "name" : "Student Information",
+  "order" : 4,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
   "enumeratorHelp" : "Answer the questions below",
-  "questions": [
-    {
-      "label": "School Shift",
-      "orientation": "horizontal",
-      "options": [
-        "Full day",
-        "Morning",
-        "Afternoon"
-      ]
-    },
-    {
-      "label": "Multigrade class",
-      "orientation": "horizontal",
-      "options": [
-        "No",
-        "Yes"
-      ]
-    },
-    {
-      "label": "Grade",
-      "orientation": "horizontal",
-      "options": [
-        "1st",
-        "2nd",
-        "3rd",
-        "4th"
-      ]
-    },
-    {
-      "label": "Class",
-      "orientation": "horizontal",
-      "options": [
-        "A",
-        "B",
-        "C"
-      ]
-    },
-    {
-      "label": "Year of birth",
-      "orientation": "horizontal",
-      "options": [
-        "Unknown",
-        "1997",
-        "1998",
-        "1999",
-        "2000",
-        "2001",
-        "2002",
-        "2003",
-        "2004",
-        "2005",
-        "2006",
-        "2007"
-      ]
-    },
-    {
-      "label": "Month of Birth",
-      "orientation": "horizontal",
-      "options": [
-        "Unknown",
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ]
-    },
-    {
-      "label": "Gender",
-      "orientation": "horizontal",
-      "options": [
-        "Female",
-        "Male"
-      ]
-    }
-  ],
- 
- 
-  "couchapp": {
-  }
+  "couchapp": {}
 }

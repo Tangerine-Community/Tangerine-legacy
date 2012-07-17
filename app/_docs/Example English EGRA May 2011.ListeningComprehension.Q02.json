@@ -1,0 +1,22 @@
+{
+  "_id": "Example English EGRA May 2011.ListeningComprehension.Q02",
+  "subtestId": "Example English EGRA May 2011.ListeningComprehension",
+  "prompt": "What hit Pat on the head?",
+  "hint": "[rain; water drops]",
+  "name" : "pat_head",
+  "order" : 2,
+  "type": "single",
+  "options": [
+    {
+      "label": "Correct",
+      "value": "Correct"
+    },
+    {
+      "label": "Incorrect",
+      "value": "Incorrect"
+    }
+  ],
+  "collection": "question",
+  "couchapp": {},
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

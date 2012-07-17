@@ -1,0 +1,68 @@
+<!DOCTYPE html>  <html> <head>   <title>ResultView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               ResultView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">ResultView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">className: </span><span class="s">&quot;result_view&quot;</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .save&#39;</span>    <span class="o">:</span> <span class="s">&#39;save&#39;</span>
+    <span class="s">&#39;click .another&#39;</span> <span class="o">:</span> <span class="s">&#39;another&#39;</span>
+
+  <span class="nv">another: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;restart/</span><span class="si">#{</span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">id</span><span class="si">}</span><span class="s">&quot;</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">save: </span><span class="o">-&gt;</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">add</span>
+      <span class="nv">name : </span><span class="s">&quot;Assessment complete&quot;</span>
+      <span class="nv">prototype: </span><span class="s">&quot;complete&quot;</span>
+      <span class="nv">data :</span>
+        <span class="s">&quot;comment&quot;</span> <span class="o">:</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#additional_comments&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">||</span> <span class="s">&quot;&quot;</span>
+      <span class="nv">subtestId : </span><span class="s">&quot;result&quot;</span>
+      <span class="nv">sum :</span>
+        <span class="nv">correct : </span><span class="mi">1</span>
+        <span class="nv">incorrect : </span><span class="mi">0</span>
+        <span class="nv">missing : </span><span class="mi">0</span>
+        <span class="nv">total : </span><span class="mi">1</span>
+
+    <span class="k">if</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+      <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Result saved&quot;</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.save_status&#39;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;saved&quot;</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.save_status&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&#39;not_saved&#39;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;button.save, .question&#39;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.confirmation&#39;</span><span class="p">).</span><span class="nx">removeClass</span><span class="p">(</span><span class="s">&#39;confirmation&#39;</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Save error&quot;</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.save_status&#39;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Results may not have saved&quot;</span>
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@assessment = </span><span class="nx">options</span><span class="p">.</span><span class="nx">assessment</span>
+    <span class="vi">@saved = </span><span class="kc">false</span>
+    <span class="vi">@resultSumView = </span><span class="k">new</span> <span class="nx">ResultSumView</span>
+      <span class="nv">model : </span><span class="nx">@model</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="s">&quot;&lt;h2&gt;Assessment complete&lt;/h2&gt;</span>
+<span class="s">    &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">      &lt;label&gt;Result&lt;/label&gt;</span>
+<span class="s">      &lt;div class=&#39;info_box save_status not_saved&#39;&gt;Not saved yet&lt;/div&gt;</span>
+<span class="s">        &lt;h2&gt;Subtests completed&lt;/h2&gt;</span>
+<span class="s">    &quot;</span>
+    <span class="nx">@resultSumView</span><span class="p">.</span><span class="nx">render</span><span class="p">()</span>
+    
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="nx">@resultSumView</span><span class="p">.</span><span class="nx">el</span>
+    
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="s">&quot;</span>
+
+<span class="s">      &lt;div class=&#39;question&#39;&gt;</span>
+<span class="s">      &lt;div class=&#39;prompt&#39;&gt;Additional comments (optional)&lt;/div&gt;</span>
+<span class="s">      &lt;textarea id=&#39;additional_comments&#39; class=&#39;full_width&#39;&gt;&lt;/textarea&gt;</span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">      &lt;button class=&#39;save command&#39;&gt;Save result&lt;/button&gt;&lt;br&gt;</span>
+<span class="s">      &lt;div class=&#39;confirmation&#39;&gt;&lt;button class=&#39;another command&#39;&gt;Perform another assessment&lt;/button&gt;&lt;/div&gt;</span>
+<span class="s">    &quot;</span>
+
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+    
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="nx">@resultSumView</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

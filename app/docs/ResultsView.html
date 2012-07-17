@@ -1,0 +1,142 @@
+<!DOCTYPE html>  <html> <head>   <title>ResultsView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               ResultsView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">ResultsView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .cloud&#39;</span>   <span class="o">:</span> <span class="s">&#39;cloud&#39;</span>
+    <span class="s">&#39;click .csv&#39;</span>     <span class="o">:</span> <span class="s">&#39;csv&#39;</span>
+    <span class="s">&#39;click .tablets&#39;</span> <span class="o">:</span> <span class="s">&#39;tablets&#39;</span>
+    <span class="s">&#39;click .detect&#39;</span>  <span class="o">:</span> <span class="s">&#39;detectOptions&#39;</span>
+
+  <span class="nv">cloud: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="o">not</span> <span class="nx">@available</span><span class="p">.</span><span class="nx">cloud</span>
+      <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Cannot detect cloud&quot;</span>
+      <span class="k">return</span> <span class="kc">false</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.status&quot;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.info_box&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;&quot;</span>
+    <span class="nv">ajaxOptions =</span>
+      <span class="nv">success: </span><span class="o">=&gt;</span>
+        <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.status&quot;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.info_box&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Results uploaded successfully&quot;</span>
+        <span class="k">new</span> <span class="nx">Log</span>
+          <span class="nv">type         : </span><span class="s">&quot;replication&quot;</span>
+          <span class="nv">event        : </span><span class="s">&quot;cloud:success&quot;</span>
+          <span class="nv">assessmentId : </span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">id</span>
+      <span class="nv">error: </span><span class="p">(</span><span class="nx">res</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.status&quot;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.info_box&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;&lt;div&gt;Upload error&lt;/div&gt;&lt;div&gt;</span><span class="si">#{</span><span class="nx">res</span><span class="si">}</span><span class="s">&lt;/div&gt;&quot;</span>
+        <span class="k">new</span> <span class="nx">Log</span>
+          <span class="nv">type         : </span><span class="s">&quot;replication&quot;</span>
+          <span class="nv">event        : </span><span class="s">&quot;cloud:error&quot;</span>
+          <span class="nv">assessmentId : </span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">id</span>
+    <span class="nv">replicationOptions =</span>
+      <span class="nv">filter: </span><span class="s">&quot;tangerine/resultFilter&quot;</span>
+      <span class="nv">query_params:</span>
+        <span class="nv">assessmentId: </span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">id</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">couch</span><span class="p">.</span><span class="nx">replicate</span><span class="p">(</span><span class="s">&quot;tangerine&quot;</span><span class="p">,</span> <span class="s">&quot;http://tangerine.iriscouch.com/tangerine&quot;</span><span class="p">,</span> <span class="nx">ajaxOptions</span><span class="p">,</span> <span class="nx">replicationOptions</span><span class="p">)</span>
+
+
+  <span class="nv">tablets: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="o">not</span> <span class="nx">@available</span><span class="p">.</span><span class="nx">tablets</span>
+      <span class="nx">Utils</span><span class="p">.</span><span class="nx">midAlert</span> <span class="s">&quot;Cannot detect cloud&quot;</span>
+      <span class="k">return</span> <span class="kc">false</span>
+
+  <span class="nv">csv: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;csv/&quot;</span><span class="o">+</span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">detectOptions: </span><span class="o">-&gt;</span>
+    <span class="vi">@available = </span>
+      <span class="nv">cloud : </span><span class="kc">null</span>
+      <span class="nv">tablets : </span><span class="kc">null</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span>
+      <span class="nv">dataType: </span><span class="s">&quot;jsonp&quot;</span>
+      <span class="nv">url: </span><span class="s">&quot;http://tangerine.iriscouch.com:5984/&quot;</span>
+      <span class="nv">success: </span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="vi">@available.cloud = </span><span class="kc">true</span>
+        <span class="nx">@updateOptions</span><span class="p">()</span>
+      <span class="nv">error: </span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="vi">@available.cloud = </span><span class="kc">false</span>
+        <span class="nx">@updateOptions</span><span class="p">()</span>
+
+    <span class="vi">@available.tablets = </span><span class="kc">false</span>
+    <span class="nx">@updateOptions</span><span class="p">()</span>
+        </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>$.ajax
+     dataType: "jsonp"
+     url: "http://127.0.0.2:5984/"
+     success: (a, b) =>
+       @available.tablets = true
+       @updateOptions()
+     error: (a, b) =>
+       @available.tablets = false
+       @updateOptions()</p>             </td>             <td class="code">               <div class="highlight"><pre>  
+  <span class="nv">updateOptions: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@available</span><span class="p">.</span><span class="nx">cloud</span> 
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;button.cloud&#39;</span><span class="p">).</span><span class="nx">removeAttr</span><span class="p">(</span><span class="s">&#39;disabled&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">@available</span><span class="p">.</span><span class="nx">tablets</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;button.cloud&#39;</span><span class="p">).</span><span class="nx">removeAttr</span><span class="p">(</span><span class="s">&#39;disabled&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isBoolean</span><span class="p">(</span><span class="nx">@available</span><span class="p">.</span><span class="nx">cloud</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isBoolean</span><span class="p">(</span><span class="nx">@available</span><span class="p">.</span><span class="nx">tablets</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.status .info_box&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="s">&quot;Done detecting options&quot;</span>
+
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="nx">@detectOptions</span><span class="p">()</span>
+    <span class="vi">@results = </span><span class="p">[]</span>
+    <span class="vi">@subViews = </span><span class="p">[]</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@assessment = </span><span class="nx">options</span><span class="p">.</span><span class="nx">assessment</span>
+    <span class="nv">allResults = </span><span class="k">new</span> <span class="nx">Results</span>
+    <span class="nx">allResults</span><span class="p">.</span><span class="nx">fetch</span>
+      <span class="nv">key: </span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">id</span>
+      <span class="nv">success: </span><span class="p">(</span><span class="nx">collection</span><span class="p">)</span> <span class="o">=&gt;</span>
+        <span class="vi">@results = </span><span class="nx">collection</span><span class="p">.</span><span class="nx">models</span>
+        <span class="nx">@render</span><span class="p">()</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nx">@clearSubViews</span><span class="p">()</span>
+
+    <span class="nv">cloudButton = </span><span class="s">&quot;&lt;button class=&#39;cloud command&#39; disabled=&#39;disabled&#39;&gt;Cloud&lt;/button&gt;&quot;</span>
+    <span class="nv">tabletButton = </span><span class="s">&quot;&lt;button class=&#39;tablets command&#39; disabled=&#39;disabled&#39;&gt;Tablets&lt;/button&gt;&quot;</span>
+    <span class="nv">csvButton = </span><span class="s">&quot;&lt;button class=&#39;csv command&#39;&gt;CSV&lt;/button&gt;&quot;</span>
+
+    <span class="nv">html = </span><span class="s">&quot;</span>
+<span class="s">      &lt;h1&gt;</span><span class="si">#{</span><span class="nx">@assessment</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">&lt;/h1&gt;</span>
+<span class="s">      &lt;h2&gt;Save options&lt;/h2&gt;</span>
+<span class="s">      &lt;div class=&#39;menu_box&#39;&gt;</span>
+<span class="s">        </span><span class="si">#{</span><span class="k">if</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">mobile</span> <span class="k">then</span> <span class="nx">cloudButton</span>  <span class="k">else</span> <span class="s">&quot;&quot;</span><span class="si">}</span><span class="s"></span>
+<span class="s">        </span><span class="si">#{</span><span class="k">if</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">mobile</span> <span class="k">then</span> <span class="nx">tabletButton</span> <span class="k">else</span> <span class="s">&quot;&quot;</span><span class="si">}</span><span class="s"></span>
+<span class="s">        </span><span class="si">#{</span><span class="nx">csvButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">      &lt;/div&gt;&quot;</span>
+
+    <span class="k">if</span> <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">context</span><span class="p">.</span><span class="nx">mobile</span>
+      <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">        &lt;button class=&#39;detect command&#39;&gt;Detect options&lt;/button&gt;</span>
+<span class="s">        &lt;div class=&#39;status&#39;&gt;</span>
+<span class="s">          &lt;h2&gt;Status&lt;/h2&gt;</span>
+<span class="s">          &lt;div class=&#39;info_box&#39;&gt;&lt;/div&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &quot;</span>
+    <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;</span>
+<span class="s">      &lt;h2&gt;Results&lt;/h2&gt;</span>
+<span class="s">    &quot;</span>
+    
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="nx">html</span>
+    
+    
+    
+    <span class="k">if</span> <span class="nx">@results</span><span class="o">?</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="s">&quot;No results yet!&quot;</span>
+    <span class="k">else</span>
+      <span class="k">for</span> <span class="nx">result</span> <span class="k">in</span> <span class="nx">@results</span>
+        <span class="nv">view = </span><span class="k">new</span> <span class="nx">ResultSumView</span> <span class="nv">model: </span><span class="nx">result</span>
+        <span class="nx">view</span><span class="p">.</span><span class="nx">render</span><span class="p">()</span>
+        <span class="nx">@subViews</span><span class="p">.</span><span class="nx">push</span> <span class="nx">view</span>
+        <span class="nx">@$el</span><span class="p">.</span><span class="nx">append</span> <span class="nx">view</span><span class="p">.</span><span class="nx">el</span>
+      
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+  
+  <span class="nv">afterRender: </span><span class="o">=&gt;</span>
+    <span class="k">for</span> <span class="nx">view</span> <span class="k">in</span> <span class="nx">@subViews</span>
+      <span class="nx">view</span><span class="p">.</span><span class="nx">afterRender</span><span class="o">?</span><span class="p">()</span>
+      
+  <span class="nx">clearSubViews</span><span class="o">:-&gt;</span>
+    <span class="k">for</span> <span class="nx">view</span> <span class="k">in</span> <span class="nx">@subViews</span>
+      <span class="nx">view</span><span class="p">.</span><span class="nx">close</span><span class="p">()</span>
+    <span class="vi">@subViews = </span><span class="p">[]</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

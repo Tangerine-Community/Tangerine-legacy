@@ -1,0 +1,65 @@
+{
+  "collection": "question",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "subtestId": "Example English EGRA May 2011.StudentInformation",
+  "_id": "Example English EGRA May 2011.StudentInformation.Q05",
+  "couchapp": {},
+  "order": 6,
+  "prompt": "Month of Birth",
+  "name": "birth_month",
+  "type": "single",
+  "options": [
+    {
+      "label": "Unknown",
+      "value": "unknown"
+    },
+    {
+      "label": "January",
+      "value": "january"
+    },
+    {
+      "label": "February",
+      "value": "february"
+    },
+    {
+      "label": "March",
+      "value": "march"
+    },
+    {
+      "label": "April",
+      "value": "april"
+    },
+    {
+      "label": "May",
+      "value": "may"
+    },
+    {
+      "label": "June",
+      "value": "june"
+    },
+    {
+      "label": "July",
+      "value": "july"
+    },
+    {
+      "label": "August",
+      "value": "august"
+    },
+    {
+      "label": "September",
+      "value": "september"
+    },
+    {
+      "label": "October",
+      "value": "october"
+    },
+    {
+      "label": "November",
+      "value": "november"
+    },
+    {
+      "label": "December",
+      "value": "december"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q03",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "collection": "question",
+  "couchapp": {},
+  "order": 3,
+  "prompt": "What language does your father read or write in?",
+  "name": "father-language",
+  "type": "multiple",
+  "options": [
+    {
+      "label": "English",
+      "value": "English"
+    },
+    {
+      "label": "Wolof",
+      "value": "Wolof"
+    },
+    {
+      "label": "Pular",
+      "value": "Pular"
+    },
+    {
+      "label": "Jola",
+      "value": "Jola"
+    },
+    {
+      "label": "Mandinka",
+      "value": "Mandinka"
+    },
+    {
+      "label": "Other",
+      "value": "Other"
+    }
+  ],
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

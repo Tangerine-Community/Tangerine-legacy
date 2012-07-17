@@ -1,0 +1,56 @@
+<!DOCTYPE html>  <html> <head>   <title>AssessmentElementView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               AssessmentElementView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">AssessmentElementView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">tagName : </span><span class="s">&quot;li&quot;</span>
+
+  <span class="nv">events:</span>
+    <span class="s">&#39;click .link_icon&#39;</span>              <span class="o">:</span> <span class="s">&#39;navigate&#39;</span>
+    <span class="s">&#39;click .assessment_menu_toggle&#39;</span> <span class="o">:</span> <span class="s">&#39;assessmentMenuToggle&#39;</span>
+    <span class="s">&#39;click .assessment_delete&#39;</span>         <span class="o">:</span> <span class="s">&#39;assessmentDeleteShow&#39;</span>
+    <span class="s">&#39;click .assessment_delete_cancel&#39;</span>  <span class="o">:</span> <span class="s">&#39;assessmentDeleteShow&#39;</span>
+    <span class="s">&#39;click .assessment_delete_confirm&#39;</span> <span class="o">:</span> <span class="s">&#39;assessmentDeleteHide&#39;</span>
+
+  <span class="nx">initialize</span><span class="o">:</span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@isAdmin = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">isAdmin</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+
+  <span class="nv">navigate: </span><span class="nf">(event) -&gt;</span>
+    <span class="nv">whereTo = </span><span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">attr</span> <span class="s">&#39;data-href&#39;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="nx">whereTo</span><span class="p">,</span> <span class="kc">true</span>
+
+  <span class="nv">assessmentMenuToggle: </span><span class="o">-&gt;</span>
+    <span class="nv">toggleChar = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span> <span class="s">&#39;.assessment_menu_toggle&#39;</span>
+    <span class="k">if</span> <span class="nx">toggleChar</span><span class="p">.</span><span class="nx">html</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;&amp;gt; &#39;</span> <span class="k">then</span> <span class="nx">toggleChar</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="s">&#39;&amp;nabla; &#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nx">toggleChar</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="s">&quot;&amp;gt; &quot;</span><span class="p">)</span>
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;.assessment_menu&#39;</span><span class="p">).</span><span class="nx">toggle</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+  <span class="nv">assessmentDeleteShow: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.assessment_delete_confirm&quot;</span><span class="p">).</span><span class="nx">show</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+  <span class="nv">assessmentDeleteHide: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.assessment_delete_confirm&quot;</span><span class="p">).</span><span class="nx">fadeOut</span><span class="p">(</span><span class="mi">250</span><span class="p">)</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">toggleButton  = </span><span class="s">&quot;&lt;span class=&#39;assessment_menu_toggle clickable&#39;&gt;&amp;gt; &lt;/span&gt;&quot;</span>
+    <span class="nv">deleteButton  = </span><span class="s">&quot;&lt;img data-href=&#39;assessment/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">/delete&#39; class=&#39;assessment_delete&#39; src=&#39;images/icon_delete.png&#39;&gt;&lt;span class=&#39;assessment_delete_confirm&#39;&gt;Are you sure? &lt;button class=&#39;assessment_delete_yes&#39;&gt;Yes&lt;/button&gt; &lt;button class=&#39;assessment_delete_cancel&#39;&gt;Cancel&lt;/button&gt;&lt;/span&gt;&quot;</span>
+    <span class="nv">editButton    = </span><span class="s">&quot;&lt;img data-href=&#39;assessment/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">/edit&#39; class=&#39;link_icon&#39; src=&#39;images/icon_edit.png&#39;&gt;&quot;</span>
+    <span class="nv">resultsButton = </span><span class="s">&quot;&lt;img data-href=&#39;assessment/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">/results&#39; class=&#39;link_icon&#39; src=&#39;images/icon_result.png&#39;&gt;&quot;</span>
+    <span class="nv">runButton     = </span><span class="s">&quot;&lt;img data-href=&#39;assessment/</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">/run&#39; class=&#39;link_icon&#39; src=&#39;images/icon_run.png&#39;&gt;&quot;</span>
+    <span class="nv">name          = </span><span class="s">&quot;&lt;span class=&#39;name clickable&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">&lt;/span&gt;&quot;</span>
+    <span class="nv">adminName     = </span><span class="s">&quot;&lt;span class=&#39;admin_name clickable&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">)</span><span class="si">}</span><span class="s">&lt;/span&gt;&quot;</span>
+
+    <span class="nv">resultCount   = </span><span class="s">&quot;&lt;span class=&#39;resultCount&#39;&gt;</span><span class="si">#{</span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;resultCount&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="s">&#39;0&#39;</span><span class="si">}</span><span class="s"> results&lt;/span&gt;&quot;</span>
+    <span class="nv">subtestCount  = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&#39;subtestIds&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nx">@isAdmin</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">        &lt;div&gt;</span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">toggleButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">adminName</span><span class="si">}</span><span class="s"> </span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">resultCount</span><span class="si">}</span><span class="s"></span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        &lt;div class=&#39;assessment_menu&#39;&gt;</span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">runButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">resultsButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">editButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">          </span><span class="si">#{</span><span class="nx">deleteButton</span><span class="si">}</span><span class="s"></span>
+<span class="s">        &lt;/div&gt;&quot;</span>
+    <span class="k">else</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;&lt;div&gt;</span><span class="si">#{</span><span class="nx">runButton</span><span class="si">}#{</span><span class="nx">name</span><span class="si">}</span><span class="s"> </span><span class="si">#{</span><span class="nx">resultsButton</span><span class="si">}#{</span><span class="nx">resultCount</span><span class="si">}</span><span class="s">&lt;/div&gt;&quot;</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

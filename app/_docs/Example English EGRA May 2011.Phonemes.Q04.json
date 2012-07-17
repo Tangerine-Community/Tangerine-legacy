@@ -1,0 +1,29 @@
+{
+  "_id": "Example English EGRA May 2011.Phonemes.Q04",
+  "subtestId": "Example English EGRA May 2011.Phonemes",
+  "prompt": "thank",
+  "name" : "thank",
+  "order" : 4,
+  "type": "multiple",
+  "options": [
+    {
+      "label": "th",
+      "value": "th"
+    },
+    {
+      "label": "a",
+      "value": "a"
+    },
+    {
+      "label": "ng",
+      "value": "ng"
+    },
+    {
+      "label": "k",
+      "value": "k"
+    }
+  ],
+  "collection": "question",
+  "couchapp": {},
+  "assessmentId": "Example English EGRA May 2011.Assessment"
+}

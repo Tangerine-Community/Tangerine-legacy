@@ -1,0 +1,21 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q33",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "collection": "question",
+  "couchapp": {},
+  "order": 33,
+  "prompt": "Does your teacher explain lessons to you in your own language?",
+  "name": "teacher-explains-lessons-in-your-language",
+  "type": "single",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "Yes",
+      "value": "Yes"
+    }
+  ]
+}

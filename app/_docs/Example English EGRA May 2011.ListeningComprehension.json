@@ -1,17 +1,12 @@
 {
   "collection": "subtest",
   "_id": "Example English EGRA May 2011.ListeningComprehension",
-  "pageType": "UntimedSubtest",
-  "pageId": "ListeningComprehension",
+  "prototype" : "survey",
+  "name" : "Listening Comprehension",
+  "order" : 11,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
   "enumeratorHelp": "This is NOT a timed exercise and THERE IS NO STUDENT SHEET. <br/>Read the following passage aloud to the child ONLY ONE TIME, slowly (about 1 word per second). Then allow 15 seconds for each question. <br/>Reminders:<br/><li>Ask each question only once. <li>Touch the button that corresponds to the child's answer: [Correct], if they provide the correct answer; [Incorrect] If they provide a wrong answer or if they say they don't know the answer; [No answer] if the child remains silent for more than 15 seconds.</li>\n",
   "studentDialog": "<b>I am going to read you a short story aloud ONCE and then ask you some questions. Please listen carefully and answer the questions as best as you can. Do you understand what you are to do? </b>\n\n<br/>\nIf the child says \"yes\", read the following: \n<b>Pat lives on a farm with his family. Every year, the land gets dry. One afternoon, Pat saw dark clouds. Something hit his head lightly. The rains had come at last. </b>",
-  "questions": [
-    "Where does Pat live? [on a farm; home]",
-    "Why does the land get dry? [the rain hasn't come; there is a dry season]",
-    "What hit Pat on the head? [rain; water drops]"
-  ],
- 
- 
   "couchapp": {
   }
 }

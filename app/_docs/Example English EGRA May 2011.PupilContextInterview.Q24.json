@@ -1,0 +1,21 @@
+{
+  "_id": "Example English EGRA May 2011.PupilContextInterview.Q24",
+  "subtestId": "Example English EGRA May 2011.PupilContextInterview",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "collection": "question",
+  "couchapp": {},
+  "order": 24,
+  "prompt": "Do you ever practice reading aloud to your class?",
+  "name": "practice-reading-aloud-to-class",
+  "type": "single",
+  "options": [
+    {
+      "label": "No",
+      "value": "No"
+    },
+    {
+      "label": "Yes",
+      "value": "Yes"
+    }
+  ]
+}

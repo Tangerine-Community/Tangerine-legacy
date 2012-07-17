@@ -1,7 +1,14 @@
 {
+  "_id": "Example English EGRA May 2011.Letters",
   "collection": "subtest",
-  "pageType": "ToggleGridWithTimer",
-  "pageId": "Letters",
+  "prototype": "grid",
+  "name" : "Letters",
+  "variableName" : "letters",
+  "order" : 5,
+  "timer" : 60,
+  "autostop" : 10,
+  "columns" : 10,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
   "enumeratorHelp" : "Show the child the sheet of letters in the student stimuli booklet. <br/> Reminders:<li>Start the timer when the child reads the first letter. <li>Touch each incorrect letter (it will become blue). Touch again to mark it correct if the child self-corrects.<li>Stay quiet, except when providing answers as follows: if the child hesitates for 3 seconds, provide the sound of the letter, point to the next letter and say <b>“Please go on.”</b>Mark the letter you provide to the child as incorrect.<li>If the student gives you the letter name, rather than the sound, provide the letter sound and say: <b>“Please tell me the SOUND of the letter.”</b>. This prompt may be given only once during the exercise.</li>\n<br/>\nAFTER 60 SECONDS (the screen will flash red) SAY, <b>“STOP.”</b> and touch the [Stop] button. Touch the final letter read (it will place a yellow box on the letter--ensure that this letter is correctly marked as either correct or incorrect.<br/>\nEarly stop rule: If the child does not give a single correct response on the first line, say <b>“Thank you!”</b>, Press the [Stop] button and the last letter attempted and go on to the next exercise.",
   "studentDialog" : "Here is a page full of letters of the alphabet. Please tell me the SOUNDS of as many letters as you can--not the NAMES of the letters, but the SOUNDS. For example, the sound of this letter <span class='student-dialog-nonverbal'>[point to A]</span> is “AH” as in “APPLE”.<br/>Let’s practise:  tell me the sound of this letter<span class='student-dialog-nonverbal'> [point to V]:  <li>If the child responds correctly say: <b>Very good, the sound of this letter name is “VVVV.”</b>\n<li>If the child does not respond correctly, say: <b>The name of this letter is “VVVV.”</b><br/></span>\nNow try another one: tell me the sound of this letter <span class='student-dialog-nonverbal'> [point to L]: <li> If the child responds correctly say: <b>Good, the sound of this letter is “LLL.”</b>\n<li>If the child does not respond correctly, say: <b>The name of this letter is “LLL.”</li></b></span> \n<br/>\nDo you understand what you are to do? \n<br/>\nWhen I say “Begin,” please sound out the letters as quickly and carefully as you can. Tell me the sound of the letters, starting here and continuing this way.</b>  <span class='student-dialog-nonverbal'>[Point to the first letter on the row after the example and draw your finger across the first line].</span>If you come to a letter you do not know, I will tell it to you. Otherwise I will keep quiet and listen to you. Ready? Begin.",
   "items": [
@@ -106,9 +113,6 @@
     "j",
     "E"
   ],
-  "_id": "Example English EGRA May 2011.Letters",
- 
- 
   "couchapp": {
   }
 }

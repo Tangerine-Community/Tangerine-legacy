@@ -1,0 +1,153 @@
+<!DOCTYPE html>  <html> <head>   <title>LocationEditView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               LocationEditView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">LocationEditView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
+
+  <span class="nv">events: </span>
+    <span class="s">&#39;keyup #data&#39;</span>               <span class="o">:</span> <span class="s">&#39;updateData&#39;</span>
+    <span class="s">&#39;keyup #levels&#39;</span>             <span class="o">:</span> <span class="s">&#39;updateLevels&#39;</span>
+    <span class="s">&#39;click #data_format input&#39;</span>   <span class="o">:</span> <span class="s">&#39;updateData&#39;</span>
+    <span class="s">&#39;click #levels_format input&#39;</span> <span class="o">:</span> <span class="s">&#39;updateLevels&#39;</span>
+
+
+  <span class="nv">updateData: </span><span class="nf">(event) -&gt;</span>
+    <span class="k">if</span> <span class="nx">event</span><span class="o">?</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s">&quot;click&quot;</span>
+      <span class="k">if</span> <span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Tabs&quot;</span> 
+        <span class="nx">@dataCommaToTab</span><span class="p">()</span>
+        <span class="nv">hasTabs   = </span><span class="kc">true</span>
+        <span class="nv">hasCommas = </span><span class="kc">false</span>
+      <span class="k">else</span>
+        <span class="nx">@dataTabToComma</span><span class="p">()</span>
+        <span class="nv">hasTabs   = </span><span class="kc">false</span>
+        <span class="nv">hasCommas = </span><span class="kc">true</span>
+      
+    <span class="k">else</span>
+      <span class="nv">data = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+      <span class="nv">hasTabs = </span><span class="nx">data</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">)</span><span class="o">?</span>
+      <span class="nv">hasCommas = </span><span class="nx">data</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/,/g</span><span class="p">)</span><span class="o">?</span>
+
+    <span class="k">if</span> <span class="nx">hasTabs</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data_format :radio[value=&#39;Tabs&#39;]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data_format&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data_format :radio[value=&#39;Commas&#39;]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data_format&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">)</span>
+
+  <span class="nv">updateLevels: </span><span class="nf">(event) -&gt;</span>
+    <span class="k">if</span> <span class="nx">event</span><span class="o">?</span><span class="p">.</span><span class="nx">type</span> <span class="o">==</span> <span class="s">&quot;click&quot;</span>
+      <span class="k">if</span> <span class="nx">$</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="s">&quot;Tabs&quot;</span> 
+        <span class="nx">@levelsCommaToTab</span><span class="p">()</span>
+        <span class="nv">hasTabs   = </span><span class="kc">true</span>
+        <span class="nv">hasCommas = </span><span class="kc">false</span>
+      <span class="k">else</span>
+        <span class="nx">@levelsTabToComma</span><span class="p">()</span>
+        <span class="nv">hasTabs   = </span><span class="kc">false</span>
+        <span class="nv">hasCommas = </span><span class="kc">true</span>
+      
+    <span class="k">else</span>
+      <span class="nv">levels    = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+      <span class="nv">hasTabs   = </span><span class="nx">levels</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">)</span><span class="o">?</span>
+      <span class="nv">hasCommas = </span><span class="nx">levels</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/,/g</span><span class="p">)</span><span class="o">?</span>
+
+    <span class="nv">levels = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span>
+    <span class="nv">hasTabs   = </span><span class="nx">levels</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">)</span><span class="o">?</span>
+    <span class="nv">hasCommas = </span><span class="nx">levels</span><span class="p">.</span><span class="nx">match</span><span class="p">(</span><span class="sr">/,/g</span><span class="p">)</span><span class="o">?</span>
+    <span class="k">if</span> <span class="nx">hasTabs</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels_format :radio[value=&#39;Tabs&#39;]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels_format&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">)</span>
+    <span class="k">else</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels_format :radio[value=&#39;Commas&#39;]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels_format&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">)</span>
+    
+
+
+  <span class="nv">dataTabToComma: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">,</span><span class="s">&quot;, &quot;</span><span class="p">))</span>
+  <span class="nv">dataCommaToTab: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/, */g</span><span class="p">,</span> <span class="s">&quot;\t&quot;</span><span class="p">))</span>
+  <span class="nv">levelsTabToComma: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">()).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">,</span><span class="s">&quot;, &quot;</span><span class="p">))</span>
+  <span class="nv">levelsCommaToTab: </span><span class="o">-&gt;</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/, */g</span><span class="p">,</span> <span class="s">&quot;\t&quot;</span><span class="p">))</span>
+
+  <span class="nv">save: </span><span class="o">-&gt;</span>
+    <span class="k">if</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">)</span><span class="o">?</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data_format :radio[value=&#39;Tabs&#39;]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data_format&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">)</span>
+      <span class="nx">@dataTabToComma</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">match</span><span class="p">(</span><span class="sr">/\t/g</span><span class="p">)</span><span class="o">?</span>
+      <span class="nx">@levelsTabToComma</span><span class="p">()</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels_format :radio[value=&#39;Tabs&#39;]&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s">&quot;checked&quot;</span><span class="p">,</span> <span class="s">&quot;checked&quot;</span><span class="p">)</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels_format&quot;</span><span class="p">).</span><span class="nx">buttonset</span><span class="p">(</span><span class="s">&quot;refresh&quot;</span><span class="p">)</span>
+      
+    <span class="nv">levels = </span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">levels&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">().</span><span class="nx">split</span><span class="p">(</span><span class="sr">/, */g</span><span class="p">)</span>
+    <span class="k">for</span> <span class="nx">level</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">levels</span>
+      <span class="nx">levels</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">level</span><span class="p">).</span><span class="nx">replace</span><span class="p">(</span><span class="sr">/[^a-zA-Z0-9&#39;]/g</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>removes /\s/</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">locationsValue = </span><span class="nx">$</span><span class="p">.</span><span class="nx">trim</span><span class="p">(</span><span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">data&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">())</span>
+
+    <span class="nv">locations = </span><span class="nx">locationsValue</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s">&quot;\n&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="nx">location</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">locations</span>
+      <span class="nx">locations</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">location</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="sr">/, */g</span><span class="p">)</span>
+
+    <span class="nx">@model</span><span class="p">.</span><span class="nx">set</span>
+      <span class="s">&quot;levels&quot;</span>    <span class="o">:</span> <span class="nx">levels</span>
+      <span class="s">&quot;locations&quot;</span> <span class="o">:</span> <span class="nx">locations</span>
+
+  <span class="nv">isValid: </span><span class="o">-&gt;</span>
+    <span class="nv">levels = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;levels&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="nx">location</span> <span class="k">in</span> <span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;locations&quot;</span><span class="p">)</span>
+      <span class="k">if</span> <span class="nx">location</span><span class="p">.</span><span class="nx">length</span> <span class="o">!=</span> <span class="nx">levels</span><span class="p">.</span><span class="nx">length</span>
+        <span class="nx">@errors</span><span class="p">.</span><span class="nx">push</span> <span class="s">&quot;column_match&quot;</span> <span class="nx">unless</span> <span class="s">&quot;column_match&quot;</span> <span class="k">in</span> <span class="nx">@errors</span>
+    <span class="k">return</span> <span class="nx">@errors</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span>
+
+  <span class="nv">showErrors: </span><span class="o">-&gt;</span>
+    <span class="nv">alertText = </span><span class="s">&quot;Please correct the following errors:\n\n&quot;</span>
+    <span class="k">for</span> <span class="nx">error</span> <span class="k">in</span> <span class="nx">@errors</span>
+      <span class="nx">alertText</span> <span class="o">+=</span> <span class="nx">@errorMessages</span><span class="p">[</span><span class="nx">error</span><span class="p">]</span>
+    <span class="nx">alert</span> <span class="nx">alertText</span>
+    <span class="vi">@errors = </span><span class="p">[]</span>
+
+  <span class="nv">initialize: </span><span class="nf">( options ) -&gt;</span>
+    <span class="vi">@errors = </span><span class="p">[]</span>
+    <span class="vi">@model = </span><span class="nx">options</span><span class="p">.</span><span class="nx">model</span>
+    <span class="vi">@errorMessages = </span>
+      <span class="s">&quot;column_match&quot;</span> <span class="o">:</span> <span class="s">&quot;Some columns in the location data do not match the number of columns in the geographic levels.&quot;</span>
+
+  <span class="nv">render: </span><span class="o">-&gt;</span>
+    <span class="nv">levels    = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;levels&quot;</span><span class="p">)</span>    <span class="o">||</span> <span class="p">[]</span>
+    <span class="nv">locations = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;locations&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]</span>
+
+    <span class="nv">levels = </span><span class="nx">levels</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">)</span>
+
+    <span class="nv">locations = </span><span class="nx">locations</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&quot;\n&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nx">_</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">locations</span><span class="p">)</span>
+      <span class="k">for</span> <span class="nx">location</span><span class="p">,</span> <span class="nx">i</span> <span class="k">in</span> <span class="nx">locations</span> 
+        <span class="nx">locations</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">=</span> <span class="nx">location</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s">&quot;, &quot;</span><span class="p">)</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span>  <span class="s">&quot;</span>
+<span class="s">      &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">        &lt;div class=&#39;menu_box&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;levels&#39; title=&#39;This is a comma separated list of geographic levels. (E.g. Country, Province, District, School Id) These are the levels that you would consider individual fields on the location form.&#39;&gt;Geographic Levels&lt;/label&gt;</span>
+<span class="s">          &lt;input id=&#39;levels&#39; value=&#39;</span><span class="si">#{</span><span class="nx">levels</span><span class="si">}</span><span class="s">&#39;&gt;</span>
+<span class="s">          &lt;label title=&#39;Tangerine uses comma separated values. If you copy and paste from another program like Excel, the values will be tab separated. These buttons allow you to switch back and forth, however, Tangerine will always save the comma version.&#39;&gt;Format&lt;/label&gt;&lt;br&gt;</span>
+<span class="s">          &lt;div id=&#39;levels_format&#39; class=&#39;buttonset&#39;&gt;</span>
+<span class="s">            &lt;label for=&#39;levels_tabs&#39;&gt;Tabs&lt;/label&gt;</span>
+<span class="s">            &lt;input id=&#39;levels_tabs&#39; name=&#39;levels_format&#39; type=&#39;radio&#39; value=&#39;Tabs&#39;&gt;</span>
+<span class="s">            &lt;label for=&#39;levels_commas&#39;&gt;Commas&lt;/label&gt;</span>
+<span class="s">            &lt;input id=&#39;levels_commas&#39; name=&#39;levels_format&#39; type=&#39;radio&#39; value=&#39;Commas&#39;&gt;</span>
+<span class="s">          &lt;/div&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">      &lt;div class=&#39;label_value&#39;&gt;</span>
+<span class="s">        &lt;div class=&#39;menu_box&#39;&gt;</span>
+<span class="s">          &lt;label for=&#39;data&#39; title=&#39;Comma sperated values, with multiple rows separated by line. This information will be used to autofill the location data.&#39;&gt;Location data&lt;/label&gt;</span>
+<span class="s">          &lt;textarea id=&#39;data&#39;&gt;</span><span class="si">#{</span><span class="nx">locations</span><span class="si">}</span><span class="s">&lt;/textarea&gt;&lt;br&gt;</span>
+<span class="s">          &lt;label title=&#39;Tangerine uses comma separated values. If you copy and paste from another program like Excel, the values will be tab separated. These buttons allow you to switch back and forth, however, Tangerine will always save the comma version.&#39;&gt;Format&lt;/label&gt;&lt;br&gt;        &lt;div id=&#39;data_format&#39; class=&#39;buttonset&#39;&gt;</span>
+<span class="s">            &lt;label for=&#39;data_tabs&#39;&gt;Tabs&lt;/label&gt;</span>
+<span class="s">            &lt;input id=&#39;data_tabs&#39; name=&#39;data_format&#39; type=&#39;radio&#39; value=&#39;Tabs&#39;&gt;</span>
+<span class="s">            &lt;label for=&#39;data_commas&#39;&gt;Commas&lt;/label&gt;</span>
+<span class="s">            &lt;input id=&#39;data_commas&#39; name=&#39;data_format&#39; type=&#39;radio&#39; value=&#39;Commas&#39;&gt;</span>
+<span class="s">        &lt;/div&gt;</span>
+<span class="s">        </span>
+<span class="s">      &lt;/div&gt;</span>
+<span class="s">    &quot;</span>
+    
+    <span class="nx">@updateLevels</span><span class="p">()</span>
+    <span class="nx">@updateData</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

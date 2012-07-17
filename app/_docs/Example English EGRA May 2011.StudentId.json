@@ -1,0 +1,10 @@
+{
+  "_id" : "Example English EGRA May 2011.StudentId",
+  "collection": "subtest",
+  "prototype": "id",
+  "name" : "Student ID",
+  "order" : 1,
+  "assessmentId" : "Example English EGRA May 2011.Assessment",
+  "couchapp": {
+  }
+}

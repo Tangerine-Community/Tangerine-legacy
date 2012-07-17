@@ -1,40 +1,63 @@
 <!DOCTYPE html>  <html> <head>   <title>LoginView.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               LoginView.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="k">class</span> <span class="nx">LoginView</span> <span class="k">extends</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">View</span>
 
-  <span class="nv">initialize: </span><span class="nf">(model) -&gt;</span>
-    <span class="vi">@model = </span><span class="nx">model</span>
-    <span class="nx">@model</span><span class="p">.</span><span class="kc">on</span> <span class="s">&quot;change:messages&quot;</span><span class="p">,</span> <span class="nx">@renderMessages</span>
-  
-  <span class="nv">el: </span><span class="s">&#39;#content&#39;</span>
-
-  <span class="nv">render: </span><span class="o">=&gt;</span>
-    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
-<span class="s">      &lt;div id=&#39;login_wrapper&#39;&gt;</span>
-<span class="s">        &lt;img src=&#39;images/tangerine_logo.png&#39;&gt;</span>
-<span class="s">        &lt;div id=&#39;login_message&#39;&gt;&lt;/div&gt;</span>
-<span class="s">        &lt;form id=&#39;login_form&#39;&gt;</span>
-<span class="s">          &lt;label for=&#39;login_name&#39;&gt;Enumerator Name&lt;/label&gt;</span>
-<span class="s">          &lt;input id=&#39;login_username&#39; name=&#39;login_username&#39;&gt;</span>
-<span class="s">          &lt;label for=&#39;login_password&#39;&gt;Password&lt;/label&gt;</span>
-<span class="s">          &lt;input id=&#39;login_password&#39; name=&#39;login_username&#39; type=&#39;password&#39;&gt;</span>
-<span class="s">          &lt;input id=&#39;login_button&#39; type=&#39;submit&#39; value=&#39;Login&#39;&gt;</span>
-<span class="s">        &lt;/form&gt;</span>
-<span class="s">      &lt;/div&gt;</span>
-<span class="s">    &quot;</span>
+  <span class="nv">className: </span><span class="s">&#39;login_view&#39;</span>
 
   <span class="nv">events:</span>
-    <span class="s">&quot;submit form</span><span class="err">#</span><span class="s">login_form&quot;</span><span class="o">:</span> <span class="s">&quot;login&quot;</span>
+    <span class="s">&quot;click button.login&quot;</span> <span class="o">:</span> <span class="s">&quot;login&quot;</span>
+    <span class="s">&quot;keypress input&quot;</span>     <span class="o">:</span> <span class="s">&quot;keyHandler&quot;</span>
 
-  <span class="nv">login: </span><span class="o">-&gt;</span>
-    <span class="nv">values = </span><span class="nx">Utils</span><span class="p">.</span><span class="nx">getValues</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">login_form&quot;</span><span class="p">)</span>
+  <span class="nv">initialize: </span><span class="nf">(options) -&gt;</span>
+    <span class="vi">@model = </span><span class="nx">Tangerine</span><span class="p">.</span><span class="nx">user</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="kc">on</span> <span class="s">&quot;change:messages&quot;</span><span class="p">,</span> <span class="nx">@renderMessages</span>
+    <span class="nx">@model</span><span class="p">.</span><span class="kc">on</span> <span class="s">&quot;change:authentication&quot;</span><span class="p">,</span> <span class="nx">@goOn</span>
+
+  <span class="nv">goOn: </span><span class="o">-&gt;</span>
+    <span class="nx">Tangerine</span><span class="p">.</span><span class="nx">router</span><span class="p">.</span><span class="nx">navigate</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="kc">true</span>
+
+
+  <span class="nv">render: </span><span class="o">=&gt;</span>
+    <span class="nv">width = </span><span class="nx">$</span><span class="p">(</span><span class="s">&#39;#content&#39;</span><span class="p">).</span><span class="nx">width</span><span class="p">()</span>
+    <span class="nv">parentWidth = </span><span class="nx">$</span><span class="p">(</span><span class="s">&#39;#content&#39;</span><span class="p">).</span><span class="nx">offsetParent</span><span class="p">().</span><span class="nx">width</span><span class="p">()</span>
+    <span class="vi">@oldWidth = </span><span class="mi">100</span> <span class="o">*</span> <span class="nx">width</span> <span class="o">/</span> <span class="nx">parentWidth</span>
+
+    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">content&quot;</span><span class="p">).</span><span class="nx">css</span> <span class="s">&quot;width&quot;</span><span class="p">,</span> <span class="s">&quot;100%&quot;</span>
+
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">html</span> <span class="s">&quot;</span>
+<span class="s">      &lt;img src=&#39;images/tangerine_logo.png&#39; id=&#39;login_logo&#39;&gt;</span>
+<span class="s">      &lt;div class=&#39;messages&#39;&gt;&lt;/div&gt;</span>
+<span class="s">      &lt;label for=&#39;login_username&#39;&gt;Enumerator Name&lt;/label&gt;</span>
+<span class="s">      &lt;input id=&#39;login_username&#39; name=&#39;login_username&#39;&gt;</span>
+<span class="s">      &lt;label for=&#39;login_password&#39;&gt;Password&lt;/label&gt;</span>
+<span class="s">      &lt;input id=&#39;login_password&#39; name=&#39;login_username&#39; type=&#39;password&#39;&gt;</span>
+<span class="s">      &lt;button class=&#39;login&#39;&gt;Login&lt;/button&gt;</span>
+<span class="s">    &quot;</span>
+    <span class="nx">@trigger</span> <span class="s">&quot;rendered&quot;</span>
+
+  <span class="nv">onClose: </span><span class="o">-&gt;</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">content&quot;</span><span class="p">).</span><span class="nx">css</span> <span class="s">&quot;width&quot;</span><span class="p">,</span> <span class="nx">@oldWidth</span> <span class="o">+</span> <span class="s">&quot;%&quot;</span>
+
+  <span class="nv">keyHandler: </span><span class="nf">(event) -&gt;</span>
+    <span class="k">if</span> <span class="nx">event</span><span class="p">.</span><span class="nx">which</span>
+      <span class="k">if</span> <span class="nx">event</span><span class="p">.</span><span class="nx">which</span> <span class="o">!=</span> <span class="mi">13</span>
+        <span class="k">return</span> <span class="kc">true</span>
+      <span class="k">else</span>
+        <span class="nx">@login</span><span class="p">()</span>
+
+  <span class="nv">login: </span><span class="nf">(event) -&gt;</span>
+    <span class="nv">values = </span><span class="nx">Utils</span><span class="p">.</span><span class="nx">getValues</span><span class="p">(</span><span class="nx">@el</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nx">values</span><span class="p">[</span><span class="s">&#39;login_password&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;&quot;</span>
+      <span class="nx">@model</span><span class="p">.</span><span class="nx">showMessage</span> <span class="s">&quot;Please enter a password&quot;</span>
+      <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&#39;#login_password&#39;</span><span class="p">).</span><span class="nx">focus</span><span class="p">()</span>
+      <span class="k">return</span> <span class="kc">false</span>
     <span class="nx">@model</span><span class="p">.</span><span class="nx">login</span> <span class="nx">values</span><span class="p">[</span><span class="s">&quot;login_username&quot;</span><span class="p">],</span> <span class="nx">values</span><span class="p">[</span><span class="s">&quot;login_password&quot;</span><span class="p">]</span>
-  
+
   <span class="nv">renderMessages: </span><span class="o">=&gt;</span>
     <span class="nv">messages = </span><span class="nx">@model</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s">&quot;messages&quot;</span><span class="p">)</span> <span class="o">||</span> <span class="p">[]</span>
     <span class="nv">html = </span><span class="s">&quot;&lt;ul&gt;&quot;</span>
     <span class="k">for</span> <span class="nx">message</span> <span class="k">in</span> <span class="nx">messages</span>
       <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;li&gt;</span><span class="si">#{</span><span class="nx">message</span><span class="si">}</span><span class="s">&lt;/li&gt;&quot;</span>
     <span class="nx">html</span> <span class="o">+=</span> <span class="s">&quot;&lt;/ul&gt;&quot;</span>
-    <span class="nx">$</span><span class="p">(</span><span class="s">&quot;</span><span class="err">#</span><span class="s">login_message&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">html</span> 
+    <span class="nx">@$el</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span><span class="s">&quot;.messages&quot;</span><span class="p">).</span><span class="nx">html</span> <span class="nx">html</span> 
     
 
 </pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

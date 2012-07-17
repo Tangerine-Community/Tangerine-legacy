@@ -1,0 +1,27 @@
+{
+  "_id": "Example English EGRA May 2011.ReadingComprehension.Q01",
+  "collection": "question",
+  "subtestId": "Example English EGRA May 2011.ReadingComprehension",
+  "assessmentId": "Example English EGRA May 2011.Assessment",
+  "couchapp": {},
+  "order": 1,
+  "type": "single",
+  "prompt": "What is Modou's little brother's name?",
+  "name" : "modou_brother_name",
+  "hint": "[Samba]",
+  "linkedGridScore": 23,
+  "options": [
+    {
+      "label": "Correct",
+      "value": "Correct"
+    },
+    {
+      "label": "Incorrect",
+      "value": "Incorrect"
+    },
+    {
+      "label": "No response",
+      "value": "No response"
+    }
+  ]
+}
