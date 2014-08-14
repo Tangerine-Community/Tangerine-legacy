@@ -10,6 +10,7 @@ class AssessmentsMenuView extends Backbone.View
     'click .import'      : 'import'
     'click .apk'         : 'apk'
     'click .groups'      : 'gotoGroups'
+    'click .upload'      : 'gotoUpload'
     'click .universal_upload' : 'universalUpload'
 
     'click .sync_tablets' : 'syncTablets'
@@ -77,6 +78,8 @@ class AssessmentsMenuView extends Backbone.View
 
   gotoGroups: -> Tangerine.router.navigate "groups", true
 
+  gotoUpload: -> Tangerine.router.navigate "upload", true
+
   import:     -> Tangerine.router.navigate "import", true
 
   i18n: ->
@@ -130,6 +133,7 @@ class AssessmentsMenuView extends Backbone.View
     importButton  = "<button class='import command'>#{@text.import}</button>"
     apkButton     = "<button class='apk navigation'>#{@text.apk}</button>"
     groupsButton  = "<button class='navigation groups'>#{@text.groups}</button>"
+    uploadFileButton  = "<button class='command upload'>Upload</button>"
     uploadButton  = "<button class='command universal_upload'>#{@text.universal_upload}</button>"
     syncTabletsButton = "<button class='command sync_tablets'>#{@text.sync_tablets}</button>"
     resultsButton = "<button class='navigation results'>#{@text.results}</button>"
@@ -152,6 +156,7 @@ class AssessmentsMenuView extends Backbone.View
           #{apkButton}
           #{resultsButton} 
           #{groupHandle}
+          #{uploadFileButton}
           "
         ) }
       <section>

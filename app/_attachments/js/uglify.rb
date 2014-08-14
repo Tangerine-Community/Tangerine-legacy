@@ -163,6 +163,7 @@ jsFiles = [
   'modules/viewManager/ViewManager.js',
 
   'modules/navigation/NavigationView.js',
+  'modules/upload/UploadView.js',
 
   'router.js',
 
