@@ -1,4 +1,4 @@
-  "Tangerine" :
+"Tangerine" :
     "message" : 
       "save_error" : "Save error"
       "saved"      : "Saved"

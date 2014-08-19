@@ -51,6 +51,7 @@ class UploadView extends Backbone.View
     err = []
     uploader = new Uploader
     subtests = uploader.CSVToJSON(@$el.find("#data").val(), err)
+    return if subtests.length == 0
     @documents = uploader.generateAssessment(subtests, err)
     @errors = err
     @questions = uploader.totalQuestions
@@ -76,7 +77,7 @@ class UploadView extends Backbone.View
           Utils.topAlert "Saved!"
         error: =>
           @activity = null
-          Utils.topAlert "Save error"
+          Utils.topAlert "Save error (probably already saved)"
     return false
 
     

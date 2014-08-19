@@ -23,8 +23,8 @@ end
 #require './features/sign_in.rb'
 #require './features/groups.rb'
 #require './features/assessment_screen.rb'
-require './features/basic_assessment.rb'
+#require './features/basic_assessment.rb'
 
 #require './features/grids.rb'
 #require './features/surveys.rb'
-
+require './features/upload.rb'
