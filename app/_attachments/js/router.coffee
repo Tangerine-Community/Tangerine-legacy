@@ -1,5 +1,8 @@
 class Router extends Backbone.Router
   routes:
+    'upload'   : 'upload'
+
+
     'login'    : 'login'
     'register' : 'register'
     'logout'   : 'logout'
@@ -361,7 +364,14 @@ class Router extends Backbone.Router
   # Assessment
   #
 
-
+  upload: (options) ->
+    view = new UploadView()
+    vm.show view
+    # Tangerine.user.verify
+    #   isAuthenticated: ->
+    #     view = new UploadView()
+    #     vm.show view
+    
   dataEntry: ( assessmentId ) ->
     Tangerine.user.verify
       isAdmin: ->    

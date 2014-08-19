@@ -80,8 +80,8 @@ listen = Listen.to(".") do |modified, added, removed|
         # special case for i18n translation files. We just want a basic JSON object, nothing else.
         path = match.split("/")
         puts "\nCompiling translation file for language: #{path[-2]}"
-        newFile = path[0..path.length-2].join("/")+"/translation.json"
-        result = `coffee --compile --bare --print #{match}`
+        newFile = "#{path[0..path.length-2].join('/')}"+"/translation.json"
+        result = `coffee --compile --bare --print "#{match}"`
         bareJson = result.gsub(/[\;\(\)]|\/\/.*$\n/, '')
         File.open(newFile, "w") {|f| f.write(bareJson)}
         result = "" # to pass error checking

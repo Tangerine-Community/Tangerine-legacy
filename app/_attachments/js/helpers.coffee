@@ -215,6 +215,13 @@ String.prototype.safetyDance = -> this.replace(/\s/g, "_").replace(/[^a-zA-Z0-9_
 String.prototype.databaseSafetyDance = -> this.replace(/\s/g, "_").toLowerCase().replace(/[^a-z0-9_-]/g,"")
 String.prototype.count = (substring) -> this.match(new RegExp substring, "g")?.length || 0
 
+Array.prototype.remove = (args...) ->
+  output = []
+  for arg in args
+    index = @indexOf arg
+    output.push @splice(index, 1) if index isnt -1
+  output = output[0] if args.length is 1
+  output
 
 
 Math.ave = ->
@@ -546,6 +553,8 @@ class Utils
 
 
   # returns a GUID
+  @uuid: -> 
+    return @S4()+@S4()+@S4()+@S4()+@S4()+@S4()+@S4()+@S4()
   @guid: ->
    return @S4()+@S4()+"-"+@S4()+"-"+@S4()+"-"+@S4()+"-"+@S4()+@S4()+@S4()
   @S4: ->
@@ -648,6 +657,395 @@ class TangerineTree
         error data, JSON.parse(data.responseText)
       complete: ->
         Utils.working false
+
+
+class Uploader
+  _questions: 0
+  totalQuestions: 0
+  totalOptions: 0
+  totalSubtests: 0
+  documents: []
+  
+  # Parses a csv string into an array of arrays
+  CSVToArray: (strData, strDelimiter) ->
+    strDelimiter = (strDelimiter or ",")
+    objPattern = new RegExp(("(\\" + strDelimiter + "|\\r?\\n|\\r|^)" + "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" + "([^\"\\" + strDelimiter + "\\r\\n]*))"), "gi")
+    arrData = [[]]
+    arrMatches = null
+    while arrMatches = objPattern.exec(strData)
+      strMatchedDelimiter = arrMatches[1]
+      arrData.push []  if strMatchedDelimiter.length and strMatchedDelimiter isnt strDelimiter
+      strMatchedValue = undefined
+      if arrMatches[2]
+        strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"")
+      else
+        strMatchedValue = arrMatches[3]
+      arrData[arrData.length - 1].push strMatchedValue
+    arrData
+
+
+  # File should be of form
+  # file = 
+  #   lines:        array of arrays of strings
+  #   nCurrentLine:   num
+  #   n_lines:      num
+  #   depth:        num
+  obj2JSON: (section, csv) ->
+    justCalled = true
+    section.depth += 1
+    tokens = section.lines[section.nCurrentLine].filter (word) -> word isnt "" #Remove empty cells
+    newobj = {name: tokens[0]} #There should only be one token, and it should contain the name
+    unless tokens.length == 1
+      throw "Line #{csv.nCurrentLine}: expected a single cell filled, but instead found #{tokens.length}"
+    section.nCurrentLine += 1
+    csv.nCurrentLine += 1
+
+    while section.nCurrentLine < section.nLines
+      if section.depth == 1 and !justCalled
+        throw "Line #{csv.nCurrentLine}: Expected at least a 1 line break between sections."
+      line = section.lines[section.nCurrentLine]
+      
+      # We need to check if we should be making a new object or continuing our current one
+      newDepth = 0
+      for i in [0..section.depth]
+        newDepth = i
+        break unless line[i] == ""
+      if newDepth < section.depth
+        section.depth -= 1
+        return newobj
+
+      # Now we read in the line and take the appropriate action
+      tokens = line.filter (word) -> word isnt "" #Remove empty cells
+      if tokens.length == 1
+        newobj[tokens[0]] = this.obj2JSON(section, csv)
+      else 
+        if line[section.depth] == ""
+          throw "Line #{csv.nCurrentLine}: Expected #{section.depth}-cell indent. Either the line was indented too far, or you intended to create a new section on the line above."
+        newobj[tokens[0]] = tokens[1]
+        section.nCurrentLine += 1
+        csv.nCurrentLine += 1
+    return newobj
+
+  # splits a csv into assessment sections
+  CSVToSections: (text) ->
+    return [] if text == ""
+    sections = text.replace(/\n(\t+\n)+/g, "\n\n").split("\n\n")
+    this.CSVToArray(section, "\t") for section in sections
+
+  # Splits a CSV into JSON objects corresponding to subtests
+  CSVToJSON: (text, err) ->
+    return [] if text == ""
+    errors = []
+    filelines = this.CSVToSections text
+    csv = {nCurrentLine: 1}
+    output = []
+    for sectionlines in filelines
+      section = 
+        lines:        sectionlines
+        nCurrentLine: 0 #The first line should just be one token with the name of the section
+        nLines:       sectionlines.length
+        depth:        0
+      try
+        output.push this.obj2JSON(section, csv)
+      catch error
+        err.push error
+    return output
+
+  # Maps the JSON objects to couch-ready JSON objects
+  generateOptions: (options) ->
+    return ({"label": option, "value": value} for option, value of options when option isnt "label" and option isnt "name")
+
+  # Maps the JSON objects to couch-ready JSON objects
+  generateQuestion:  (question, subtest, err) ->
+    template = {
+          "_id": Utils.uuid()
+          "prompt": "",
+          "name": null,
+          "hint": "",
+          "order": @_questions,
+          "linkedGridScore": 0,
+          "type": "single",
+          "options": [],
+          "subtestId": null,
+          "prototype": "question",
+          "collection": "question",
+          "skipLogic": "",
+          "skippable": false,
+          "customValidationCode": "",
+          "customValidationMessage": "",
+          "displayCode": ""}
+    for property, value of template
+      if property == "options"
+        template[property] = this.generateOptions(question[property])
+      else
+        template[property] = question[property] || template[property]
+      delete question[property] if question[property] != undefined
+    template["subtestId"] = subtest["_id"]
+    template["assessmentId"] = subtest["assessmentId"]
+    @_questions++
+    @totalQuestions++
+    @totalOptions += template["options"].length
+    # Unread properties should proc an error
+    for property, value of question
+      err.push "Error in question #{template.name}: unrecognized property #{property}"
+    return template
+
+  # Maps the JSON objects to couch-ready JSON objects
+  generateSurvey: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "order": @totalSubtests, 
+          "prototype": "survey", 
+          "name": null, 
+          "prompt": "", 
+          "gridLinkId": "", 
+          "collection": "subtest", 
+          "displayCode": "", 
+          "fontFamily": "", 
+          "autostopLimit": 0, 
+          "focusMode": false
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      delete survey[property] if survey[property]
+    @_questions = 0 # We need to set this for ordering
+    questions = (this.generateQuestion(survey[property], template, err) for property, value of survey)
+    @totalSubtests++
+    return [template].concat questions
+
+  generateClassObs: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "order": @totalSubtests, 
+          "prototype": "observation", 
+          "name": null, 
+          "prompt": "", 
+          "gridLinkId": "", 
+          "collection": "subtest", 
+          "displayCode": "", "fontFamily": "", "autostopLimit": 0, 
+          "focusMode": false,
+          "totalSeconds": 0
+          "intervalLength": 0
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      delete survey[property] if survey[property]
+    @_questions = 0 # We need to set this for ordering
+    questions = (this.generateQuestion(survey[property], template, err) for property, value of survey)
+    @totalSubtests++
+    console.log(questions)
+    return [template].concat questions
+
+  generateConsent: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "order": @totalSubtests, 
+          "prototype": "consent", 
+          "name": null, 
+          "collection": "subtest"
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      delete survey[property] if survey[property]
+    @totalSubtests++
+    return template
+
+  generateDateTime: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "language": "",
+          "backButton": false,
+          "fontFamily": "",
+          "order": @totalSubtests, 
+          "prototype": "datetime", 
+          "name": null, 
+          "collection": "subtest"
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      delete survey[property] if survey[property]
+    @totalSubtests++
+    return template
+
+  generateStudentId: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "language": "",
+          "backButton": false,
+          "fontFamily": "",
+          "order": @totalSubtests, 
+          "prototype": "id", 
+          "name": null, 
+          "collection": "subtest"
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      delete survey[property] if survey[property]
+    @totalSubtests++
+    return template
+
+  generateGPS: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "language": "",
+          "backButton": false,
+          "fontFamily": "",
+          "order": @totalSubtests, 
+          "prototype": "id", 
+          "name": null, 
+          "collection": "subtest"
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      delete survey[property] if survey[property]
+    @totalSubtests++
+    return template
+
+  # Maps the JSON objects to couch-ready JSON objects
+  generateGrid: (grid, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "studentDialog": "",
+          "assessmentId": assessment["_id"],
+          "enumeratorHelp": "",
+          "transitionComment": "",
+          "skippable": false,
+          "items": [],
+          "columns": 0,
+          "order": @totalSubtests,
+          "prototype": "grid",
+          "autostop": 0,
+          "timer": 60,
+          "name": null,
+          "fromInstanceId": Utils.humanGUID(),
+          "collection": "subtest",
+          "rtl": false,
+          "backButton": false,
+          "language": "",
+          "displayCode": "",
+          "fontFamily": "",
+          "captureLastAttempted": true,
+          "endOfLine": true,
+          "captureItemAtTime": false,
+          "captureAfterSeconds": 0,
+          "fontSize": "medium",
+          "layoutMode": "fixed",
+          "randomize": false,
+          "variableName": null
+      }
+    for property, value of template
+      if property == "items"
+        template["items"] = grid["items"].split(' ') || []
+      else
+        template[property] = grid[property] || template[property]
+    @totalSubtests++
+    return template
+  
+  parseLocations: (locations) ->
+    returnarr = []
+    delete locations.name
+    for property, value of locations
+      returnarr.push([property].concat value.split(","))
+    return returnarr
+
+  generateLocation: (survey, assessment, err) ->
+    template = {
+          "_id": Utils.uuid(),
+          "assessmentId": assessment["_id"],
+          "studentDialog": "", 
+          "enumeratorHelp": "", 
+          "transitionComment": "", 
+          "skippable": false, 
+          "order": @totalSubtests, 
+          "prototype": "location", 
+          "name": null, 
+          "levels": [],
+          "locations": [],
+          "gridLinkId": "", 
+          "collection": "subtest", 
+        }
+    for property, value of template
+      template[property] = survey[property] || template[property]
+      if property == 'locations'
+        template[property] = this.parseLocations(survey[property])
+      else if property == 'levels' and survey[property]
+        template[property] = survey[property].split(',')
+      delete survey[property] if survey[property]
+    @totalSubtests++
+    console.log template
+    return template
+
+  # Maps the JSON objects to couch-ready JSON objects
+  generateAssessment: (sections, err) ->
+    return [] if sections.length == 0
+    @_questions = 0
+    @totalSubtests = 0
+    @totalOptions = 0
+    @documents = []
+    assessment = {}
+    assessment["_id"] = Utils.guid()
+    assessment["assessmentId"] = assessment["_id"]
+    assessment['name'] = sections[0].name || "Unnamed Assessment"
+    if sections[0].sequences
+      sequences = sections[0].sequences.replace(/\s/g, "").split("|")
+      assessment['sequences'] = (sequence.split(",") for sequence in sequences)
+    else 
+      assessment['sequences'] = null
+    assessment['archived'] = sections[0].archived || false
+    assessment['collection'] = "assessment"
+    @documents.push assessment
+    sections.remove sections[0]
+    for section in sections
+      prototype = section.prototype
+      if prototype == 'survey'
+        @documents = @documents.concat this.generateSurvey(section, assessment, err)
+      else if prototype == 'grid'
+        @documents.push this.generateGrid(section, assessment, err)
+      else if prototype == 'consent'
+        @documents.push this.generateConsent(section, assessment, err)
+      else if prototype == 'datetime'
+        @documents.push this.generateDateTime(section, assessment, err)
+      else if prototype == 'id'
+        @documents.push this.generateStudentId(section, assessment, err)
+      else if prototype == 'gps'
+        @documents.push this.generateGPS(section, assessment, err)
+      else if prototype == 'observation'
+        @documents = @documents.concat this.generateClassObs(section, assessment, err)
+      else if prototype == 'location'
+        @documents.push this.generateLocation(section, assessment, err)
+      else 
+        err.push "Error: unknown prototype (#{prototype}) in subtest # #{@documents.length + 1}"
+    return @documents
 
 
 ##UI helpers
