@@ -7,10 +7,12 @@
     <meta name="HandheldFriendly" content="True">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="apple-touch-icon-precomposed" href="images/TangerineIcon.png"/>
-
-    <link rel="stylesheet" href="css/tangerine.less.css">
+  
+    
+    <link rel="stylesheet" href="css/tangerine.css">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/jquery-ui.css">
+
+    <!-- <link rel="stylesheet" href="css/jquery-ui.css"> TODO: figure out why this is here ??-->
 
     <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
     <script src="js/lib/modernizr-custom.js"></script>
@@ -21,8 +23,39 @@
     <div id="content_wrapper"><div id='content'></div></div>
     <div id='footer'><div id="watermark"><img src="images/tangerine_logo_89.png"></div></div>
 
-    <script src="js/lib.js"></script>
-    <script src="js/app.js"></script>
+    <!-- build:js js/vendor.min.js --> 
+    <script src='js/lib/phonegap.js'></script>
+    <script src='js/lib/jquery.js'></script>
+    <script src='js/lib/underscore.js'></script>
+    <script src='js/lib/sha1.js'></script>
+    <script src='js/lib/jquery.couch.js'></script>
+    <script src='js/lib/jquery.cookie.js'></script>
+    <script src='js/lib/jquery.tablesorter.js'></script>
+    <script src='js/lib/jquery.flot.js'></script>
+    <script src='js/lib/jquery.i18next.js'></script>
+    <script src='js/lib/excanvas.js'></script>
+    <script src='js/lib/jquery.ui.core.js'></script>
+    <script src='js/lib/jquery.ui.widget.js'></script>
+    <script src='js/lib/jquery.ui.mouse.js'></script>
+    <script src='js/lib/jquery.ui.sortable.js'></script>
+    <script src='js/lib/jquery.ui.accordion.js'></script>
+    <script src='js/lib/jquery.ui.button.js'></script>
+    <script src='js/lib/jquery.ui.progressbar.js'></script>
+    <script src='js/lib/inflection.js'></script>
+    <script src='js/lib/backbone.js'></script>
+    <script src='js/lib/moment.js'></script>
+    <script src='js/lib/backbone-couchdb.js'></script>
+    <script src='js/lib/transcriptionCheckdigit.js'></script>
+    <script src='js/lib/table2CSV.js'></script>
+    <script src='js/lib/base64.js'></script>
+    <script src='js/lib/jstz.js'></script>
+    <script src='js/lib/ckeditor.js'></script>
+    <script src='js/lib/coffee-script.js'></script>
+    <!-- endbuild -->
+    <!-- app:js -->
+    <!-- endinject -->
+
+
   </body>
   <!-- added for the dashboard - sorry @fetmar please help also in index-dev.html -->
   <style>

@@ -1,22 +1,10 @@
-`function (head, req)
-{
-  start({
-    "headers" : {"content-type": "application/json"}
-  });
+(head, req) ->
+  start headers:
+    "content-type": "application/json"
 
-  var results = [];
-
-  while(row = getRow())
-  {
-    if (!!~req.userCtx.roles.indexOf("group."+row.value.group))
-    {
-      results.push (row)
-    };
-  };
+  results = []
+  results.push row  unless not ~req.userCtx.roles.indexOf("group." + row.value.group)  while row = getRow()
   
-  
-  //send( "(" + JSON.stringify( results, null, " " ) + ")" );
-  send( "(" + JSON.stringify( req, null, " " ) + ")" );
-
-
-}`
+  #send( "(" + JSON.stringify( results, null, " " ) + ")" );
+  send "(" + JSON.stringify(req, null, " ") + ")"
+  return

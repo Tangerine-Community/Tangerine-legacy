@@ -3,25 +3,17 @@
 *.swp
 *.tmp
 .DS_store
-
-# from android-couchbase-callback
-# built application files
 *.apk
 *.ap_
 *.log
-
-# files for the dex VM
 *.dex
-
-# Java class files
 *.class
-
-# generated files
 bin/
 gen/
-
-# Local configuration file (sdk path, etc)
 local.properties
 build.properties
 Android-Couchbase-Callback/assets/tangerine.couch
 Android-Couchbase-Callback/assets/class.couch
+dist
+Junked
+node_modules
