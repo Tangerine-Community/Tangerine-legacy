@@ -14,49 +14,66 @@ Alternatively put, Tangerine is a [CouchApp](http://couchapp.org/page/index) tha
 [Tangerine Central](http://www.tanerinecentral.org) more information about Tangerine projects and news.
 
 
-# Getting Started
+## Getting Started
 
 _The following is a list of tools required to start developing for Tangerine. Related: See the guide for setting up a [Tangerine server](https://github.com/Tangerine-Community/Tangerine/wiki/Tangerine-Server)._
 
 The overwhelming majority of our developers have prefered Mac or Linux. Windows alternatives are available but have not been thoroughly tested, and in some cases, not tested at all.
 
-[Apache CouchDB](http://couchdb.apache.org/#download)
+# Step 1: Install the Dev Tools
 
-[CoffeeScript](http://coffeescript.org/#installation)
+[Apache CouchDB](http://couchdb.apache.org/#download): After you install CouchDB, be sure to setup an administrative user that you can use for development.
 
 [CouchApp](https://github.com/benoitc/couchapp)
 
-[Ruby](https://www.ruby-lang.org/en/downloads/)
+[Node.js](http://nodejs.org/)
 
-[Listen](https://github.com/guard/listen)
+[Gulp](http://gulpjs.com/)
+```
+$ npm install --global gulp
+```
 
-[LessCSS](http://lesscss.org/#using-less-installation)
+# Step 2: Configure the Project
 
-Then clone this repo.
+Clone the Tangerine repo
+```
+git clone https://github.com/Tangerine-Community/Tangerine.git
+```
 
-    git clone https://github.com/Tangerine-Community/Tangerine.git
+Install the dependencies
+```
+npm install
+```
 
-## Config
+Customize your development environment
 
-The folowing files may need to be configured to match our or your development environment.
+  1. **.couchapprc:** Copy and rename *.couchapprc.sample* to *.couchapprc*. Then enter the admin credentials that you setup for CouchDB
+  2. **app/_docs/configuration:** Depending on your needs, this file may or may not need to be updated.
 
-  .couchapprc
-  app/_docs/configuration
 
-## Fire it up!
-
-Quickly
+## Step 3: Fire it up!
 
   1. Start CouchDB
-  2. `cd app`
-  3. `couchapp push`
-  4. goto `http://localhost:5984/tangerine/_design/ojai/index.html`
+  2. `gulp`
 
-Normally
+# Gulp Commands
 
-  1. Start CouchDB
-  2. `cd app`
-  3. `./listen.rb`
+  Gulp is used as the build tool for this project. Use the following commands to manage your project:
+  
+```javascript
+// Default build task and it's modifiers
+//    --prod:     overrides the default behavior to force minification of the scripts
+//    --noLint:   disables linting on the CoffeeScript files
+
+gulp (--prod) (--noLint)
+
+// Perform a fully-compressed build
+gulp build
+
+// Clean the project working directories
+gulp clean
+
+```
  
 ----
 
