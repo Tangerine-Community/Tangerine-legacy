@@ -20,7 +20,7 @@ _The following is a list of tools required to start developing for Tangerine. Re
 
 The overwhelming majority of our developers have prefered Mac or Linux. Windows alternatives are available but have not been thoroughly tested, and in some cases, not tested at all.
 
-# Step 1: Install the Dev Tools
+## Step 1: Install the Dev Tools
 
 [Apache CouchDB](http://couchdb.apache.org/#download): After you install CouchDB, be sure to setup an administrative user that you can use for development.
 
@@ -33,7 +33,7 @@ The overwhelming majority of our developers have prefered Mac or Linux. Windows 
 $ npm install --global gulp
 ```
 
-# Step 2: Configure the Project
+## Step 2: Configure the Project
 
 Clone the Tangerine repo
 ```
@@ -50,14 +50,13 @@ Customize your development environment
   1. **.couchapprc:** Copy and rename *.couchapprc.sample* to *.couchapprc*. Then enter the admin credentials that you setup for CouchDB
   2. **app/_docs/configuration:** Depending on your needs, this file may or may not need to be updated.
 
-
 ## Step 3: Fire it up!
 
   1. Start CouchDB
   2. `cd` into your project directory
   2. `gulp`
 
-# Gulp Commands
+## Gulp Commands
 
   Gulp is used as the build tool for this project. Use the following commands to manage your project:
   
