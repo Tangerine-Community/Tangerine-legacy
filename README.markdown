@@ -54,6 +54,7 @@ Customize your development environment
 ## Step 3: Fire it up!
 
   1. Start CouchDB
+  2. `cd` into your project directory
   2. `gulp`
 
 # Gulp Commands
