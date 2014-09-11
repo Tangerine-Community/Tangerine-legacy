@@ -5,19 +5,23 @@
 var gulp 		= require('gulp'); 
 
 // general & process plugins 
-var changed 		= require('gulp-changed');
+var changed 	= require('gulp-changed');
 var clean 		= require('gulp-clean');
 var concat 		= require('gulp-concat');
+var exec 		= require('child_process').exec;
+var fs 			= require('fs');
 var gulpif 		= require("gulp-if");
 var gutil 		= require('gulp-util');
 var inject 		= require('gulp-inject');
 var merge 		= require('merge-stream');
 var path 		= require('path');
+var plumber 	= require('gulp-plumber');
 var rename 		= require("gulp-rename");
 var runSequence = require('run-sequence');
 var size 		= require('gulp-size');
 var sourcemaps 	= require('gulp-sourcemaps');
 var useref 		= require('gulp-useref');
+var watch 		= require('gulp-watch');
 
 // script plugins
 var coffee 		= require('gulp-coffee');
@@ -54,7 +58,8 @@ var paths = {
 		dest_locales: 	'dist/app/_attachments/locales'
 	},
 	app_scripts: {		//some src files are explicitly specified here to enforce order of including in the app.js
-		src: 			['.tmp/app/_attachments/js/helpers.js', '.tmp/app/_attachments/js/modules/**/*.js', '.tmp/app/_attachments/js/{boot,helpers,router}.js', 'app/_attachments/js/version.js', '!.tmp/**/app.js', '!.tmp/**/vendor.min.js', '!.tmp/**/*.js.map'],
+		src: 			['.tmp/app/_attachments/js/helpers.js', '.tmp/app/_attachments/js/modules/**/*.js', '.tmp/app/_attachments/js/{boot,helpers,router}.js', '.tmp/app/_attachments/js/version.js', '!.tmp/**/app.js', '!.tmp/**/vendor.min.js', '!.tmp/**/*.js.map'],
+		src_version: 	'.tmp/app/_attachments/js/version.js',
 		dest: 			'dist/app/_attachments/js'
 	},
 	vendor_scripts: {
@@ -94,15 +99,23 @@ var paths = {
 
 // Define options for the gulp build process
 var options = {
-	isProd: true,
-	doLint: false
+	isProd: false,
+	doLint: true,
+	isWatching: false,
+	openBrowser: true
 };
 
 // Enable command-line overrides of options
 options.isProd = (gutil.env.prod === true)? true : options.isProd;		//gulp --prod
 options.doLint = (gutil.env.noLint === true)? false : options.doLint;	//gulp --noLint (defaults to perform linting)
 
+//helper functoin to log any errors that are thrown
+var handleError = function(error){
+	gutil.log('Handling Error');
+	gutil.log(error.message);
+};
 
+//helper function to display an intro message
 var introMessage = function(taskName) {
 	gutil.log(
 		gutil.colors.blue(
@@ -116,9 +129,15 @@ var introMessage = function(taskName) {
 	);
 };
 
+//helper function to log the file changes
 var logChange= function(event){
 	gutil.log(gutil.colors.green('File ' + event.path + ' was ' + event.type + ', running tasks...'))
 	'File ' + event.path + ' was ' + event.type + ', running tasks...'
+};
+
+// Helper function to execute a shell command
+var execute = function(command, callback){
+    exec(command, function(error, stdout, stderr){ callback(stdout); });
 };
 
 
@@ -140,9 +159,10 @@ gulp.task('lint_coffee', function() {
 	var stream;
 	if(options.doLint){
 		stream = gulp.src(paths.coffee_scripts.src_all)
+			.pipe( options.isWatching ? changed(paths.coffee_scripts.dest_all, { extension: '.js' }) : gutil.noop() ) //if watching, only lint changed files
 			.pipe(coffeelint())
   			.pipe(coffeelint.reporter())
-			.pipe(coffeelint.reporter('fail'));
+			.on('error', handleError);
 	} else {
 		stream = gulp.src(paths.coffee_scripts.src_all, {read: false})
 			.pipe(gutil.noop());
@@ -154,21 +174,21 @@ gulp.task('lint_coffee', function() {
  * Gulp Task: coffee - compile all coffeescript
  * @return {stream} gulp stream
  */
-gulp.task('coffee', ['lint_coffee'], function() {
+gulp.task('coffee', function() {
 	return merge(
 
 		//compile all coffee with the exception of the locale files
 		gulp.src(paths.coffee_scripts.src_all)
 			.pipe(changed(paths.coffee_scripts.dest_all, { extension: '.js' }))
 			.pipe(sourcemaps.init())
-				.pipe(coffee({bare: true}).on('error', gutil.log))
+				.pipe(coffee({bare: true}).on('error', handleError))
 			.pipe(sourcemaps.write('.'))
 			.pipe(gulp.dest(paths.coffee_scripts.dest_all)),
 
 		//handle special situation for locales -> json files
 		gulp.src(paths.coffee_scripts.src_locales)
 			.pipe(changed(paths.coffee_scripts.dest_locales, { extension: '.json' }))
-			.pipe(cson().on('error', gutil.log))
+			.pipe(cson().on('error', handleError))
 			.pipe(rename({extname: '.json'}))
 			.pipe(gulp.dest(paths.coffee_scripts.dest_locales))
 	);
@@ -178,7 +198,7 @@ gulp.task('coffee', ['lint_coffee'], function() {
  * Gulp Task: app_scripts - concat and optionally uglify the app scripts into app.js (includes sourcemapping)
  * @return {stream} gulp stream
  */
-gulp.task('app_scripts', ['coffee'], function() {
+gulp.task('app_scripts', ['version','coffee'], function() {
 
 	return gulp.src(paths.app_scripts.src)
 			.pipe(sourcemaps.init({loadMaps: true}))
@@ -206,12 +226,31 @@ gulp.task('vendor_scripts', function() {
 		//grab the includes from the index.html and combine them
 		gulp.src(paths.vendor_scripts.src_html)
 			.pipe(assets)
-			.pipe(gulpif('*.js', uglify().on('error', gutil.log)))			//todo: if want to include maps on these... try to use lazy stream
+			.pipe(gulpif('*.js', uglify().on('error', handleError)))			//todo: if want to include maps on these... try to use lazy stream
 			.pipe(gulpif('*.css', minifyCSS()))			
 			.pipe(assets.restore())
 			.pipe(useref())
 			.pipe(gulp.dest(paths.vendor_scripts.dest_html))
 	);
+});
+
+/**
+ * Gulp Task: Version - write out the version file
+ * @param {callback} cb used by gulp to know when the task has completed
+ */
+gulp.task('version', function(cb){
+	execute('git describe --tags', function(version){
+		execute('git rev-parse --short HEAD', function(build){
+			fs.writeFile(
+				path.join(__dirname, paths.app_scripts.src_version), 
+				'window.Tangerine.buildVersion = "'+build.replace(/\n/,'')+'"; window.Tangerine.version = "'+version.replace(/\n/,'')+'";',
+				function(err){
+					gutil.log(err)
+					cb();
+			});
+		});
+	});
+
 });
 
 /**
@@ -241,8 +280,8 @@ gulp.task('styles', function() {
 		gulp.src(paths.styles.src_less)
 			.pipe(changed(paths.styles.dest, { extension: '.css' }))
 			.pipe(sourcemaps.init())
-				.pipe(less().on('error', gutil.log))
-    			.pipe( options.isProd ? minifyCSS({keepSpecialComments:0}) : gutil.noop() )
+				.pipe(less().on('error', handleError))
+    			.pipe( options.isProd ? minifyCSS({keepSpecialComments:0}) : gutil.noop() ) // only minify css if prod
 			.pipe(sourcemaps.write('.'))
 			.pipe(gulp.dest(paths.styles.dest))
 	);
@@ -255,7 +294,7 @@ gulp.task('styles', function() {
 gulp.task('images', function() {
 	return gulp.src(paths.images.src)
 		.pipe(changed(paths.images.dest))
-		.pipe(imagemin({optimizationLevel: 5}))
+		.pipe( options.isProd ? imagemin({optimizationLevel: 5}) : gutil.noop() ) // only compress images if prod
 		.pipe(gulp.dest(paths.images.dest))
 		.pipe(size({title:'images'}));
 });
@@ -270,7 +309,6 @@ gulp.task('html', function() {
 	return target.pipe(inject(gulp.src(paths.inject.src_js, {read:false}), {name: 'app', relative:true}))
 		.pipe(gulp.dest(paths.inject.dest_html));
 });
-
 
 /**
  * Gulp Task: couch_copy - copy the non-_attachment assets into the build directory 
@@ -289,24 +327,21 @@ gulp.task('couch_copy', function() {
  */
 gulp.task('couchapp_push', function(cb) {
 	var cwd = path.join(__dirname, 'dist/app/');
-	var cmd = new run.Command('couchapp push', {cwd:cwd, verbosity:2});
+	var cmd = new run.Command('couchapp push'+ (options.openBrowser ? ' -b' : '') , {cwd:cwd, verbosity:2});
 	cmd.exec('', cb);
+	options.openBrowser = false; //only open the browser window on startup
 });
-gulp.task('couchapp_start', function(cb) {
-	var cwd = path.join(__dirname, 'dist/app/');
-	var cmd = new run.Command('couchapp push -b', {cwd:cwd, verbosity:2});
-	cmd.exec('', cb);
-});
-
 
 /**
  * Gulp Task: watch - monitor the dirs for changed files and recompile things
  * @return {stream} gulp stream
  */
 gulp.task('watch', function() {
+	//used by lint_coffeescript to enforce a complete lint on startup
+	options.isWatching = true;
 
 	// CoffeeScript files
-	gulp.watch(paths.coffee_scripts.src_all, function(event) { runSequence('app_scripts', 'couchapp_push'); logChange(event); }); 
+	gulp.watch(paths.coffee_scripts.src_all, function(event) { runSequence('lint_coffee', 'app_scripts', 'couchapp_push'); logChange(event); }); 
 	gulp.watch(paths.coffee_scripts.src_locales, function(event) { runSequence('coffee', 'couchapp_push'); logChange(event); }); 
 
 	// Vendor Scripts
@@ -315,7 +350,7 @@ gulp.task('watch', function() {
 	}); 
 
 	// DB Scripts
-	gulp.watch(paths.coffee_scripts.src_locales, function(event) { 
+	gulp.watch(paths.db_scripts.src, function(event) { 
 		runSequence('db_scripts', 'couchapp_push'); logChange(event); 
 	}); 
 
@@ -343,13 +378,20 @@ gulp.task('watch', function() {
  */
 gulp.task('build', function(callback){
 	introMessage("Production");
+	options.isProd = true;
 	//remove runSequence when upgrading to the upcoming Gulp v4
 	runSequence(
 		'clean',
+		'styles',
+		'lint_coffee',
 		['app_scripts', 'vendor_scripts', 'images'],
+		'db_scripts',
 		'html',
+		'couch_copy',
+		'couchapp_push',
 		callback
 	);
+	options.isProd = false;
 });
 
 /**
@@ -360,11 +402,12 @@ gulp.task('default', function(callback){
 	//remove runSequence when upgrading to the upcoming Gulp v4
 	runSequence(
 		'styles',
+		'lint_coffee',
 		['app_scripts', 'vendor_scripts', 'images'],
 		'db_scripts',
 		'html',
 		'couch_copy',
-		'couchapp_start',
+		'couchapp_push',
 		'watch',
 		callback
 	);

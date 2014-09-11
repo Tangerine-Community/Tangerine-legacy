@@ -3,14 +3,14 @@
   start
     "headers" : {
       "Content-Type": "text/csv; charset=UTF-8"
-      "Content-Disposition": 
+      "Content-Disposition":
         if req.query.download == "false"
           ""
         else
           "attachment; filename=\"#{req.query.filename}.csv\""
     }
 
-  `unpair = function(pair) { for (var key in pair) {return [key, pair[key]] }} `
+  `unpair = function(pair) { for (var key in pair) {return [key, pair[key]] }}`
 
   excludes = if req.query.excludes? then JSON.parse(req.query.excludes) else []
   includes = if req.query.includes? then JSON.parse(req.query.includes) else []
@@ -18,7 +18,7 @@
   dump = (obj) ->
     out = ""
     for i in obj
-        out += i + ": " + obj[i] + "\n"
+      out += i + ": " + obj[i] + "\n"
 
   rowCache = []
 

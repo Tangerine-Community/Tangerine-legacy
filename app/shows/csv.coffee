@@ -1,5 +1,5 @@
 (doc, req) ->
-  log(req);
+  log(req)
   return {
     "headers" :
       "Content-Type" : "text/csv"

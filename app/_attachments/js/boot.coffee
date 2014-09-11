@@ -1,5 +1,5 @@
 # This file loads the most basic settings related to Tangerine and kicks off Backbone's router.
-#   * The doc `configuration` holds the majority of settings. 
+#   * The doc `configuration` holds the majority of settings.
 #   * The Settings object contains many convenience functions that use configuration's data.
 #   * Templates should contain objects and collections of objects ready to be used by a Factory.
 # Also intialized here are: Backbone.js, and jQuery.i18n
@@ -71,7 +71,7 @@ Tangerine.onSettingsLoad = ->
 
           #$("<button id='reload'>reload me</button>").appendTo("#footer").click -> document.location.reload()
 
-          $.i18n.init 
+          $.i18n.init
             "fallbackLng" : "en"
             "lng"         : Tangerine.settings.get "language"
             "resGetPath"  : "locales/__lng__/translation.json"
@@ -104,8 +104,8 @@ Tangerine.onSettingsLoad = ->
               router : Tangerine.router
             Tangerine.log    = new Log()
 
-            Tangerine.user.sessionRefresh 
-              success: -> 
+            Tangerine.user.sessionRefresh
+              success: ->
                 Backbone.history.start()
 
 

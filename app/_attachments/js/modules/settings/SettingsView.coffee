@@ -2,7 +2,7 @@ class SettingsView extends Backbone.View
 
   className : "SettingsView"
 
-  events: 
+  events:
     'click .save' : 'save'
     'click .back' : 'goBack'
 
@@ -14,13 +14,13 @@ class SettingsView extends Backbone.View
 
   save: ->
     @settings.save
-      context   : @$el.find('#group_handle').val()
-      context   : @$el.find('#context').val()
-      language  : @$el.find('#language').val()
-      groupName : @$el.find("#group_name").val()
-      groupHost : @$el.find("#group_host").val()
-      upPass    : @$el.find("#up_pass").val()
-      log       : @$el.find("#log").val().split(/[\s,]+/)
+      context     : @$el.find('#context').val()
+      language    : @$el.find('#language').val()
+      groupName   : @$el.find("#group_name").val()
+      groupHandle : @$el.find('#group_handle').val()
+      groupHost   : @$el.find("#group_host").val()
+      upPass      : @$el.find("#up_pass").val()
+      log         : @$el.find("#log").val().split(/[\s,]+/)
     ,
       success: =>
         Utils.midAlert "Settings saved"

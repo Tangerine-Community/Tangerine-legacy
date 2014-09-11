@@ -5,7 +5,7 @@
       "content-type": "application/json"
     }
     
-  `unpair = function(pair) { for (var key in pair) {return [key, pair[key]] }} `
+  `unpair = function(pair) { for (var key in pair) {return [key, pair[key]] }}`
 
   columnKeys = []
   columnsBySubtest = []

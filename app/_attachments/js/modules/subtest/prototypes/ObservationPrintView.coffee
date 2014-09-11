@@ -69,7 +69,7 @@ class ObservationPrintView extends Backbone.View
     clearInterval @timerInterval
     fromClick = e?
     isntPrematureStop = ! e?
-    if e? 
+    if e?
       @trigger "showNext"
 
     if isntPrematureStop && not @iHave.finished
@@ -139,7 +139,7 @@ class ObservationPrintView extends Backbone.View
     @$el.find(".time_till_next").html timeTillNext
 
     if not @iAm.recording && not @iHave.finished
-      @$el.find(".next_display, .completed_display").removeClass "confirmation" 
+      @$el.find(".next_display, .completed_display").removeClass "confirmation"
 
   resetObservationFlags: ->
     @iAm.recording  = false
@@ -212,7 +212,7 @@ class ObservationPrintView extends Backbone.View
     @$el.find("#current_survey").append @survey.view.el
     @$el.find("#current_survey").append "<button class='command done'>Done with <i>this</i> observation</button>"
     
-    @$el.find("#current_survey").scrollTo 250, => 
+    @$el.find("#current_survey").scrollTo 250, =>
       if @iHave.forcedProgression
         Utils.midAlert "Please continue with the next observation."
         @iHave.forcedProgression = false
@@ -235,7 +235,7 @@ class ObservationPrintView extends Backbone.View
 
   getSum: ->
     {
-      "total" : @my.observation.completed 
+      "total" : @my.observation.completed
     }
 
   getSkipped: ->
