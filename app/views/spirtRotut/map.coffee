@@ -43,9 +43,9 @@
     if subtest.prototype is "location"
 
       for label, i in subtest.data.labels
-        zoneIndex   = i if label is "Zone"
-        countyIndex = i if label is "County"
-        schoolIndex = i if label is "SchoolName"
+        zoneIndex   = i if label is "zone"
+        countyIndex = i if label is "county"
+        schoolIndex = i if label is "school"
 
       zoneKey   = subtest.data.location[zoneIndex]
       countyKey = subtest.data.location[countyIndex]
