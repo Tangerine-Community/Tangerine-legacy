@@ -55,6 +55,8 @@
       result.county = countyKey if subtest.data.location[countyIndex]?
       result.school = schoolKey if subtest.data.location[schoolIndex]?
 
+      result.school = subtest.data.schoolId if subtest.data.schoolId?
+
     else if subtest.prototype is "survey"
 
       result.subject = subtest.data.subject if subtest.data.subject?
