@@ -1,6 +1,5 @@
 {
    "_id" : "configuration",
-
    "local" : {
       "login"  : "localuser:localpass",
       "host"   : "http://localhost"
@@ -9,7 +8,7 @@
    "update" : {
       "target" : "http://localadmin:localpassword@localhost:5984/tangerine",
       "dbName" : "update",
-      "host"   : "ht.tangerinecentral.org/db",
+      "host"   : "ntp.tangerinecentral.org/db",
       "login"  : ""
    },
 
@@ -19,15 +18,15 @@
 
    "trunk" : {
       "dbName" : "t",
-      "host" : "ht.tangerinecentral.org/db"
+      "host" : "ntp.tangerinecentral.org/db"
    },
 
    "groupDBPrefix" : "group-",
    "port" : 5984,
 
-   "tree"    : "http://ht.tangerinecentral.org/tree/",
-   "robbert" : "http://ht.tangerinecentral.org/robbert/",
-   "vouch"   : "http://ht.tangerinecentral.org/vouch/",
+   "tree"    : "http://ntp.tangerinecentral.org/tree/",
+   "robbert" : "http://ntp.tangerinecentral.org/robbert/",
+   "vouch"   : "http://ntp.tangerinecentral.org/vouch/",
 
    "defaults" : {
       "settings" : {
@@ -36,7 +35,7 @@
          "language" : "en",
          "log" : [""],
          "groupName" : "empty",
-         "groupHost" : "http://ht.tangerinecentral.org/db",
+         "groupHost" : "http://ntp.tangerinecentral.org/db",
          "upPass" : "pass"
       }
    },
