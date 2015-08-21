@@ -3,7 +3,7 @@ class EmailManagerView extends Backbone.View
   className : "EmailManagerView"
 
   events:
-    "click .update " : "update" 
+    "click .update " : "update"
     'change .select-all' : 'selectAll'
     'click .add'      : 'add'
     'click .delete'   : 'delete'
@@ -24,7 +24,7 @@ class EmailManagerView extends Backbone.View
 
   send: ->
     return unless @isOkToSend()
-    
+
     userIds = []
     @$el.find("input.report-user:checked").each ( index, el ) =>
       userIds.push $(el).attr("data-id")
@@ -116,7 +116,7 @@ class EmailManagerView extends Backbone.View
 
   selectAll: ( event ) ->
     checked = $(event.target).is(":checked")
-    @$el.find("input.report-user").each ( index, el ) -> 
+    @$el.find("input.report-user").each ( index, el ) ->
       $(el).prop "checked", checked
 
   MONTHS: [null, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -131,7 +131,10 @@ class EmailManagerView extends Backbone.View
 
     @users = new ReportUsers
     @users.fetch
-      success: => @renderUsers()
+      success: =>
+        Loc.query null, (value) =>
+          @countyNameById = value.reduce ((obj, cur) -> obj[cur.id] = cur.name; return obj), {}
+          @renderUsers()
 
   render: =>
 
@@ -174,7 +177,7 @@ class EmailManagerView extends Backbone.View
     for user in @users.models
 
       timestamp = "#{@thisYear}-#{@MONTHS[@thisMonth]}"
-      statusClass = if user.getArray('monthsSent').indexOf()
+      statusClass = if user.getArray('monthsSent').indexOf(timestamp)
           "class='report-user-not-current'"
         else
           ''
@@ -182,7 +185,7 @@ class EmailManagerView extends Backbone.View
       html += "
         <tr>
           <td><input type='checkbox' class='report-user' data-id='#{user.id}'></td>
-          <td>#{try capitalize atob(user.get('county')) catch e then capitalize user.get('county')}</td>
+          <td>#{@countyNameById[user.get('county')]}</td>
           <td>#{user.get('title')}</td>
           <td>#{user.get('last')}, #{user.get('first')}</td>
           <td>#{user.get('email')}</td>
@@ -195,7 +198,7 @@ class EmailManagerView extends Backbone.View
 
     @$el.find('#report-users').html(html).DataTable()
 
-  
+
 class ReportUser extends Backbone.Model
 
   className : "ReportUser"
@@ -211,8 +214,8 @@ class ReportUserEditView extends Backbone.View
   className: "ReportUserEditView"
 
   events:
-    "change input" : "save" 
-    "change select" : "save" 
+    "change input" : "save"
+    "change select" : "save"
 
   save: ->
     Utils.working true
