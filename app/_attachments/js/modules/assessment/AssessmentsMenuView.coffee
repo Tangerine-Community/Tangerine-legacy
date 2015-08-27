@@ -121,8 +121,8 @@ class AssessmentsMenuView extends Backbone.View
     year  = d.getFullYear()
     group = Tangerine.settings.get("groupName")
 
-    moestReportButton   = "<a href='/_csv/report/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}.html'><button class='nav-button'>MoEST reports</button></a>"
-    financeReportButton = "<a href='/_csv/reimbursement/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}/#{btoa('akoret')}.html'><button class='nav-button'>Tusome Finance reports</button></a>"
+    moestReportButton   = "<a href='/_csv/report/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/ep8yqMKT.html'><button class='nav-button'>MoEST reports</button></a>"
+    financeReportButton = "<a href='/_csv/reimbursement/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/ep8yqMKT/UPPZsEAg.html'><button class='nav-button'>Tusome Finance reports</button></a>"
     emailReportButton   = "<a href='#email'><button class='nav-button'>Email reports</button></a>"
 
     groupsButton  = "<button class='nav-button groups'>Groups</button>"
