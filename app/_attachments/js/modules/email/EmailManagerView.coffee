@@ -134,6 +134,7 @@ class EmailManagerView extends Backbone.View
       success: =>
         Loc.query null, (value) =>
           @countyNameById = value.reduce ((obj, cur) -> obj[cur.id] = cur.name; return obj), {}
+          @countyNameById["All"] = "All"
           @renderUsers()
 
   render: =>
