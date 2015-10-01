@@ -11,7 +11,7 @@ Alternatively put, Tangerine is a [CouchApp](http://couchapp.org/page/index) tha
 
 [Dev wiki](https://github.com/Tangerine-Community/Tangerine/wiki) development guides and references
 
-[Tangerine Central](http://www.tanerinecentral.org) more information about Tangerine projects and news.
+[Tangerine Central](http://www.tangerinecentral.org/) more information about Tangerine projects and news.
 
 
 # Getting Started
