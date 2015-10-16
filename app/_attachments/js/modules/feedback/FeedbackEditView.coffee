@@ -1,6 +1,6 @@
 
 class FeedbackEditView extends Backbone.EditView
-  
+
   events : $.extend
     'click  .critique-add'    : "critiqueAdd"
     'click  .critique-remove' : 'critiqueRemove'
@@ -41,7 +41,7 @@ class FeedbackEditView extends Backbone.EditView
 
               <td>#{@getEditable
                 model: critiqueModel
-                attribute: 
+                attribute:
                   key : 'name'
                   escape : true
                 name: 'Step name'
@@ -54,7 +54,7 @@ class FeedbackEditView extends Backbone.EditView
               <th>Order</th>
               <td>#{@getEditable
                   model: critiqueModel
-                  attribute: 
+                  attribute:
                     key : 'order'
                     isNumber : true
                   name : 'Order'
@@ -67,7 +67,7 @@ class FeedbackEditView extends Backbone.EditView
               <th>Show notes field</th>
               <td>#{@getEditable
                 model: critiqueModel
-                attribute: 
+                attribute:
                   key : 'showNotes'
                 name: 'Show notes field'
                 placeholder: 'true or false'
@@ -92,7 +92,7 @@ class FeedbackEditView extends Backbone.EditView
               <th>Feedback Code</th>
               <td>#{@getEditable
                 model: critiqueModel
-                attribute: 
+                attribute:
                   key : 'processingCode'
                   escape: true
                   coffee: true
@@ -106,8 +106,9 @@ class FeedbackEditView extends Backbone.EditView
               <th>Show feedback when</th>
               <td>#{@getEditable
                 model: critiqueModel
-                attribute: 
+                attribute:
                   key : 'when'
+                  code: true
                 name: 'Show when code'
                 placeholder: 'Show when code'
                 }
@@ -132,14 +133,23 @@ class FeedbackEditView extends Backbone.EditView
       </style>
       <div class='menubox'>
         <div class='menubox'>
-          <h3>Display Lesson viewer</h3>
+          <h3>Dropdown menu variables</h3>
           #{@getEditable
-            model: @feedback
-            attribute: 
-              key : 'showLessonPlan'
-            name: 'Lesson viewer status'
-            placeholder: 'true or false'
-            prepare: (value) -> value is "true"
+              model: @feedback
+              attribute:
+                key : 'dropdownVariables'
+              name: 'Drop down variables'
+              placeholder: 'County, Zone, etc.'
+            }
+        </div>
+        <div class='menubox'>
+          <h3>Sort variables</h3>
+          #{@getEditable
+            model: @feedback,
+            attribute:
+              key : 'sortVariables'
+            name: 'Sort variables'
+            placeholder: 'start_time, subject, term, etc.'
           }
         </div>
 

@@ -1,6 +1,6 @@
 
 class WorkflowEditView extends Backbone.EditView
-  
+
   className: "WorkflowEditView"
 
   events : $.extend
@@ -12,6 +12,7 @@ class WorkflowEditView extends Backbone.EditView
     'click .open-selector'  : 'openSelector'
 
     'click .remove-step'    : 'removeStep'
+    'click .duplicate-step' : 'duplicateStep'
 
   , Backbone.EditView.prototype.events
 
@@ -23,6 +24,13 @@ class WorkflowEditView extends Backbone.EditView
     @workflow.save null,
       success: ->
         Utils.topAlert("Step removed")
+
+  duplicateStep: (event) ->
+    $target = $(event.target)
+    modelId = $target.attr('data-model-id')
+    @workflow.duplicateStep modelId,
+      success: ->
+        Utils.topAlert("Step duplicated")
 
   openSelector: ( event ) ->
     $target = $(event.target)
@@ -69,16 +77,12 @@ class WorkflowEditView extends Backbone.EditView
 
       selectedAssessment = "selected='selected'" if stepType is "assessment"
       selectedCurriculum = "selected='selected'" if stepType is "curriculum"
-      selectedNewObject  = "selected='selected'" if stepType is "new"
       selectedMessage    = "selected='selected'" if stepType is "message"
-      selectedLogin      = "selected='selected'" if stepType is "login"
       selectedNoType     = "selected='selected'" if stepType is ""
 
       displayAssessment = "display:none;" if stepType is "" or stepType isnt "assessment"
       displayCurriculum = "display:none;" if stepType is "" or stepType isnt "curriculum"
-      displayNew        = "display:none;" if stepType is "" or stepType isnt "new"
       displayMessage    = "display:none;" if stepType is "" or stepType isnt "message"
-      displayLogin      = "display:none;" if stepType is "" or stepType isnt "login"
 
       typeSelector = "
         <select class='type-selector' data-id='#{stepModel.id}'>
@@ -86,8 +90,6 @@ class WorkflowEditView extends Backbone.EditView
           <option #{selectedAssessment || ''} value='assessment'>Assessment</option>
           <option #{selectedCurriculum || ''} value='curriculum'>Curriculum</option>
           <option #{selectedMessage    || ''} value='message'>Message</option>
-          <option #{selectedNewObject  || ''} value='new'>New Object</option>
-          <option #{selectedLogin      || ''} value='login'>Login</option>
         </select>"
 
       stepList += "
@@ -142,6 +144,7 @@ class WorkflowEditView extends Backbone.EditView
                   attribute:
                     key : 'skipLogic'
                     escape: true
+                    code: true
                   name: 'Skip logic'
                   placeholder: 'Skip logic'
                   prepare: (value) -> CoffeeScript.compile "return #{value}"
@@ -214,13 +217,13 @@ class WorkflowEditView extends Backbone.EditView
               </td>
             </tr>
             <tr class='curriculum-only not-assessment not-new not-login' style='#{displayCurriculum||''}'>
-              <th>Week variable</th>
+              <th>Version variable</th>
               <td>#{@getEditable
                   model: stepModel
                   attribute: 
                     key : 'curriculumWeek'
-                  name: 'Week variable'
-                  placeholder: 'Week variable'
+                  name: 'Version variable'
+                  placeholder: 'Version variable'
                 }
               </td>
             </tr>
@@ -239,6 +242,7 @@ class WorkflowEditView extends Backbone.EditView
 
             <tr>
               <td><button class='command remove-step' data-model-id='#{stepModel.id}'>Remove</button></td>
+              <td><button class='command duplicate-step' data-model-id='#{stepModel.id}'>Duplicate</button></td>
             </tr>
           </table>
         </li>
@@ -248,13 +252,12 @@ class WorkflowEditView extends Backbone.EditView
 
       @needSelector.push stepModel if stepType is "assessment" and stepModel.getTypesId() is ""
       @needSelector.push stepModel if stepType is "curriculum" and stepModel.getTypesId() is ""
-      @needSelector.push stepModel if stepType is "login" and stepModel.getUserType() is ""
 
 
     html = "
       <h1>#{@getEditable
         model: @workflow
-        attribute : 
+        attribute :
           key : 'name'
           escape : true
         name : "Workflow name"
@@ -321,7 +324,7 @@ class WorkflowEditView extends Backbone.EditView
     value   = $target.val()
 
     model.save "type":value,
-      error: => 
+      error: =>
         Utils.midAlert "Could not save. Please try again."
         @render()
       success: =>
@@ -334,7 +337,7 @@ class WorkflowEditView extends Backbone.EditView
   updateSelector: (modelId, type) =>
     if type is "assessment"
       @$el.find("#typeSelectorContainer-#{modelId}").html("<img src='images/loading.gif' class='loading'>")
-      
+
       @assessments = new Assessments unless @assessments?
       @assessments.fetch
         success: =>
@@ -385,33 +388,6 @@ class WorkflowEditView extends Backbone.EditView
               #{htmlOptions}
             </select><br>
           "
-
-    else if type is "login"
-
-
-      possibleTypes = ['tac', 'teacher']
-
-      oneSelected = false
-      htmlOptions = ''
-
-      stepModel = @workflow.collection.get(modelId)
-
-      for userType in possibleTypes
-        if stepModel.getUserType() is userType
-          oneSelected = true
-          selected = "selected='selected'"
-        else
-          selected = ''
-        htmlOptions += "<option value='#{userType}' #{selected}>#{userType}</option>"
-
-      promptSelection = "<option selected='selected' disabled='disabled'>Please select a user type</option>" unless oneSelected
-
-      @$el.find("#user-type-selector-container-#{modelId}").html "
-        <select class='user-type' data-step-id='#{modelId}'>
-          #{promptSelection||''}
-          #{htmlOptions}
-        </select>
-      "
 
 
   stepAdd: -> @workflow.newChild()

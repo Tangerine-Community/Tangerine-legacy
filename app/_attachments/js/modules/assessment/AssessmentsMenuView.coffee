@@ -69,7 +69,7 @@ class AssessmentsMenuView extends Backbone.View
 
   apk: ->
 
-    includeLessonPlans = confirm "Include lesson plans in APK?"
+    includeLessonPlans = false
 
     TangerineTree.make
       includeLessonPlans : includeLessonPlans
@@ -92,7 +92,7 @@ class AssessmentsMenuView extends Backbone.View
           completePull: => @tabletManager.pushDocs()
 
     @[key] = value for key, value of options
-      
+
 
 
     @assessments.each (assessment) => @listenTo assessment, "new", @addAssessment
@@ -109,9 +109,9 @@ class AssessmentsMenuView extends Backbone.View
 
 
   render: =>
-    
+
     isAdmin = Tangerine.user.isAdmin()
-    
+
     newButton     = "<button class='new command'>New</button>"
     importButton  = "<button class='import command'>Import</button>"
     apkButton     = "<button class='apk nav-button'>APK</button>"
@@ -121,9 +121,9 @@ class AssessmentsMenuView extends Backbone.View
     year  = d.getFullYear()
     group = Tangerine.settings.get("groupName")
 
-    moestReportButton   = "<a href='/_csv/report/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}.html'><button class='nav-button'>MoEST reports</button></a>"
-    financeReportButton = "<a href='/_csv/reimbursement/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}/#{btoa('akoret')}.html'><button class='nav-button'>Tusome Finance reports</button></a>"
-    emailReportButton   = "<a href='#email'><button class='nav-button'>Email reports</button></a>"
+    #moestReportButton   = "<a href='/_csv/report/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}.html'><button class='nav-button'>MoEST reports</button></a>"
+    #financeReportButton = "<a href='/_csv/reimbursement/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}/#{btoa('akoret')}.html'><button class='nav-button'>Tusome Finance reports</button></a>"
+    #emailReportButton   = "<a href='#email'><button class='nav-button'>Email reports</button></a>"
 
     groupsButton  = "<button class='nav-button groups'>Groups</button>"
     uploadButton  = "<button class='command universal_upload'>Universal Upload</button>"
@@ -132,7 +132,7 @@ class AssessmentsMenuView extends Backbone.View
     groupHandle   = "<h2 class='settings grey' data-attribtue='groupHandle'>#{Tangerine.settings.getEscapedString('groupHandle') || Tangerine.settings.get('groupName')}</h2>"
 
 
-    resultsButton = 
+    resultsButton =
       if (dashLink = Tangerine.settings.getString("dashboard")) isnt ""
         "<a href='##{dashLink}'><button class='nav-button results'>Results</button></a>"
       else
@@ -150,6 +150,12 @@ class AssessmentsMenuView extends Backbone.View
 
 
     html = ""
+    ###
+      #{moestReportButton}
+      #{financeReportButton}
+      #{emailReportButton}
+    ###
+
 
     if isAdmin
       html += "
@@ -158,9 +164,6 @@ class AssessmentsMenuView extends Backbone.View
           #{groupsButton}
           #{apkButton}
           #{resultsButton}<br>
-          #{moestReportButton}
-          #{financeReportButton}
-          #{emailReportButton}
           #{groupHandle}
           "
         ) }
@@ -169,7 +172,7 @@ class AssessmentsMenuView extends Backbone.View
           #{if Tangerine.settings.get("context") == "server" then newButton else "" }
           #{importButton}
 
-          
+
 
           <div class='new_form confirmation'>
             <div class='menu_box'>
@@ -295,7 +298,7 @@ class AssessmentsMenuView extends Backbone.View
       callback = @addCurriculum
 
     newObject.save null,
-      success : => 
+      success : =>
         callback(newObject)
         @$el.find('.new_form, .new').fadeToggle(250, => @$el.find('.new_name').val(""))
         Utils.midAlert "#{name} saved"

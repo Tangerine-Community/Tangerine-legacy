@@ -13,7 +13,7 @@ class NotesView extends Backbone.EditView
   render: ->
     @$el.html @getEditable
       model: @model
-      attribute: 
+      attribute:
         key : 'notes'
       name: 'Notes'
       placeholder: 'Tap here to edit'
@@ -54,7 +54,7 @@ class FeedbackRunView extends Backbone.View
           return parseInt(( maxTime - minTime ) / 1000 / 60)
 
 
-      try 
+      try
         shouldDisplay = CoffeeScript.eval.apply(namespace, [critique.getString("when")])
       catch e
         Utils.midAlert "Show when code error in #{critique.getString("name")}<br>#{e}"
@@ -65,7 +65,7 @@ class FeedbackRunView extends Backbone.View
         CoffeeScript.eval.apply(namespace, [critique.getString("processingCode")])
       catch e
         Utils.midAlert "Processing code error in #{critique.getString("name")}<br>#{e}"
-      
+
       try
         template = _.template critique.getString("template")
       catch e
@@ -74,9 +74,8 @@ class FeedbackRunView extends Backbone.View
 
       try
 
-        firstThreeClass = if shownCount >= 1 and shownCount <= 3 then " class='three'" else ''
         html += "
-        <div#{firstThreeClass}>
+        <div>
           <h3>#{critique.getString('name')}</h3>
           <p>#{template(namespace)}</p>
         </div>
@@ -105,7 +104,7 @@ class FeedbackRunView extends Backbone.View
           model: model
         noteView.setElement $(note)
         @noteViews.push noteView
-        
+
         model.fetch
           success: ->
             noteView.render()

@@ -9,10 +9,7 @@ class FeedbackTripsView extends Backbone.View
     "change #school" : "onSchoolSelectionChange"
 
     "click .show-feedback"    : "showFeedback"
-    "click .show-lesson-plan" : "showLessonPlan"
-
     "click .hide-feedback"    : "hideFeedback"
-    "click .hide-lesson-plan" : "hideLessonPlan"
 
     "click .show-survey-data" : "showSurveyData"
     "click .hide-survey-data" : "hideSurveyData"
@@ -20,13 +17,7 @@ class FeedbackTripsView extends Backbone.View
     "click .sortable" : "sortTable"
     "click .back" : "goBack"
 
-  valueToHuman :
-    "english_word" : "English"
-    "word"         : "Kiswahili"
-    "operation"    : "Mathematics"
-    "3"            : "Mother Tongue"
-
-  # 
+  #
   showSurveyData: (event) ->
     $target = $(event.target)
 
@@ -34,12 +25,15 @@ class FeedbackTripsView extends Backbone.View
     $target.siblings().toggle()
 
     tripId = $target.attr("data-trip-id")
-    $output = @$el.find(".#{tripId}-result").append("<div><img class='loading' src='images/loading.gif'></div>").find("div")
-    
+    $output = @$el.find(".#{tripId}-result")
+    $output.html "<img class='loading' src='images/loading.gif'>"
+
+
     view = new WorkflowResultView
       workflow : @workflow
       trip : @trips.get(tripId)
     view.setElement($output)
+
 
     @subViews.push view
     @["WorkflowResultView-#{tripId}"] = view
@@ -50,8 +44,8 @@ class FeedbackTripsView extends Backbone.View
     $target.toggle()
     $target.siblings().toggle()
 
-    tripId = $target.attr("data-trip-id")
-
+    tripId = $target.attr("trip-id")
+    @$el.find(".show-survey-data, .hide-survey-data").toggle()
     @subViews = _(@subViews).without @["WorkflowResultView-#{tripId}"]
     @["WorkflowResultView-#{tripId}"].close()
 
@@ -64,62 +58,12 @@ class FeedbackTripsView extends Backbone.View
     @subViews = []
 
     @trips = new TripResultCollection
-    @trips.fetch 
+    @trips.fetch
       resultView : "tutorTrips"
       queryKey   : "workflow-#{@workflow.id}"
-      success: => 
+      success: =>
         @isReady = true
         @render()
-
-  hideLessonPlan: (event) ->
-
-    $target = $(event.target)
-
-    $target.toggle()
-    $target.siblings().toggle()
-
-    tripId = $target.attr("data-trip-id")
-    @$el.find(".#{tripId}-lesson").empty()
-
-
-  showLessonPlan: (event) ->
-
-    $target = $(event.target)
-
-    $target.toggle()
-    $target.siblings().toggle()
-
-    tripId = $target.attr("data-trip-id")
-    trip   = @trips.get(tripId)
-
-    @$lessonContainer = @$el.find(".#{tripId}-lesson")
-
-    @$lessonContainer.html "<img class='loading' src='images/loading.gif'>"
-
-
-    subject = ({"bukusu": "bukusu","kamba": "kamba","word": "kiswahili", "english_word" : "english", "operation" : "maths"})[trip.get('subject')]
-
-    motherTongue = trip.get("subject_mother_tongue")
-    grade   = trip.get("class")
-    week    = trip.get("lesson_week")
-    day     = trip.get("lesson_day")
-
-    lessonImage = new Image 
-    $(lessonImage).on "load", 
-      (event) =>
-        if lessonImage.height is 0
-          @$lessonContainer .find("img").remove?()
-          @$lessonContainer.html "Sorry, no lesson plan available."
-          @$lessonContainer.append(lessonImage)
-        else
-          @$lessonContainer.find("img").remove?()
-          @$lessonContainer.append(lessonImage)
-
-
-    if subject is "3"
-      lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/#{motherTongue}_w#{week}_d#{day}.png"
-    else
-      lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/#{subject}_c#{grade}_w#{week}_d#{day}.png"
 
 
   hideFeedback: (event) ->
@@ -143,7 +87,7 @@ class FeedbackTripsView extends Backbone.View
     tripId = $target.attr("data-trip-id")
 
     trip = @trips.get(tripId)
-    
+
     view = new FeedbackRunView
       trip     : trip
       feedback : @feedback
@@ -157,7 +101,6 @@ class FeedbackTripsView extends Backbone.View
   onClose: ->
     for view in @subViews
       view.close()
-    @$lessonContainer?.remove?()
 
   sortTable: ( event ) ->
     newSortAttribute = $(event.target).attr("data-attr")
@@ -171,50 +114,32 @@ class FeedbackTripsView extends Backbone.View
       else if @sortDirection is 1
         @sortDirection = -1
 
+
     @updateFeedbackList()
+
+
+
 
 
   render: =>
 
     if @isReady and @trips.length == 0
-      @$el.html " 
+      @$el.html "
         <h1>Feedback</h1>
         <button class='nav-button back'>Back</button>
         <p>No visits yet.</p>
       "
       return @trigger "rendered"
-      
-    
+
     return unless @isReady
 
-    tripsByCounty = @trips.indexBy("County")
-    counties = _(@trips.pluck("County")).chain().compact().uniq().value().sort()
-    countyOptions = ("<option value='#{_(county).escape()}'>#{_(county).escape()} (#{tripsByCounty[county]?.length || 0})</option>" for county in counties).join('')
-    countyOptions = "<option disabled='disabled' selected='selected'>Select a county</option>" + countyOptions
 
     html = "
       <h1>Feedback</h1>
       <h2>Visits</h2>
-      <div id='county-selection'>
-        <label for='county'>County</label>
-        <select id='county'>
-          #{countyOptions}
-        </select>
-      </div>
-      
-      <div id='zone-selection'>
-        <label for='zone'>Zone</label>
-        <select id='zone'>
-          <option disabled='disabled' selected='selected'></option>
-        </select>
+      <div id='dropdown-selector'>
       </div>
 
-      <div id='school-selection'>
-        <label for='school'>School</label>
-        <select id='school'>
-          <option disabled='disabled' selected='selected'></option>
-        </select>
-      </div>
       <br>
       <div id='feedback-list'>
 
@@ -222,6 +147,17 @@ class FeedbackTripsView extends Backbone.View
     "
 
     @$el.html html
+
+    @dropdownView = new DropdownView
+      variables : @feedback.get('dropdownVariables')
+      collection : @trips
+
+    @dropdownView.setElement(@$el.find("#dropdown-selector"))
+    @dropdownView.render()
+
+    @subViews.push @dropdownView
+
+    @listenTo @dropdownView, "change", @handleSelection
 
     @trigger "rendered"
 
@@ -266,68 +202,58 @@ class FeedbackTripsView extends Backbone.View
     return "&#x25b2;" if @sortAttribute is attributeName and @sortDirection is -1
     return ""
 
-  onSchoolSelectionChange: ( event ) ->
+  handleSelection: ( selectionObject ) ->
 
-    @selectedSchool = @$el.find("#school").val()
-    @selectedZone   = @$el.find("#zone").val()
-    @selectedCounty = @$el.find("#county").val()
+    feedbackVariableLength = @feedback.get('dropdownVariables')
+    allSelectionsMade = Object.keys(selectionObject) is feedbackVariableLength
+    unless allSelectionsMade
+      @selectedTrips = @trips.where selectionObject
+      @updateFeedbackList()
 
-    @selectedTrips = @trips.where
-      County : @selectedCounty
-      Zone   : @selectedZone
-      SchoolName : @selectedSchool
 
-    @updateFeedbackList()
+
 
   updateFeedbackList: ->
 
-    if @sortAttribute in [ "subject", "stream" ]
+    # to sort strings
+    sortFunction = (a, b) =>
+      a = a.getString(@sortAttribute).toLowerCase()
+      b = b.getString(@sortAttribute).toLowerCase()
+      if (a < b)
+        result = -1
+      else if (a > b)
+        result = 1
+      else
+        result = 0
+      return result * @sortDirection
 
-      # to sort strings
-      sortFunction = (a, b) => 
-        a = a.getString(@sortAttribute)
-        b = b.getString(@sortAttribute)
-        if (a < b)
-          result = -1
-        else if (a > b)
-          result = 1
-        else
-          result = 0
-        return result * @sortDirection
-
-    else
-
-      # sorting numbers
-
-      sortFunction = (a, b) => ( b.get(@sortAttribute) - a.get(@sortAttribute) ) * @sortDirection
+    # sorting numbers
+    # sortFunction = (a, b) => ( b.get(@sortAttribute) - a.get(@sortAttribute) ) * @sortDirection
 
     @selectedTrips = @selectedTrips.sort sortFunction
 
+    sortVariables = @feedback.get("sortVariables").split(/\s*,\s*/)
+
     feedbackHtml = "
-      <h2>#{@selectedTrips[0]?.get?("SchoolName") || ''}</h2>
       <table id='feedback-table'>
         <thead>
           <tr>
-            <th nowrap class='sortable' data-attr='subject'>Subject #{@getSortArrow("subject")}</th>
-            <th nowrap class='sortable' data-attr='class'>Class #{@getSortArrow("class")}</th>
-            <th nowrap class='sortable' data-attr='stream'>Stream #{@getSortArrow("stream")}</th>
-            <th nowrap class='sortable' data-attr='start_time'>Observation Start Time #{@getSortArrow("start_time")}</span></th>
+            #{
+              ("
+              <th nowrap class='sortable' data-attr='#{_.escape(attribute)}'>#{attribute.underscore().humanize()} #{@getSortArrow(attribute)}</th>
+              " for attribute in sortVariables).join('')
+            }
             <th nowrap class='sortable' data-attr=''>&nbsp;</th>
           </tr>
         </thead>
         <tbody>
     "
 
+    formatTime = (time) -> moment(time).format("MMM-DD HH:mm")
+
     for trip,index in @selectedTrips
 
       tripId = trip.get('tripId')
-
-      lessonPlanButtonsHtml = "
-        <button class='command show-lesson-plan' data-trip-id='#{tripId}'>Show lesson plan</button>
-        <button class='command hide-lesson-plan' data-trip-id='#{tripId}' style='display:none;'>Hide lesson plan</button>
-      " unless @feedback.get("showLessonPlan")
-
-      subject = @valueToHuman[trip.get "subject"] || ''
 
       resultButtonHtml = "
         <button class='command show-survey-data' data-trip-id='#{tripId}'>Show survey data</button>
@@ -337,16 +263,21 @@ class FeedbackTripsView extends Backbone.View
 
       feedbackHtml += "
         <tr>
-          <td id='subject-#{index}'>#{subject}</td>
-          <td>#{trip.getString("class")}</td>
-          <td>#{trip.getString("stream")}</td>
-          <td>#{moment(trip.get("start_time")).format("MMM-DD HH:mm")}</td>
+            #{
+              ("
+              <td>
+                #{
+                  if ~attribute.indexOf("time")
+                    formatTime(trip.getNumber(attribute))
+                  else
+                    trip.getString(attribute)
+                }
+                </td>
+              " for attribute in sortVariables).join('')
+            }
           <td>
             <button class='command show-feedback' data-trip-id='#{tripId}'>Show feedback</button>
             <button class='command hide-feedback' data-trip-id='#{tripId}' style='display:none;'>Hide feedback</button>
-          </td>
-          <td>
-            #{lessonPlanButtonsHtml || ''}
           </td>
           <td>
             #{resultButtonHtml || ''}
@@ -359,9 +290,6 @@ class FeedbackTripsView extends Backbone.View
         <tr>
           <td colspan='5' class='#{tripId}'></td>
         </tr>
-        <tr>
-          <td colspan='5' class='#{tripId}-lesson'></td>
-        </tr>
       "
     feedbackHtml += "</tbody></table>"
 
@@ -369,8 +297,8 @@ class FeedbackTripsView extends Backbone.View
 
 
 class WorkflowResultView extends Backbone.View
-  
-  events: 
+
+  events:
     "change select" : "updateDisplay"
 
   updateDisplay: ->
@@ -386,7 +314,7 @@ class WorkflowResultView extends Backbone.View
     assessmentSteps = _(@workflow.getChildren()).where({"type":"assessment"})
     assessmentModelBlanks = assessmentSteps.map( (el) -> { "_id" : el.typesId })
     loadOne = (assessments) ->
-      
+
       if assessmentModelBlanks.length == 0
         self.render()
       else
@@ -410,42 +338,27 @@ class WorkflowResultView extends Backbone.View
     displayHtml = ""
     first = true
 
-    for assessment in @assessments 
+    for assessment in @assessments
       for subtest in assessment.subtests.models
         if subtest.get("prototype") is "survey"
 
           hidden = if not first then "style='display:none;'" else ""
-          first = false if first 
+          first = false if first
           displayHtml += "<section #{hidden} class='subtest-#{subtest.id} result-display'>"
           optionsHtml += "<option value='#{subtest.id}'>#{subtest.get('name')}</option>"
 
           for question in assessment.questions.models
 
-            continue if question.get("subtestId") isnt subtest.id
-
             tableHtml = ""
 
             type = question.get('type')
 
-            if type is "single"
+            if type is "multiple" or type is "single"
               for option in question.get("options")
                 unless @trip.get(question.get('name'))
                   answer = "<span color='grey'>no data</span>"
                 else
                   answer = if @trip.get(question.get('name')) is option.value then "<span style='color:green'>checked</span>" else "<span style='color:red'>unchecked</span>"
-                tableHtml += "
-                  <tr>
-                    <th>#{option.label}</th>
-                    <td>#{answer}</td>
-                  </tr>
-                "
-            else if type is "multiple"
-              for option in question.get("options")
-                value = @trip.get("#{question.get('name')}_#{option.value}")
-                unless value
-                  answer = "<span color='grey'>no data</span>"
-                else
-                  answer = if @trip.get("#{question.get('name')}_#{option.value}") is 1 then "<span style='color:green'>checked</span>" else "<span style='color:red'>unchecked</span>"
                 tableHtml += "
                   <tr>
                     <th>#{option.label}</th>
@@ -464,8 +377,8 @@ class WorkflowResultView extends Backbone.View
             "
           displayHtml += "</section>"
     selectorHtml = "<select>#{optionsHtml}</select>"
-    
-    
+
+
     html = "
       <h2>Section</h2>
       #{selectorHtml}
@@ -473,3 +386,134 @@ class WorkflowResultView extends Backbone.View
     "
 
     @$el.html html
+
+
+class DropdownView extends Backbone.View
+
+  events :
+    "change select" : "onSelect"
+
+  onSelect: (event) ->
+
+    $target = $(event.target)
+    value = $target.val()
+    level = parseInt($(event.target.selectedOptions[0]).attr('data-level'))
+    console.log "I found level #{level} and value #{value}"
+
+    @selected[level] = value
+    @selected = @selected[0..level]
+
+    @update
+      startLevel : level
+
+    if @selected.length is @variables.length
+      @trigger "change", @getSelection()
+
+  getSelection: ->
+    result = {}
+    for value, i in @selected
+      result[@variables[i]] = value
+    return result
+
+  initialize: (options) ->
+    @variables = options.variables.split(/\s*,\s*/)
+    @collection = options.collection
+    @selected = []
+
+  @template:
+    options: ( args ) ->
+      DropdownView.template.emptyOption() +
+      args.values.map( (value) ->
+        DropdownView.template.oneOption(level:args.level,value:value)
+      ).join('')
+
+    oneOption: (args) ->
+      "<option data-level='#{args.level}' #{if args.selected then 'selected="selected"' else ''} value='#{_.escape(args.value)}'>#{args.value}</option>"
+
+    emptyOption: ->
+      "<option selected='selected'>---</option>"
+
+    fullSelect: ( args ) ->
+      "
+        <label for='#{args.cid}-select-level-#{args.level}'>#{args.variable}</label>
+        <select id='#{args.cid}-select-level-#{args.level}'>
+          #{DropdownView.template.options(level : args.level, values:args.values)}
+        </select>
+      "
+
+    emptySelect: ( args ) ->
+      "
+        <label for='#{args.cid}-select-level-#{args.level}'>#{args.variable}</label>
+        <select id='#{args.cid}-select-level-#{args.level}' disabled='disabled'>
+          #{DropdownView.template.emptyOption()}
+        </select>
+      "
+
+  render: ->
+    html = ""
+    for variable, i in @variables
+
+      if i is 0
+
+        html += DropdownView.template.fullSelect
+          variable : variable
+          level : i
+          values : @getValues(variable)
+          cid: @cid
+
+      else
+
+        html += DropdownView.template.emptySelect
+          cid      : @cid
+          level    : i
+          variable : variable
+
+    @$el.html html
+
+  # get values for variable with currently selected values
+  getValues: ( variable ) ->
+
+    if @selected.length is 0
+      variables = @collection.pluck(variable)
+    else
+      variables = (new Backbone.Collection @collection.where @getSelection()).pluck(variable)
+
+    variables = variables.filter (a) -> !!a
+
+    return _(variables).uniq().sort()
+
+  renderLevel: (options) ->
+    if options.clear or not options.values
+      @$el.find("##{@cid}-select-level-#{options.level}").attr("disabled",true).html DropdownView.template.emptyOption()
+    else if options.values.length is 1
+      @$el.find("##{@cid}-select-level-#{options.level}").removeAttr('disabled').html DropdownView.template.oneOption(level: options.level,value: options.values[0], selected:true)
+    else
+      @$el.find("##{@cid}-select-level-#{options.level}").removeAttr('disabled').html DropdownView.template.options(level: options.level,values: options.values)
+
+  # updates levels, recursive
+  update: (options) ->
+
+    startLevel = options.startLevel || 0
+
+    return if startLevel >= @variables.length # recursive end condition
+
+    thisLevel = startLevel + 1
+
+    values = @getValues @variables[thisLevel]
+
+    if values.length is 1 # if only one choice, auto select
+      @selected[thisLevel] = values[0]
+      @renderLevel
+        level  : thisLevel
+        values : values
+
+      @update
+        startLevel : thisLevel
+    else
+      shouldClear = thisLevel > @selected.length
+      @renderLevel
+        level  : thisLevel
+        values : values
+        clear  : shouldClear
+      @update
+        startLevel : thisLevel

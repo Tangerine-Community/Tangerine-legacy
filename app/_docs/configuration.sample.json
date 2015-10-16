@@ -9,7 +9,7 @@
    "update" : {
       "target" : "http://localadmin:localpassword@localhost:5984/tangerine",
       "dbName" : "update",
-      "host"   : "ht.tangerinecentral.org/db",
+      "host"   : "malawi.tangerinecentral.org/db",
       "login"  : ""
    },
 
@@ -19,15 +19,15 @@
 
    "trunk" : {
       "dbName" : "t",
-      "host" : "ht.tangerinecentral.org/db"
+      "host" : "malawi.tangerinecentral.org/db"
    },
 
    "groupDBPrefix" : "group-",
    "port" : 5984,
 
-   "tree"    : "http://ht.tangerinecentral.org/tree/",
-   "robbert" : "http://ht.tangerinecentral.org/robbert/",
-   "vouch"   : "http://ht.tangerinecentral.org/vouch/",
+   "tree"    : "http://malawi.tangerinecentral.org/tree/",
+   "robbert" : "http://malawi.tangerinecentral.org/robbert/",
+   "vouch"   : "http://malawi.tangerinecentral.org/vouch/",
 
    "defaults" : {
       "settings" : {
@@ -36,7 +36,7 @@
          "language" : "en",
          "log" : [""],
          "groupName" : "empty",
-         "groupHost" : "http://ht.tangerinecentral.org/db",
+         "groupHost" : "http://malawi.tangerinecentral.org/db",
          "upPass" : "pass"
       }
    },

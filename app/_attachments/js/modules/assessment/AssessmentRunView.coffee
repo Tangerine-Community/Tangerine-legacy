@@ -43,7 +43,7 @@ class AssessmentRunView extends Backbone.View
       places = Tangerine.settings.get("sequencePlaces")
       places = {} unless places?
       places[@model.id] = 0 unless places[@model.id]?
-      
+
       if places[@model.id] < sequences.length - 1
         places[@model.id]++
       else
@@ -57,7 +57,7 @@ class AssessmentRunView extends Backbone.View
       for i in [0..@subtestViews.length]
         @orderMap[i] = i
 
-    resultAttributes = 
+    resultAttributes =
       assessmentId   : @model.id
       assessmentName : @model.get "name"
       blank          : true
@@ -66,7 +66,7 @@ class AssessmentRunView extends Backbone.View
       resultAttributes.tripId     = @tripId
       resultAttributes.workflowId = @workflowId
 
-    @result = new Result resultAttributes 
+    @result = new Result resultAttributes
 
     if hasSequences then @result.set("order_map" : @orderMap)
 
@@ -109,6 +109,8 @@ class AssessmentRunView extends Backbone.View
     @listenTo currentView, "subRendered", => @trigger "subRendered"
     @listenTo currentView, "hideNext",    => @hideNext()
     @listenTo currentView, "showNext",    => @showNext()
+    @listenTo currentView, "skip",        => @skip()
+
 
     currentView.setElement(@$el.find("#subtest"))
     currentView.render()
@@ -133,12 +135,13 @@ class AssessmentRunView extends Backbone.View
     @result.clear()
     $("#current_student_id").fadeOut(250, -> $(@).html("").show())
     $("#current_student").fadeOut(250)
-    
+
   abort: ->
     @abortAssessment = true
     @next()
 
   skip: =>
+    @isSkipping = true
     currentView = @subtestViews[@orderMap[@index]]
     @result.add
       name      : currentView.model.get "name"
@@ -149,7 +152,12 @@ class AssessmentRunView extends Backbone.View
       sum       : currentView.getSum()
     ,
       success: =>
-        @resetNext()
+        # plus 2 because it hasn't been incremented yet. normally plus 1 for 0 index
+        atLastSubtest = @orderMap[@index] + 2 is @subtestViews.length
+        if @inWorkflow and atLastSubtest
+          @trigger "subViewDone"
+        else
+          @resetNext()
 
   next: =>
     if @abortAssessment
@@ -185,7 +193,7 @@ class AssessmentRunView extends Backbone.View
     @rendered.assessment = false
     currentView = @subtestViews[@orderMap[@index]]
     currentView.close()
-    @index = 
+    @index =
       if @abortAssessment == true
         @subtestViews.length-1
       else

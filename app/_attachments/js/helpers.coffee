@@ -174,7 +174,9 @@ class Backbone.EditView extends Backbone.View
 
         numberOrNot = if _.isNumber(value) then "data-is-number='true'" else "data-is-number='false'" 
 
-        result = "<div class='edit_in_place #{key}-edit-in-place' id='#{model.id}-#{key}'><span data-model-id='#{model.id}' data-type='#{type}' data-key='#{key}' data-value='#{value}' data-name='#{name}' #{editOrNot} #{numberOrNot} #{untitled||''}>#{value}</span></div>"
+        codeClass   = if attribute.code is true then "code" else ''
+
+        result = "<div class='edit_in_place #{key}-edit-in-place' id='#{model.id}-#{key}'><span class='#{codeClass}' data-model-id='#{model.id}' data-type='#{type}' data-key='#{key}' data-value='#{value}' data-name='#{name}' #{editOrNot} #{numberOrNot} #{untitled||''}>#{value}</span></div>"
 
         return result
 
@@ -227,8 +229,6 @@ class Backbone.EditView extends Backbone.View
 
   editing: (event) =>
 
-    return false if event.which == 13 and event.type == "keyup"
-
     $target = $(event.target)
 
     $parent = $target.parent()
@@ -245,7 +245,7 @@ class Backbone.EditView extends Backbone.View
     newValue = $target.val()
     newValue = if isNumber then parseInt(newValue) else newValue
 
-    if event.which == 27 or event.type == "focusout"
+    if event.which == 27
       @$el.find("##{modelId}-#{key}").html @htmlGenCatelog[modelId][key]?()
       @alreadyEditing = false
       return
@@ -255,8 +255,8 @@ class Backbone.EditView extends Backbone.View
     enter   = event.which is 13
     altKey  = event.altKey
 
-    return true if enter and altKey
-    return true unless enter and keyDown
+    #return true unless enter and keyDown
+    return true unless event.type is "focusout"
 
     @alreadyEditing = false
 
@@ -268,7 +268,7 @@ class Backbone.EditView extends Backbone.View
         try
           attributes[key+"-cooked"] = @preparations[modelId][key](newValue)
         catch e
-          Utils.sticky("Problem cooking value<br>#{e.message}")
+          Utils.sticky("Problem cooking value for #{key}<br>#{e.message}")
           return
       model.save attributes,
         success: =>
@@ -344,8 +344,9 @@ class Backbone.ParentModel extends Backbone.Model
     newChild.set("_id", Utils.guid())
     newChild.parent = @
     @collection.add(newChild, options)
-    newChild.save attributes,
-      success: =>
+    console.log "saving new child with attributes"
+    console.log attributes
+    newChild.save attributes, options
         
 
   childSave: (options = {}) =>

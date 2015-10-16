@@ -189,12 +189,12 @@ class GridRunView extends Backbone.View
   updateMode: ( mode = null ) =>
     # dont' change the mode if the time has never been started
     if (mode==null && @timeElapsed == 0 && not @dataEntry) || mode == "disabled"
-      @modeButton.setValue null
+      @modeButton?.setValue null
     else if mode? # manually change the mode
       @mode = mode
-      @modeButton.setValue @mode
+      @modeButton?.setValue @mode
     else # handle a click event
-      @mode = @modeButton.getValue()
+      @mode = @modeButton?.getValue()
 
 
   getTime: ->
@@ -459,8 +459,10 @@ class GridRunView extends Backbone.View
 
     @$el.html html
 
-    @modeButton.setElement @$el.find ".mode-button"
-    @modeButton.render()
+    if @captureLastAttempted || @captureItemAtTime
+
+      @modeButton.setElement @$el.find ".mode-button"
+      @modeButton.render()
 
     @trigger "rendered"
     @trigger "ready"

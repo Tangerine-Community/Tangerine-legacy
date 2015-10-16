@@ -17,34 +17,43 @@ class Subtest extends Backbone.Model
       @set key, value
     @save()
 
-  copyTo: ( assessmentId ) ->
-    newSubtest = new Subtest
-    newSubtest.attributes = @attributes
-    newId = Utils.guid()
+  copyTo: (options) ->
 
-    if newSubtest.has("surveyAttributes")
-      newSubtest.set "surveyAttributes",
-        "_id" : newId
-        "assessmentId" : assessmentId
+    assessmentId = options.assessmentId
+    callback     = options.callback
+    order        = options.order || 0
+
+    newSubtest = new Subtest @attributes
+    newId = Utils.guid()
 
     newSubtest.save
       "_id"          : newId
       "assessmentId" : assessmentId
-      "order"        : 0
+      "order"        : order
       "gridLinkId"   : ""
+    ,
+      success: =>
+        questions = new Questions
+        questions.fetch
+          key: @id
+          error: -> Utils.sticky "There was an error copying."
+          success: =>
 
-    questions = new Questions
-    questions.fetch
-      key: @get("assessmentId")
-      success: (questionCollection) =>
-        return if questionCollection.length is 0
-        subtestQuestions = questionCollection.where "subtestId" : @id
-        for question in subtestQuestions
-          newQuestion = question.clone()
-          newQuestion.save
-            "assessmentId" : assessmentId
-            "_id"          : Utils.guid() 
-            "subtestId"    : newId
-        # send user to edit page for reordering subtests
-        Tangerine.router.navigate "edit/#{assessmentId}", true
-        Utils.midAlert "Subtest copied"
+            doOne = ->
+              question = questions.pop()
+              if question
+                newQuestion = new Question question.attributes
+                newQuestion.save
+                  "assessmentId" : assessmentId
+                  "_id"          : Utils.guid()
+                  "subtestId"    : newId
+                ,
+                  success: ->
+                    doOne()
+                  error: -> Utils.sticky "There was an error copying."
+              else
+                # send user to edit page for reordering subtests
+                Utils.midAlert "Subtest copied"
+                callback()
+
+            doOne()

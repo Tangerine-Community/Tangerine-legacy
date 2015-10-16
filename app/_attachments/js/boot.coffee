@@ -363,7 +363,6 @@ Tangerine.boot = (callback) ->
       Tangerine.bootSequence.getSettings
       #Tangerine.bootSequence.hitViews
       Tangerine.bootSequence.getTemplates
-      Tangerine.bootSequence.getSchoolList
       Tangerine.bootSequence.ensureAdmin
       Tangerine.bootSequence.transitionUsers
       Tangerine.bootSequence.startApp

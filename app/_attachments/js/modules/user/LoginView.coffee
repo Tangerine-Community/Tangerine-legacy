@@ -13,7 +13,7 @@ class LoginView extends Backbone.View
       'keyup #new-name'    : 'checkNewName'
       'click .next'   : 'next' #touchstart
       'click .verify' : 'verify' #touchstart
-    } 
+    }
   else
     {
       'keypress input'     : 'keyHandler'
@@ -42,39 +42,6 @@ class LoginView extends Backbone.View
     @oldBackground = $("body").css("background")
     $("body").css("background", "white")
     $("#footer").hide()
-
-    @fetchLocations => @renderSchoolList("data")
-
-  fetchLocations: ( callback = $.noop ) ->
-    subtestIndex = 0
-    limit = 1
-
-    checkSubtest = =>
-
-      Tangerine.$db.view("#{Tangerine.design_doc}/byCollection",
-        key   : "subtest"
-        skip  : subtestIndex
-        limit : limit
-        include_docs : true
-        error : $.noop
-        success: (response) =>
-          if response.rows.length is 0 
-            if Tangerine.settings.get("context") isnt "server"
-              return alert "Failed to find locations"
-            else
-              return 
-          
-          locationSubtest = response.rows[0].doc
-
-          if locationSubtest.prototype? && locationSubtest.prototype is "location"
-            @locationSubtest = new Subtest locationSubtest
-            @locationView = new LocationRunView model:@locationSubtest, limit:2
-            callback?()
-          else
-            subtestIndex++
-            checkSubtest()
-      )
-    checkSubtest()
 
 
   checkNewName: (event) ->
@@ -106,7 +73,7 @@ class LoginView extends Backbone.View
     @$el.find("#name").autocomplete
       source: @users.pluck("name")
 
-  recenter: => 
+  recenter: =>
     @$el.middleCenter() unless @$el.height() > $(window).height()
 
   i18n: ->
@@ -122,7 +89,6 @@ class LoginView extends Backbone.View
       "error_pass" : t('LoginView.message.error_password_empty')
       "error_name_taken" : t('LoginView.message.error_name_taken')
 
-      "tsc_number"             : t('LoginView.label.tsc_number')
       "challenge_question"     : t('LoginView.label.challenge_question')
       "challenge_response"     : t('LoginView.label.challenge_response')
       "challenge_explaination" : t('LoginView.message.challenge_explaination')
@@ -138,7 +104,7 @@ class LoginView extends Backbone.View
     $target = $(event.target)
     if $target.val() == "*new"
       @updateMode "signup"
-    else 
+    else
       @$el.find("#pass").focus()
 
   goOn: -> Tangerine.router.landing(true)
@@ -227,7 +193,6 @@ class LoginView extends Backbone.View
           #{verifiableHtml||''}
 
           <div class='messages name-message'></div>
-          <input autocomplete='off' id='tsc-number' type='text' placeholder='#{@text.tsc_number}'>
 
           <input autocomplete='off' id='new-name' type='text' placeholder='#{nameName}'>
 
@@ -243,8 +208,6 @@ class LoginView extends Backbone.View
 
           <input autocomplete='off' id='first' type='text' placeholder='#{@text.first_name}'>
           <input autocomplete='off' id='last' type='text' placeholder='#{@text.last_name}'>
-
-          <div id='schoolSelector'>Loading county and zone list...</div>
 
           <label>Gender<br>
           <select id='gender'>
@@ -282,19 +245,7 @@ class LoginView extends Backbone.View
     @nameMsg = @$el.find(".name-message")
     @passMsg = @$el.find(".pass-message")
 
-    @trigger "rendered" 
-    @renderSchoolList "dom"
-
-  renderSchoolList: (flag) ->
-    requiredFlags = ["dom", "data"]
-    @renderSchoolListFlags = [] unless @renderSchoolListFlags?
-    @renderSchoolListFlags.push flag
-    ready = _(requiredFlags).intersection(@renderSchoolListFlags).length == requiredFlags.length
-    return unless ready
-
-    @locationView.setElement @$el.find("#schoolSelector")
-    @locationView.render()
-    @locationView.$el.find(".clear").remove()
+    @trigger "rendered"
 
   next: ->
     $challenge = @$el.find("#challenge")
@@ -326,7 +277,7 @@ class LoginView extends Backbone.View
         callback: (newPass) =>
 
           newHash = (TabletUser.generateHash newPass, salt)['pass']
-          @resetUser.save 
+          @resetUser.save
             "pass": newHash
 
           Utils.sticky "Password reset", null, -> document.location.reload()
@@ -371,7 +322,7 @@ class LoginView extends Backbone.View
     # only respond to keyboard events and on fields we don't ignore
     if char? and isntIgnoredField
 
-      isSpecial = 
+      isSpecial =
         char is key.ENTER              or
         event.keyCode is key.TAB       or
         event.keyCode is key.BACKSPACE
@@ -408,9 +359,6 @@ class LoginView extends Backbone.View
 
     errors = []
 
-    if ( tscNumber  = ( $tscNumber  = @$el.find("#tsc-number")     ).val() ).length is 0
-      errors.push " - TSC or Employment number cannot be empty"
-
     if ( first  = ( $first  = @$el.find("#first")     ).val() ).length is 0
       errors.push " - First name cannot be empty"
 
@@ -434,30 +382,15 @@ class LoginView extends Backbone.View
       # do nothing
     #  errors.push " - Email cannot be empty"
 
-    location = {}
-    rawLocation = @locationView.getResult(true)
-
-    for label, i in rawLocation.labels
-
-      errors.push " - #{label} must be selected" unless rawLocation.location[i]?
-      location[label] = rawLocation.location[i]
-
-
-    previousUsers = ($previousUsers = @$el.find("#same-users")).val()
-
-
     attributes =
-      "tscNumber" : tscNumber
       "question"  : question
       "response"  : response
 
       "first"  : first
       "last"   : last
-      "location" : location
       "gender" : gender
       "phone"  : phone
       "email"  : email
-      "previousUsers" : previousUsers
 
     if @hasVerifiableAttribute()
       attributes[@verifiableAttribute()] = @verifiableAttributeValue()

@@ -26,12 +26,11 @@ class KlassSubtestRunView extends Backbone.View
 
     @prototypeRendered = false
 
-
     resultAttributes =
       if @prototype is "grid"
         prototype   : "grid"
         startTime   : (new Date()).getTime()
-        itemType    : @subtest.get("itemType")
+        itemType    : @subtest.getString("itemType")
         reportType  : @subtest.get("reportType")
         studentId   : @student.id
         subtestId   : @subtest.id
@@ -45,7 +44,7 @@ class KlassSubtestRunView extends Backbone.View
         subtestId   : @subtest.id
         part        : @subtest.get("part")
         klassId     : @student.get("klassId")
-        itemType    : @subtest.get("itemType")
+        itemType    : @subtest.getString("itemType")
         reportType  : @subtest.get("reportType")
 
     if @inWorkflow

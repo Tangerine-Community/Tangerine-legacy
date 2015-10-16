@@ -9,8 +9,15 @@ class Workflow extends Backbone.ParentModel
 
   getLength: -> @collection.length || @attributes.children.length
 
-  stepModelByIndex: ( index ) -> 
+  stepModelByIndex: ( index ) ->
     return @collection.models[index] || null
+
+  duplicateStep: (modelId, options) ->
+    model = @collection.get(modelId)
+    newAttributes      = _(model.attributes).clone()
+    newAttributes.name = "Copy of #{newAttributes.name}"
+    newAttributes._id = Utils.guid()
+    @newChild newAttributes, options
 
   validate: ( attr, options ) ->
 

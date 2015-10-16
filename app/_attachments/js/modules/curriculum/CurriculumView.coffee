@@ -41,7 +41,7 @@ class CurriculumView extends Backbone.View
         },
         {
           "key"      : "part"
-          "label"    : "Term"
+          "label"    : "Version"
           "editable" : true
         },
         {

@@ -1,5 +1,5 @@
 class WorkflowRunView extends Backbone.View
-  
+
   events:
     "click .previous" : "previousStep"
     "click .next"     : "nextStep"
@@ -56,7 +56,7 @@ class WorkflowRunView extends Backbone.View
     @$el.find('#workflow-progress').progressbar value : ( (@index+1) / (@workflow.getLength()+1) * 100 )
 
     @trigger "rendered"
-    
+
 
   afterRender: =>
     subView?.afterRender?()
@@ -70,12 +70,9 @@ class WorkflowRunView extends Backbone.View
     itIsRendered    = @subViewRendered
     itIsntDone      = not @subViewDone
     itsAnAssessment = @currentStep.getType() is "assessment"
-    itsACurriculum  = @currentStep.getType() is "curriculum"
-    itsANewObject   = @currentStep.getType() is "new"
 
     return false if !itIsRendered
     return @subView.next() if itExists and itIsntDone and itsAnAssessment
-    return @subView.save() if itExists and itIsntDone and itsANewObject
 
     @subViewRendered = false
     @subViewDone = false
@@ -123,7 +120,7 @@ class WorkflowRunView extends Backbone.View
         result = step.result.getVariable(key)
       if result?
         return result
-      
+
 
   renderStep: =>
     @steps[@index] = {} unless @steps[@index]?
@@ -137,57 +134,14 @@ class WorkflowRunView extends Backbone.View
     return if @index == @workflow.getLength()
 
     switch @currentStep.getType()
-      when "new"        then @renderNew()
       when "assessment" then @renderAssessment()
       when "curriculum" then @renderCurriculum()
       when "message"    then @renderMessage()
-      when "login"
-        @$el.find("##{@cid}_current_step").html "
-          <h1>Login - #{@currentStep.get('userType')}</h1>
-        "
       else
         @$el.find("##{@cid}_current_step").html "
           <h1>#{@currentStep.name()} - #{@currentStep.getType()}</h1>
         "
 
-    if @currentStep.getShowLesson()
-      
-      subject      = @getVariable("subject")
-      motherTongue = @getVariable("subject_mother_tongue")
-
-      subject = ({"word": "kiswahili", "english_word" : "english", "operation" : "maths","3":"3"})[subject]
-      grade   = @getVariable("class")
-      week    = @getVariable("lesson_week")
-      day     = @getVariable("lesson_day")
-
-      $content = $("#content")
-
-      unless $content.find("#display-switch").length > 0
-        $content.append("<img src='images/icon_switch.png' id='display-switch'>")
-        @$button = $content.find("#display-switch")
-        @$button.on "click", @switch
-
-      $content.append("<div id='lesson-container' style='display:none;'></div>")
-
-      @$lessonContainer = $content.find("#lesson-container")
-
-      lessonImage = new Image
-      $(lessonImage).on "load",
-        (event) =>
-          if lessonImage.height is 0
-            @$lessonContainer?.remove?()
-            @$button?.remove?()
-          else
-            @$lessonContainer.append(lessonImage)
-
-      if subject is "3"
-        lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/#{motherTongue}_w#{week}_d#{day}.png"
-      else
-        lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/#{subject}_c#{grade}_w#{week}_d#{day}.png"
-
-    else
-      @lessonContainer?.remove?()
-      @$button?.remove()
 
   renderMessage: ->
     @nextButton true
@@ -200,19 +154,6 @@ class WorkflowRunView extends Backbone.View
     @$el.find("##{@cid}_current_step").html htmlMessage
     @subViewRendered = true
 
-  renderNew: ->
-    @nextButton true
-
-    view = @currentStep.getView
-      workflowId : @workflow.id
-      tripId     : @tripId
-
-    @steps[@index].view   = view
-    @steps[@index].result = view.getResult()
-
-    @showView view
-
-
   renderAssessment: ->
     @nextButton true
 
@@ -220,7 +161,7 @@ class WorkflowRunView extends Backbone.View
       success: =>
         assessment = @currentStep.getTypeModel()
 
-        view = new AssessmentRunView 
+        view = new AssessmentRunView
           model      : assessment
           inWorkflow : true
           tripId     : @tripId
@@ -230,6 +171,8 @@ class WorkflowRunView extends Backbone.View
           view.index = @assessmentResumeIndex
           delete @assessmentResumeIndex
 
+        @listenTo view, "skip", =>
+          @nextStep()
 
         @steps[@index].view   = view
         @steps[@index].result = view.getResult()
@@ -245,44 +188,26 @@ class WorkflowRunView extends Backbone.View
       key : curriculumId
       success: =>
 
-        itemType = @getString @currentStep.getCurriculumItemType()
-        grade    = @getNumber @currentStep.getCurriculumGrade()
+        console.log @
 
-        thisYear = (new Date()).getFullYear()
-        term1Start = moment "#{thisYear} May 1"
-        term1End   = moment "#{thisYear} Aug 31"
+        criteria = {}
 
-        term2Start = moment "#{thisYear} Aug 31"
-        term2End   = moment "#{thisYear} Jan 1"
+        unless @currentStep.getCurriculumItemType() is ""
+          criteria.itemType = @getString @currentStep.getCurriculumItemType()
 
-        term3Start = moment "#{thisYear} Jan 1"
-        term3End   = moment "#{thisYear} May 1"
+        unless @currentStep.getCurriculumGrade() is ""
+          criteria.grade    = @getNumber @currentStep.getCurriculumGrade()
 
-        now = moment()
-        term =
-          if      term1Start <= now <= term1End
-            1
-          else if term2Start <= now <= term2End
-            2
-          else if term3Start <= now <= term3End
-            3
+        unless @currentStep.getCurriculumWeek() is ""
+          criteria.part     = @getNumber @currentStep.getCurriculumWeek()
 
-        criteria =
-          itemType : itemType
-          part     : term
-          grade    : grade
-
-        subtest = _(subtests.where(
-          itemType : itemType
-          part     : term
-          grade    : grade
-        )).first()
+        subtest = _(subtests.where(criteria)).first()
 
         return Utils.midAlert "
           Subtest not found for <br>
-          itemType: #{itemType}<br>
-          term: #{term}<br>
-          grade: #{grade}
+          itemType: #{@getString @currentStep.getCurriculumItemType()}<br>
+          version: #{@getNumber @currentStep.getCurriculumGrade()}<br>
+          grade: #{@getNumber @currentStep.getCurriculumWeek()}
         " unless subtest?
 
         view = new KlassSubtestRunView
@@ -296,26 +221,12 @@ class WorkflowRunView extends Backbone.View
         @steps[@index].view = view
         @showView view, @currentStep.getName()
 
-  renderEnd: ->
-    @$el.find("##{@cid}_current_step").html "
-      <p>You have completed this Classroom Observation.</p>
-      <button class='nav-button'><a href='#feedback/#{@workflow.id}'>Go to feedback</a></button>
-      <p>Once in feedback select the appropriate county, zone, school and date of this school visit to retrieve the feedback for this lesson observation. This information is to be used in your reflections and discussion with the teacher.</p>
-      <button class='nav-button'><a href='#'>Main</a></button>
-    "
-    return
-
   nextButton: ( appropriate ) ->
     if appropriate
       @$el.find("button.next").show()
     else
       @$el.find("button.next").hide()
-      
 
-
-  onClose: ->
-    @lessonContainer?.remove?()
-    @$button?.remove?()
 
   showView: (subView, header = '') ->
     header = "<h1>#{header}</h1>" if header isnt ''
@@ -326,5 +237,5 @@ class WorkflowRunView extends Backbone.View
     @listenTo @subView, "rendered", =>
       @subViewRendered = true
       @trigger "rendered"
-      #@afterRender()
+      @subView.afterRender?()
     @subView.render()
