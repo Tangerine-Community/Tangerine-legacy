@@ -77,8 +77,10 @@ class WorkflowEditView extends Backbone.EditView
 
       selectedAssessment = "selected='selected'" if stepType is "assessment"
       selectedCurriculum = "selected='selected'" if stepType is "curriculum"
+      displayNew         = "display:none;" if stepType is "" or stepType isnt "new"
       selectedMessage    = "selected='selected'" if stepType is "message"
       selectedNoType     = "selected='selected'" if stepType is ""
+      displayLogin       = "display:none;" if stepType is "" or stepType isnt "login"
 
       displayAssessment = "display:none;" if stepType is "" or stepType isnt "assessment"
       displayCurriculum = "display:none;" if stepType is "" or stepType isnt "curriculum"
