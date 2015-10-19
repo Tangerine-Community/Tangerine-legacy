@@ -21,6 +21,8 @@ class GridRunView extends Backbone.View
 
     @resetVariables()
 
+    @$el.find(".element_wrong").removeClass "element_wrong"
+
   gridClick: (event) =>
     @modeHandlers[@mode]?(event)
 
@@ -91,9 +93,13 @@ class GridRunView extends Backbone.View
 
       @checkAutostop() if @autostop != 0
 
-  lastHandler: (event) =>
-    $target = $(event.target)
-    index = $target.attr('data-index')
+  lastHandler: (event, index) =>
+    if index?
+      $target = @$el.find(".grid_element[data-index=#{index}]")
+    else
+      $target = $(event.target)
+      index = $target.attr('data-index')
+
     if index - 1 >= @gridOutput.lastIndexOf("incorrect")
       @$el.find(".element_last").removeClass "element_last"
       $target.addClass "element_last"
@@ -115,6 +121,9 @@ class GridRunView extends Backbone.View
 
     return if @timeRunning != true # stop only if needed
 
+    if event?.target
+      @lastHandler(null, @items.length)
+
     # do these always
     clearInterval @interval
     @stopTime = @getTime()
@@ -123,13 +132,13 @@ class GridRunView extends Backbone.View
     @updateCountdown()
 
     # do these if it's not a simple stop
-    if not event?.simpleStop
-      Utils.flash()
-      @updateMode("last") if @captureLastAttempted
-      if message
-        Utils.topAlert message
-      else
-        Utils.midAlert t('Please mark last item attempted') if @captureLastAttempted
+    #if not event?.simpleStop
+    #  Utils.flash()
+    #  @updateMode("last") if @captureLastAttempted
+    #  if message
+    #    Utils.topAlert message
+    #  else
+    #    Utils.midAlert t('Please mark last item attempted') if @captureLastAttempted
 
   autostopTest: ->
     Utils.flash()
