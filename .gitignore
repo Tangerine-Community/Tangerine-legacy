@@ -28,3 +28,5 @@ local.properties
 build.properties
 Android-Couchbase-Callback/assets/tangerine.couch
 Android-Couchbase-Callback/assets/class.couch
+
+.idea
