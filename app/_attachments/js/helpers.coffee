@@ -892,7 +892,12 @@ class Utils
 
       Utils.modal false
 
-
+  @showAbout: ->
+    html = "
+      <p>This application was developed by the Tusome Early Literacy Programme. Tusome is implemented by the Ministry of Education, Science & Technology with support of USAID and DFID.</p>
+      <p>If you have any questions or comments, please contact Lucy Wambari <a href='tel://254723742848'>+254723742848</a>.</p>
+    "
+    Utils.sticky(html)
 
   # returns a GUID
   @guid: ->
