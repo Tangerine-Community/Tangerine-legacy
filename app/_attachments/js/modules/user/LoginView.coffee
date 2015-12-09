@@ -6,13 +6,14 @@ class LoginView extends Backbone.View
       'keypress input'     : 'keyHandler'
       'change input'       : 'onInputChange'
       'change select#name' : 'onSelectChange'
-      'click .mode'   : 'updateMode' #touchstart
-      'click button'  : 'action' #touchstart
-      'click .recent' : 'showRecent' #touchstart
+      'click .mode'        : 'updateMode' #touchstart
+      'click button'       : 'action' #touchstart
+      'click .recent'      : 'showRecent' #touchstart
       'blur .recent'       : 'blurRecent'
       'keyup #new-name'    : 'checkNewName'
-      'click .next'   : 'next' #touchstart
-      'click .verify' : 'verify' #touchstart
+      'click .next'        : 'next' #touchstart
+      'click .verify'      : 'verify' #touchstart
+      'change select#role' : 'onRoleSelectChange'
     } 
   else
     {
@@ -26,6 +27,7 @@ class LoginView extends Backbone.View
       'keyup #new-name'    : 'checkNewName'
       'click .next'        : 'next'
       'click .verify'      : 'verify'
+      'change select#role' : 'onRoleSelectChange'
     }
 
   backButton: -> return false
@@ -106,6 +108,14 @@ class LoginView extends Backbone.View
       @updateMode "signup"
     else 
       @$el.find("#pass").focus()
+
+  onRoleSelectChange: (event) ->
+    $target = $(event.target)
+    console.log "On Role Select Change: ", $target
+    if $target.val() == "other"
+      $("#role-other").show()
+    else
+      $("#role-other").hide()
 
   goOn: -> Tangerine.router.landing(true)
 
@@ -193,6 +203,20 @@ class LoginView extends Backbone.View
           #{verifiableHtml||''}
 
           <div class='messages name-message'></div>
+          <label>Role
+          <select id='role'>
+            <option value='tac-tutor'>TAC Tutor</option>
+            <option value='coach'>Coach</option>
+            <option value='city-manager'>City Manager</option>
+            <option value='rti-staff'>RTI Staff</option>
+            <option value='scde'>SCDE</option>
+            <option value='esqac'>ESQAC</option>
+            <option value='ntt'>NTT</option>
+            <option value='other'>Other</option>
+          </select></label>
+          <input autocomplete='off' id='role-other' type='text' style='display:none' placeholder='Specify Role'>
+
+
           <input autocomplete='off' id='tsc-number' type='text' placeholder='#{@text.tsc_number}'>
 
           <input autocomplete='off' id='new-name' type='text' placeholder='#{nameName}'>
@@ -245,7 +269,7 @@ class LoginView extends Backbone.View
 
     @locView.remove() if @locView?
     @locView = new LocView
-      levels: ["county", "zone"]
+      levels: ["county", "subcounty", "zone"]
     @locView.setElement @$el.find("#zoneSelector")
 
 
@@ -369,6 +393,12 @@ class LoginView extends Backbone.View
 
     errors = []
 
+    role      = ($role       = @$el.find("#role")).val()
+    roleOther = ($roleOther  = @$el.find("#role-other")).val()
+
+    if role == "other" && roleOther.length is 0
+      errors.push " - Specify Role cannot be empty"
+
     if ( tscNumber  = ( $tscNumber  = @$el.find("#tsc-number")     ).val() ).length is 0
       errors.push " - TSC or Employment number cannot be empty"
 
@@ -398,12 +428,15 @@ class LoginView extends Backbone.View
     location = @locView.value()
 
     errors.push " - county must be selected" unless location.county?
+    errors.push " - subcounty must be selected"   unless location.subcounty?
     errors.push " - zone must be selected"   unless location.zone?
 
     previousUsers = ($previousUsers = @$el.find("#same-users")).val()
 
 
     attributes =
+      "role"      : role
+      "roleOther" : roleOther
       "tscNumber" : tscNumber
       "question"  : question
       "response"  : response
