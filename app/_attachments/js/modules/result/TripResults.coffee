@@ -67,6 +67,20 @@ class TripResultCollection extends Backbone.Collection
                           attributes[tryKey] = tryValue
                           break
 
+                  #handle the new locationIndex appropriately by setting the county, zone, and school values - this is a hack until we get something better in place
+                  #TODO: resolve this school location hack
+                  if attributes.locationIndex
+                    locKeyVals = attributes.locationIndex.replace(/\-([^-]*)\-/g, "-$1_")
+                    locKeyValArray = locKeyVals.split("_")
+                    for locPair in locKeyValArray
+                      locArray = locPair.split("-")
+                      if locArray.length == 2
+                        locKey = locArray[0]
+                        locVal = locArray[1]
+                        attributes[locKey] = locVal
+
+                    #attributes.county = locArray[1] 
+
                   attributes.tripId  = tripId
                   attributes._id  = tripId
                   attributes.rawData = allCells

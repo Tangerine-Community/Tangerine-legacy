@@ -13,6 +13,7 @@ class SchoolListView extends Backbone.View
     @$el.find(".school-list").toggle()
 
   initialize: (options) ->
+    @locLevels       = ["county", "zone", "school"]
     @geography       = {}
     @visited         = {}
     @schools         = { left : [] , done : [] }
@@ -39,23 +40,23 @@ class SchoolListView extends Backbone.View
 
     return if @invalid
     # get school names for specified county and zone
-    Loc.query
+    Loc.query @locLevels,
       county : @currentLocation.county
       zone   : @currentLocation.zone
     , (res) =>
 
       @allSchools = res.map (el) -> el.id
 
-      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.name; return obj ), {}
+      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
       # get county names
-      Loc.query null, (res) =>
-        @countyNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.name; return obj ), {}
+      Loc.query @locLevels, null, (res) =>
+        @countyNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
         # get zone names in county
-        Loc.query county: @currentLocation.county
+        Loc.query @locLevels, county: @currentLocation.county
         , (res) =>
-          @zoneNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.name; return obj ), {}
+          @zoneNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
           callback()
 
 

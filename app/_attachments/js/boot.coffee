@@ -113,6 +113,17 @@ Tangerine.bootSequence =
     Tangerine.templates.fetch
       success: callback
 
+  getLocationList : ( callback ) ->    
+    # Grab our system config doc   
+    Tangerine.locationList = new Backbone.Model "_id" : "location-list"    
+   
+    Tangerine.locationList.fetch   
+      error   : ->   
+        console.log "could not fetch location-list..."   
+        callback   
+   
+      success : callback
+
 
   # if admin user doesn't exist in _users database, create it
   ensureAdmin : (callback) ->
@@ -301,6 +312,7 @@ Tangerine.boot = (callback) ->
       Tangerine.bootSequence.getConfiguration
       Tangerine.bootSequence.getSettings
       Tangerine.bootSequence.getTemplates
+      Tangerine.bootSequence.getLocationList
       Tangerine.bootSequence.ensureAdmin
       Tangerine.bootSequence.transitionUsers
       Tangerine.bootSequence.startApp

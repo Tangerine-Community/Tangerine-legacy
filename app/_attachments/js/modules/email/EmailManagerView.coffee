@@ -132,8 +132,8 @@ class EmailManagerView extends Backbone.View
     @users = new ReportUsers
     @users.fetch
       success: =>
-        Loc.query null, (value) =>
-          @countyNameById = value.reduce ((obj, cur) -> obj[cur.id] = cur.name; return obj), {}
+        Loc.query ["county"], null, (value) =>
+          @countyNameById = value.reduce ((obj, cur) -> obj[cur.id] = cur.label; return obj), {}
           @countyNameById["All"] = "All"
           @renderUsers()
 
@@ -186,7 +186,7 @@ class EmailManagerView extends Backbone.View
       html += "
         <tr>
           <td><input type='checkbox' class='report-user' data-id='#{user.id}'></td>
-          <td>#{@countyNameById[user.get('county')]}</td>
+          <td>#{user.get('county')}</td>
           <td>#{user.get('title')}</td>
           <td>#{user.get('last')}, #{user.get('first')}</td>
           <td>#{user.get('email')}</td>
@@ -284,7 +284,7 @@ class ReportUserEditView extends Backbone.View
       showTitles: false
       levels: ["county"]
       selected: [@user.get("county")]
-      addedOptions: [[{id:"All",name:"All"}]]
+      addedOptions: [[{id:"All",label:"All"}]]
     @countyView.setElement @$el.find("#county-container")
 
     @trigger "rendered"

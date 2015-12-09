@@ -63,14 +63,16 @@ class FeedbackTripsView extends Backbone.View
 
     @subViews = []
 
+    @locLevels = ["county", "zone", "school"]
+
     @trips = new TripResultCollection
     @trips.fetch 
       resultView : "tutorTrips"
       queryKey   : "workflow-#{@workflow.id}"
       success: => 
         # get county names
-        Loc.query null, (res) =>
-          @countyNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.name; return obj ), {}
+        Loc.query @locLevels, null, (res) =>
+          @countyNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
           @isReady = true
           @render()
@@ -179,7 +181,6 @@ class FeedbackTripsView extends Backbone.View
 
 
   render: =>
-
     if @isReady and @trips.length == 0
       @$el.html " 
         <h1>Feedback</h1>
@@ -190,7 +191,6 @@ class FeedbackTripsView extends Backbone.View
       
     
     return unless @isReady
-
     tripsByCounty = @trips.indexBy("county")
     counties = _(@trips.pluck("county")).chain().compact().uniq().value().sort()
     countyOptions = ("<option value='#{_(county).escape()}'>#{_(@countyNames[county]).escape()} (#{tripsByCounty[county]?.length || 0})</option>" for county in counties).join('')
@@ -235,9 +235,9 @@ class FeedbackTripsView extends Backbone.View
     tripsByCounty  = @trips.indexBy("county")
 
     # get zone names in county
-    Loc.query county: @selectedCounty
+    Loc.query @locLevels, county: @selectedCounty
     , (res) =>
-      @zoneNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.name; return obj ), {}
+      @zoneNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
       zones = _(tripsByCounty[@selectedCounty]).chain().map((a)->a.attributes['zone']).compact().uniq().value().sort()
 
@@ -260,13 +260,13 @@ class FeedbackTripsView extends Backbone.View
     schools = _(tripsByZone[@selectedZone]).chain().map((a)->a.attributes['school']).compact().uniq().value().sort()
 
     # get school names
-    console.log "county #{@selectedCounty}"
-    console.log "zone: #{@selectedZone}"
-    Loc.query
+    #console.log "county #{@selectedCounty}"
+    #console.log "zone: #{@selectedZone}"
+    Loc.query @locLevels,
       county : @selectedCounty
       zone   : @selectedZone
     , (res) =>
-      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.name; return obj ), {}
+      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
       schoolOptions = ''
       for school in schools

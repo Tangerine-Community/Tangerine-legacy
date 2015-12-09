@@ -35,18 +35,19 @@ class LocView extends Backbone.View
 
   renderOne: (index) ->
     if index is 0
-      criteria = null
+      criteria = {}
     else
       criteria = @value()
 
-    Loc.query criteria, (res) ->
+    Loc.query @levels, criteria, (res) ->
+
       if @addedOptions
         res = @addedOptions[index].concat res
-
+      console.log "results: ", res
       res = res.sort (a,b) ->
-        if a.name.toLowerCase() < b.name.toLowerCase()
+        if a.label.toLowerCase() < b.label.toLowerCase()
           return -1
-        else if a.name.toLowerCase() > b.name.toLowerCase()
+        else if a.label.toLowerCase() > b.label.toLowerCase()
           return 1
         else
           return 0
@@ -54,7 +55,7 @@ class LocView extends Backbone.View
       htmlOptions = res.map (el) ->
         if @selected[index]? and el.id is @selected[index]
           selected = "selected='selected'"
-        "<option value='#{el.id}' #{selected||''}>#{el.name}</option>"
+        "<option value='#{el.id}' #{selected||''}>#{el.label}</option>"
       , @
 
       title = @levels[index].titleize() if @showTitles
@@ -71,8 +72,8 @@ class LocView extends Backbone.View
               #{htmlOptions}
             </select>
           </label>
+          <br>
         </div>
-        <br>
       "
       if @selected.length isnt 0
         if index + 1 is @selected.length
