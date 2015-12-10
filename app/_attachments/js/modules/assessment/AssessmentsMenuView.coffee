@@ -158,9 +158,6 @@ class AssessmentsMenuView extends Backbone.View
           #{groupsButton}
           #{apkButton}
           #{resultsButton}<br>
-          #{moestReportButton}
-          #{financeReportButton}
-          #{emailReportButton}
           #{groupHandle}
           "
         ) }
