@@ -186,6 +186,10 @@ class WorkflowRunView extends Backbone.View
           else
             @$lessonContainer.append(lessonImage)
 
+      $(lessonImage).error () =>
+        @$lessonContainer?.remove?()
+        @$button?.remove?()
+
       if @workflowConfig.showLesson
         if @workflowConfig.showLesson.output
           repr = (str, match) ->
