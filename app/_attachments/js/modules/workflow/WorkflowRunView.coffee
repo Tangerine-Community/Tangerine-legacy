@@ -15,6 +15,7 @@ class WorkflowRunView extends Backbone.View
     @steps = [] unless @steps?
     @currentStep = @workflow.stepModelByIndex @index
     @subViewRendered = false
+    @workflowConfig = Tangerine.config.get("workflow")
 
   shouldSkip: ->
     currentStep = @workflow.stepModelByIndex @index
@@ -152,13 +153,18 @@ class WorkflowRunView extends Backbone.View
 
     if @currentStep.getShowLesson()
       
-      subject      = @getVariable("subject")
-      motherTongue = @getVariable("subject_mother_tongue")
-
-      subject = ({"word": "kiswahili", "english_word" : "english", "operation" : "maths","3":"3"})[subject]
-      grade   = @getVariable("class")
-      week    = @getVariable("lesson_week")
-      day     = @getVariable("lesson_day")
+      showLessonParams = {}
+      if @workflowConfig.showLesson
+        if @workflowConfig.showLesson.inputs
+          console.log "@workflowConfig.showLesson.inputs", @workflowConfig.showLesson.inputs
+          for key, val of @workflowConfig.showLesson.inputs
+            console.log "key, val", key, val
+            if _.isObject val
+              showLessonParams[key] = val[@getVariable(key)]
+            else
+              showLessonParams[key] = @getVariable(key)
+          console.log "ShowingLesson Params", showLessonParams
+      console.log "ShowingLesson Params", showLessonParams
 
       $content = $("#content")
 
@@ -180,10 +186,14 @@ class WorkflowRunView extends Backbone.View
           else
             @$lessonContainer.append(lessonImage)
 
-      if subject is "3"
-        lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/#{motherTongue}_w#{week}_d#{day}.png"
-      else
-        lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/#{subject}_c#{grade}_w#{week}_d#{day}.png"
+      if @workflowConfig.showLesson
+        if @workflowConfig.showLesson.output
+          repr = (str, match) ->
+            value = showLessonParams[match]
+            if (typeof value == 'string') or (typeof value == 'number') then value else str
+
+          console.log "ShowingLesson Params", showLessonParams
+          lessonImage.src = "/#{Tangerine.db_name}/_design/assets/lessons/" + @workflowConfig.showLesson.output.replace /#\{([^{}]*)}/g, repr
 
     else
       @lessonContainer?.remove?()
