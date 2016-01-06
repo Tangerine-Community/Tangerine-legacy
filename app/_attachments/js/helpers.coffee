@@ -894,8 +894,8 @@ class Utils
 
   @showAbout: ->
     html = "
-      <p>This application was developed by the Tusome Early Literacy Programme. Tusome is implemented by the Ministry of Education, Science & Technology with support of USAID and DFID.</p>
-      <p>If you have any questions or comments, please contact Lucy Wambari <a href='tel://254723742848'>+254723742848</a>.</p>
+      <p>This application was developed by Tayari Early Childhood Development Programme.  Tayari is implemented by the Ministry of Education, Science and Technology and supported by Kenya Institute of Curriculum Development (KICD), Ministry of Health, Nairobi City County, Laikipia County Government, Uasin Gishu County Government, and Siaya County Government.</p>
+      <p>If you have any Questions or comments, please contact Lucy Wambari on 0723742848.</p>
     "
     Utils.sticky(html)
 
