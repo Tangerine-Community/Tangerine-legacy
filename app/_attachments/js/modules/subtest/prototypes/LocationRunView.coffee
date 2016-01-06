@@ -9,16 +9,16 @@ class LocationRunView extends Backbone.View
     "change select" : "onSelectChange"
 
   i18n: ->
-    @text = 
+    @text =
       clear : t("LocationRunView.button.clear")
 
   initialize: (options) ->
 
     @i18n()
 
-    @model  = @options.model
-    @parent = @options.parent
-    @dataEntry = @options.dataEntry
+    @model     = options.model
+    @parent    = options.parent
+    @dataEntry = options.dataEntry
 
 
     @levels = @model.get("levels")       || []

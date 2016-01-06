@@ -139,10 +139,10 @@ class SurveyRunView extends Backbone.View
 
 
   initialize: (options) ->
-    @model         = @options.model
-    @parent        = @options.parent
-    @dataEntry     = @options.dataEntry
-    @isObservation = @options.isObservation
+    @model         = options.model
+    @parent        = options.parent
+    @dataEntry     = options.dataEntry
+    @isObservation = options.isObservation
     @focusMode     = @model.getBoolean("focusMode")
     @questionIndex = 0 if @focusMode
     @questionViews = []

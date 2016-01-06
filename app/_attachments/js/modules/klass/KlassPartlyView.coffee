@@ -27,7 +27,7 @@ class KlassPartlyView extends Backbone.View
 
   update: ->
     @render()
-    Tangerine.router.navigate "class/#{@options.klass.id}/#{@currentPart}"
+    Tangerine.router.navigate "class/#{@klass.id}/#{@currentPart}"
 
   back: ->
     Tangerine.router.navigate "class", true
@@ -48,6 +48,12 @@ class KlassPartlyView extends Backbone.View
       @update()
 
   initialize: (options) ->
+
+    @klass = options.klass
+    @students = options.students
+    @results = options.results
+
+
     @search = ""
     @currentPart = options.part || 1
     @subtestsByPart = []
@@ -64,10 +70,10 @@ class KlassPartlyView extends Backbone.View
     subtestsThisPart = @subtestsByPart[@currentPart]
     return "No subtests for this assessment." if not subtestsThisPart?
 
-    for student, i in @options.students.models
+    for student, i in @students.models
       table[i] = []
 
-      resultsForThisStudent = new KlassResults @options.results.where "studentId" : student.id
+      resultsForThisStudent = new KlassResults @results.where "studentId" : student.id
 
       for subtest, j in subtestsThisPart
         studentResult = resultsForThisStudent.where "subtestId" : subtest.id

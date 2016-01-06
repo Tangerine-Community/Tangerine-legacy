@@ -10,9 +10,9 @@ class GpsRunView extends Backbone.View
 
   initialize: (options) ->
     @i18n()
-    @model   = @options.model
-    @parent  = @options.parent
-    @dataEntry = @options.dataEntry
+    @model     = options.model
+    @parent    = options.parent
+    @dataEntry = options.dataEntry
 
 
     @position = null

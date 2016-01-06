@@ -48,11 +48,11 @@ class KlassSubtestRunView extends Backbone.View
 
 
   render: ->
-    enumeratorHelp = if (@subtest.get("enumeratorHelp") || "") != "" then "<button class='subtest_help command'>help</button><div class='enumerator_help'>#{@options.subtest.get 'enumeratorHelp'}</div>" else ""
-    studentDialog  = if (@subtest.get("studentDialog")  || "") != "" then "<div class='student_dialog'>#{@options.subtest.get 'studentDialog'}</div>" else ""
+    enumeratorHelp = if (@subtest.get("enumeratorHelp") || "") != "" then "<button class='subtest_help command'>help</button><div class='enumerator_help'>#{@subtest.get 'enumeratorHelp'}</div>" else ""
+    studentDialog  = if (@subtest.get("studentDialog")  || "") != "" then "<div class='student_dialog'>#{@subtest.get 'studentDialog'}</div>" else ""
 
     @$el.html "
-      <h2>#{@options.subtest.get 'name'}</h2>
+      <h2>#{@subtest.get 'name'}</h2>
       #{enumeratorHelp}
       #{studentDialog}
     "
@@ -102,7 +102,7 @@ class KlassSubtestRunView extends Backbone.View
       history.back()
       return
 
-    Tangerine.router.navigate "class/#{@options.student.get('klassId')}/#{@options.subtest.get('part')}", true
+    Tangerine.router.navigate "class/#{@student.get('klassId')}/#{@subtest.get('part')}", true
 
   done: ->
     if @student.id == "test"
@@ -112,13 +112,13 @@ class KlassSubtestRunView extends Backbone.View
     if @isValid()
       # Gaurantee single "new" result
       Tangerine.$db.view "#{Tangerine.design_doc}/resultsByStudentSubtest",
-        key : [@options.student.id,@subtest.id]
+        key : [@student.id,@subtest.id]
         success: (data) =>
           rows = data.rows
           for datum in rows
             Tangerine.$db.saveDoc $.extend(datum.value, "old":true)
           # save this result
           @result.add @prototypeView.getResult(), =>
-            Tangerine.router.navigate "class/#{@options.student.get('klassId')}/#{@options.subtest.get('part')}", true
+            Tangerine.router.navigate "class/#{@student.get('klassId')}/#{@subtest.get('part')}", true
     else
       @prototypeView.showErrors()

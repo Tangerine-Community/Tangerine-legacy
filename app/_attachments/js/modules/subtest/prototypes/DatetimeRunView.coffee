@@ -14,9 +14,9 @@ class DatetimeRunView extends Backbone.View
 
     @i18n()
 
-    @model  = @options.model
-    @parent = @options.parent
-    @dataEntry = @options.dataEntry
+    @model  = options.model
+    @parent = options.parent
+    @dataEntry = options.dataEntry
   
   render: ->
     dateTime = new Date()

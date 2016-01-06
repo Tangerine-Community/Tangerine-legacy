@@ -88,7 +88,7 @@ class CurriculumView extends Backbone.View
     html = "
 
       <button class='navigation back'>#{t('back')}</button>
-      <h1>#{@options.curriculum.get('name')}</h1>
+      <h1>#{@curriculum.get('name')}</h1>
 
       <div class='small_grey'>Download key <b>#{@curriculum.id.substr(-5,5)}</b></div>
       

@@ -25,9 +25,9 @@ class ConsentRunView extends Backbone.View
     @i18n()
 
     @confirmedNonConsent = false
-    @model  = @options.model
-    @parent = @options.parent
-    @dataEntry = @options.dataEntry
+    @model  = options.model
+    @parent = options.parent
+    @dataEntry = options.dataEntry
 
   
   render: ->

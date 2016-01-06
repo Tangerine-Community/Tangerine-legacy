@@ -44,11 +44,12 @@ class DashboardView extends Backbone.View
   update: =>
     Tangerine.router.navigate("dashboard/groupBy/#{$("#groupBy").val()}/assessment/#{$("#assessment").val()}/shiftHours/#{$("#shiftHours").val()}", true)
 
-  render: =>
-    options = @options
+  initialize: (options) ->
     @groupBy = options.groupBy
     @key = options.assessment
     @shiftHours = options.shiftHours || 0
+
+  render: =>
 
     if @key is "All"
       $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",

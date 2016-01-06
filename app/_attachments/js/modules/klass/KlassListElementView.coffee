@@ -15,6 +15,9 @@ class KlassListElementView extends Backbone.View
     'click .klass_delete_delete' : 'delete'
 
   initialize: (options) ->
+
+    @klass = options.klass
+
     @availableReports = Tangerine.config.get("reports")
     if options.klass.has "curriculumId"
       @curriculum = new Curriculum 
@@ -25,7 +28,7 @@ class KlassListElementView extends Backbone.View
       @curriculum = new Curriculum 
 
   edit: ->
-    Tangerine.router.navigate "class/edit/" + @options.klass.id, true
+    Tangerine.router.navigate "class/edit/" + @klass.id, true
 
   getReportMenu: (event) ->
     @subMenuView?.close()
@@ -47,15 +50,14 @@ class KlassListElementView extends Backbone.View
     @subMenuView?.close()
 
   run: ->
-    Tangerine.router.navigate "class/" + @options.klass.id, true
+    Tangerine.router.navigate "class/" + @klass.id, true
 
   toggleDelete: -> @$el.find(".klass_delete_confirm").toggle()
 
   delete: ->
-    @options.klass.collection.get(@options.klass).destroy()
+    @klass.collection.get(@klass).destroy()
 
   render: =>
-    klass = @options.klass
 
     if klass.get("teacherId") == "admin"
       teacherName = "admin"
@@ -75,10 +77,10 @@ class KlassListElementView extends Backbone.View
     @$el.html "
       <table>
         #{htmlTeacher || ""}
-        <tr><th>School name</th><td>#{klass.getEscapedString('schoolName')}</td></tr>
-        <tr><th>School year</th><td>#{klass.getString('year')}</td></tr>
-        <tr><th>#{t('grade')}</th><td>#{klass.getString('grade')}</td></tr>
-        <tr><th>#{t('stream')}</th><td>#{klass.getString('stream')}</td></tr>
+        <tr><th>School name</th><td>#{@klass.getEscapedString('schoolName')}</td></tr>
+        <tr><th>School year</th><td>#{@klass.getString('year')}</td></tr>
+        <tr><th>#{t('grade')}</th><td>#{@klass.getString('grade')}</td></tr>
+        <tr><th>#{t('stream')}</th><td>#{@klass.getString('stream')}</td></tr>
         <tr><th>#{t('curriculum')}</th><td>#{@curriculum.getEscapedString('name')}</td></tr>
       </table>
       <img src='images/icon_run.png'     class='icon klass_run'> 

@@ -39,6 +39,12 @@
     font-weight: 400;
     src: url('./knu.ttf') format('truetype');
 }
+@font-face {
+    font-family: 'Preeti';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./preeti.ttf') format('truetype');
+}
 
 /*
  * Media queries for responsive design https://github.com/shichuan/mobile-html5-boilerplate/wiki/The-Style
