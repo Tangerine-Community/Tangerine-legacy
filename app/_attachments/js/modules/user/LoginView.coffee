@@ -13,6 +13,7 @@ class LoginView extends Backbone.View
       'keyup #new-name'    : 'checkNewName'
       'click .next'        : 'next' #touchstart
       'click .verify'      : 'verify' #touchstart
+      'change select#role' : 'onRoleSelectChange'
     } 
   else
     {
@@ -26,6 +27,7 @@ class LoginView extends Backbone.View
       'keyup #new-name'    : 'checkNewName'
       'click .next'        : 'next'
       'click .verify'      : 'verify'
+      'change select#role' : 'onRoleSelectChange'
     }
 
   backButton: -> return false
@@ -106,6 +108,14 @@ class LoginView extends Backbone.View
       @updateMode "signup"
     else 
       @$el.find("#pass").focus()
+
+  onRoleSelectChange: (event) ->
+    $target = $(event.target)
+    console.log "On Role Select Change: ", $target
+    if $target.val() == "other"
+      $("#role-other").show()
+    else
+      $("#role-other").hide()
 
 
   goOn: -> Tangerine.router.landing(true)
@@ -194,6 +204,15 @@ class LoginView extends Backbone.View
           #{verifiableHtml||''}
 
           <div class='messages name-message'></div>
+          <label>Role
+          <select id='role'>
+            <option value='dicece'>DICECE</option>
+            <option value='chews'>CHEWs</option>
+            <option value='rti-tayari-team'>RTI Tayari team</option>
+            <option value='national-trainers'>National Trainers</option>
+            <option value='other'>Other</option>
+          </select></label>
+          <input autocomplete='off' id='role-other' type='text' style='display:none' placeholder='Specify Role'>
 
           <input autocomplete='off' id='tsc-number' type='text' placeholder='#{@text.tsc_number}'>
 
@@ -371,6 +390,12 @@ class LoginView extends Backbone.View
 
     errors = []
 
+    role      = ($role       = @$el.find("#role")).val()
+    roleOther = ($roleOther  = @$el.find("#role-other")).val()
+
+    if role == "other" && roleOther.length is 0
+      errors.push " - Specify Role cannot be empty"
+
     if ( tscNumber  = ( $tscNumber  = @$el.find("#tsc-number")     ).val() ).length is 0
       errors.push " - TSC or Employment number cannot be empty"
 
@@ -407,6 +432,8 @@ class LoginView extends Backbone.View
 
 
     attributes =
+      "role"      : role
+      "roleOther" : roleOther
       "tscNumber" : tscNumber
       "question"  : question
       "response"  : response
