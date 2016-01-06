@@ -256,7 +256,7 @@ class WorkflowRunView extends Backbone.View
         term2End   = moment "#{thisYear} Aug 31"
 
         term3Start = moment "#{thisYear} Sept 1"
-        term3End   = moment "#{thisYear} Dec 31"
+        term3End   = moment "#{thisYear} Nov 30"
 
         now = moment()
         term =

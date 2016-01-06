@@ -40,20 +40,17 @@ class SchoolListView extends Backbone.View
 
     return if @invalid
     # get school names for specified county and zone
-    console.log "Current Location: ", @currentLocation 
-    
-    Loc.query @locLevels, 
+    Loc.query @locLevels,
       county : @currentLocation.county
       zone   : @currentLocation.zone
     , (res) =>
+
       @allSchools = res.map (el) -> el.id
 
-      console.log "All School IDs: ", @allSchools
-
       @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
-      
-      #get county names
-      Loc.query @locLevels, {}, (res) =>
+
+      # get county names
+      Loc.query @locLevels, null, (res) =>
         @countyNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
         # get zone names in county
@@ -64,6 +61,7 @@ class SchoolListView extends Backbone.View
 
 
   fetchTrips: (callback = $.noop) ->
+
     return callback() if @invalid
 
     d = new Date()
@@ -75,6 +73,7 @@ class SchoolListView extends Backbone.View
       resultView : "tutorTrips"
       queryKey   : "year#{year}month#{month}"
       success: =>
+
         rows = []
         zones = {}
 
@@ -88,6 +87,7 @@ class SchoolListView extends Backbone.View
         for trip in trips.models
 
           # skip unless they belong in this list
+
           isThisTutor = trip.get("enumerator") in [Tangerine.user.get("name")].concat(Tangerine.user.getArray("previousUsers"))
           isRightWorkflow = trip.get("workflowId") in [@WORKFLOW_NO_BOOKS, @WORKFLOW_WITH_BOOKS]
           isValid = trip.get("tripId") in @validObservationView.validTrips
@@ -106,19 +106,24 @@ class SchoolListView extends Backbone.View
             return finish()
 
           schoolId = schoolIds.pop()
-          if _.contains @allSchools, schoolId
-            @visited[schoolId] = true
-            
-          doOne()
+
+          Loc.query
+            parents: schoolId
+          , (value) =>
+            @visited[value.zone] = @visited[value.zone] || {}
+            @visited[value.zone][schoolId] = true
+            doOne()
 
         finish = =>
-          if !_.isEmpty @visited
-            @schools.done = Object.keys(@visited).sort()
+
+          if @visited[@currentLocation.zone]?
+            @schools.done = Object.keys(@visited[@currentLocation.zone]).sort()
           else
             @schools.done = []
           # use list of all schools in county/zone
           @schools.all  = @allSchools
           @schools.left = _(@allSchools).difference(@schools.done)
+
 
           @ready = true
           callback?()

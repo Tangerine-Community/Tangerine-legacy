@@ -1,12 +1,10 @@
 # Communicates with the location view
 class Loc
 
-
-
-  @query: (levels, criteria = {}, qCallback, context) ->
+  @query: (levels, criteria = {}, callback, context) ->
 
     locations = Tangerine.locationList.get "locations"
-    locationLevels = Tangerine.locationList.get "locationsLevels"
+    locationLevels = Tangerine.locationList.get("locationsLevels")
 
     targetLevelIndex = 0
     levelIDs = []
@@ -20,15 +18,14 @@ class Loc
 
     currentLevelIndex = Loc.getCurrentLevelIndex(levels, criteria, levelMap)
 
-    #console.log "Loc._query(0, currentLevelIndex, locations, levelMap, criteria)", 0, currentLevelIndex, locations, levelMap, criteria
     resp = Loc._query(0, currentLevelIndex, locations, levelMap, criteria)
 
-    setTimeout (cb) ->
+    setTimeout () ->
       if resp.length is 0
-        cb.apply context, [null]
+        callback.apply context, [null]
       else
-        cb.apply context, [resp]
-    , 0, qCallback
+        callback.apply context, [resp]
+    , 0
 
     # console.log "levelMap: ", levelMap
     # console.log "currentLevelIndex: ", currentLevelIndex
@@ -55,9 +52,9 @@ class Loc
         return loc.children
       for v, i in allChildren
         _.extend levelData, v
- 
+
       return Loc._query (depth + 1), targetDepth, levelData, levelMap, criteria
-    console.log "_query: (depth, targetDepth, data, levelMap, criteria)", depth, targetDepth, data, levelMap, criteria
+
     console.log "ERROR: Cannot find location. I should never reach this."
     return {}
 
