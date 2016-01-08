@@ -218,6 +218,8 @@ class LoginView extends Backbone.View
 
           <input autocomplete='off' id='new-name' type='text' placeholder='#{nameName}'>
 
+          <input autocomplete='off' id='mpesa-phone' type='number' placeholder='M-Pesa Phone'>
+
           <input autocomplete='off' id='challenge-question' type='hidden' value='#{@text.challenge_question}' placeholder='#{@text.challenge_question}' title='#{@text.challenge_explaination}'>
 
           <input autocomplete='off' id='challenge-response' type='text' placeholder='#{@text.challenge_response}' title='#{@text.challenge_explaination}'>
@@ -399,6 +401,9 @@ class LoginView extends Backbone.View
     if ( tscNumber  = ( $tscNumber  = @$el.find("#tsc-number")     ).val() ).length is 0
       errors.push " - TSC or Employment number cannot be empty"
 
+    if ( mpesaPhone  = ( $mpesaPhone  = @$el.find("#mpesa-phone")     ).val() ).length is 0
+      errors.push " - M-Pesa Phone Number cannot be empty"
+
     if ( first  = ( $first  = @$el.find("#first")     ).val() ).length is 0
       errors.push " - First name cannot be empty"
 
@@ -430,11 +435,11 @@ class LoginView extends Backbone.View
 
     previousUsers = ($previousUsers = @$el.find("#same-users")).val()
 
-
     attributes =
       "role"      : role
       "roleOther" : roleOther
       "tscNumber" : tscNumber
+      "mpesaPhone": mpesaPhone
       "question"  : question
       "response"  : response
 
