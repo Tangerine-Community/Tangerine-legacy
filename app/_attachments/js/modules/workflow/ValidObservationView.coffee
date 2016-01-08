@@ -43,16 +43,22 @@ class ValidObservationView extends Backbone.View
             callback?()
 
       , (callback = $.noop) ->
-        bestPractices = "00b0a09a-2a9f-baca-2acb-c6264d4247cb"
-        fullPrimr     = "c835fc38-de99-d064-59d3-e772ccefcf7d"
-        workflowKeys = [bestPractices, fullPrimr].map (el) -> "workflow-#{el}"
-        Tangerine.$db.view "#{Tangerine.design_doc}/tutorTrips",
-          keys    : workflowKeys
-          reduce  : false
-          success : (response) =>
-            @tripIds.theseWorkflows = _(response.rows.map (el) -> el.value).uniq()
-            callback?()
 
+        if Tangerine.config.get("observationValidation")?
+          targetWorkflows = Tangerine.config.get("observationValidation").targetWorkflows ? []
+
+          workflowKeys = targetWorkflows.map (el) -> "workflow-#{el}"
+          Tangerine.$db.view "#{Tangerine.design_doc}/tutorTrips",
+            keys    : workflowKeys
+            reduce  : false
+            success : (response) =>
+              @tripIds.theseWorkflows = _(response.rows.map (el) -> el.value).uniq()
+              callback?()
+        
+        else
+          callback?()
+        
+        
       , (callback = $.noop) ->
         @tripIds.final = {
           thisMonth : _.intersection(@tripIds.thisMonth, @tripIds.theseWorkflows, @tripIds.thisUser)
@@ -67,10 +73,29 @@ class ValidObservationView extends Backbone.View
           keys    : @tripIds.final.thisMonth
           success : (response) =>
 
-            validTrips = response.rows.filter (row) ->
-              minutes = (parseInt(row.value.maxTime) - parseInt(row['value']['minTime'])) / 1000 / 60
-              result = minutes >= 20
-              return result
+            validTrips = response.rows
+
+
+            if Tangerine.config.get("observationValidation")?.constraints?
+              constraints = Tangerine.config.get("observationValidation")?.constraints
+              
+              if constraints.duration?
+                validTrips = validTrips.filter (row) ->
+                  minutes = (parseInt(row.value.maxTime) - parseInt(row['value']['minTime'])) / 1000 / 60
+                  result = minutes >= constraints.duration.minutes
+                  return result
+
+              if constraints.timeOfDay?
+                validTrips = validTrips.filter (row) ->
+                  tripTime = moment(parseInt(row['value']['minTime']))
+                  tripTime.zone(Tangerine.settings.get("timeZone")) if Tangerine.settings.get("timeZone")?
+                  
+                  result = tripTime.hour() >= constraints.timeOfDay.startTime.hour and tripTime.hour() <= constraints.timeOfDay.endTime.hour
+                  return result
+
+
+
+            
 
             @validTrips = validTrips.map (el) -> el.key
             @trigger "valid-update"
