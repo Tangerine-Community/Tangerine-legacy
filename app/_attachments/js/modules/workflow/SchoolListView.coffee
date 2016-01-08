@@ -2,10 +2,6 @@
 # it will find _a_ school list
 class SchoolListView extends Backbone.View
 
-
-  WORKFLOW_NO_BOOKS   : "00b0a09a-2a9f-baca-2acb-c6264d4247cb"
-  WORKFLOW_WITH_BOOKS : "c835fc38-de99-d064-59d3-e772ccefcf7d"
-
   events:
     "click .schools-left"   : "toggleSchoolList"
 
@@ -17,6 +13,8 @@ class SchoolListView extends Backbone.View
     @geography       = {}
     @visited         = {}
     @schools         = { left : [] , done : [] }
+
+    @targetWorkflows = Tangerine.config.get("observationValidation").targetWorkflows ? []
 
     if Tangerine.user.has("location")
       @currentLocation = Tangerine.user.get("location")
@@ -40,17 +38,20 @@ class SchoolListView extends Backbone.View
 
     return if @invalid
     # get school names for specified county and zone
-    Loc.query @locLevels,
+    console.log "Current Location: ", @currentLocation 
+    
+    Loc.query @locLevels, 
       county : @currentLocation.county
       zone   : @currentLocation.zone
     , (res) =>
-
       @allSchools = res.map (el) -> el.id
 
-      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
+      console.log "All School IDs: ", @allSchools
 
-      # get county names
-      Loc.query @locLevels, null, (res) =>
+      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
+      
+      #get county names
+      Loc.query @locLevels, {}, (res) =>
         @countyNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
         # get zone names in county
@@ -61,7 +62,6 @@ class SchoolListView extends Backbone.View
 
 
   fetchTrips: (callback = $.noop) ->
-
     return callback() if @invalid
 
     d = new Date()
@@ -73,7 +73,6 @@ class SchoolListView extends Backbone.View
       resultView : "tutorTrips"
       queryKey   : "year#{year}month#{month}"
       success: =>
-
         rows = []
         zones = {}
 
@@ -87,9 +86,8 @@ class SchoolListView extends Backbone.View
         for trip in trips.models
 
           # skip unless they belong in this list
-
           isThisTutor = trip.get("enumerator") in [Tangerine.user.get("name")].concat(Tangerine.user.getArray("previousUsers"))
-          isRightWorkflow = trip.get("workflowId") in [@WORKFLOW_NO_BOOKS, @WORKFLOW_WITH_BOOKS]
+          isRightWorkflow = trip.get("workflowId") in @targetWorkflows
           isValid = trip.get("tripId") in @validObservationView.validTrips
           continue unless isThisTutor
           continue unless isRightWorkflow
@@ -106,24 +104,19 @@ class SchoolListView extends Backbone.View
             return finish()
 
           schoolId = schoolIds.pop()
-
-          Loc.query
-            parents: schoolId
-          , (value) =>
-            @visited[value.zone] = @visited[value.zone] || {}
-            @visited[value.zone][schoolId] = true
-            doOne()
+          if _.contains @allSchools, schoolId
+            @visited[schoolId] = true
+            
+          doOne()
 
         finish = =>
-
-          if @visited[@currentLocation.zone]?
-            @schools.done = Object.keys(@visited[@currentLocation.zone]).sort()
+          if !_.isEmpty @visited
+            @schools.done = Object.keys(@visited).sort()
           else
             @schools.done = []
           # use list of all schools in county/zone
           @schools.all  = @allSchools
           @schools.left = _(@allSchools).difference(@schools.done)
-
 
           @ready = true
           callback?()
@@ -160,4 +153,3 @@ class SchoolListView extends Backbone.View
       </table>
 
     "
-
