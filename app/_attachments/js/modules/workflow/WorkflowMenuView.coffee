@@ -157,7 +157,6 @@ class WorkflowMenuView extends Backbone.View
     @trigger "rendered"
 
   updateWorkflows: ->
-
     hiddenWorkflows = Tangerine.user.getPreferences("tutor-workflows", "hidden") || []
 
     htmlWorkflows = ""
@@ -166,7 +165,6 @@ class WorkflowMenuView extends Backbone.View
       continue if workflow.id in hiddenWorkflows
 
       feedback = @feedbacks.get(workflow.id+"-feedback")
-
       if workflow.getBoolean("enableFeedback") and feedback? and feedback.get("children")?.length > 0
         feedbackHtml = "<button class='command'><a href='#feedback/#{workflow.id}'>Feedback</a></button>"
       else

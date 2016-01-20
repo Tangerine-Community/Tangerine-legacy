@@ -562,10 +562,10 @@ BOOMR.plugins.BW = {
 
 /* Init the BOOMR object from the library so that we can maintain modular control in the app. */
 BOOMR.init({
-	beacon_url: 'http://ntp.tangerinecentral.org/boomerang/image-l.gif',
+	beacon_url: 'http://malawi.tangerinecentral.org/boomerang/image-l.gif',
 	autorun: false,
 	BW: {
-		base_url: 'http://ntp.tangerinecentral.org/boomerang/',
+		base_url: 'http://malawi.tangerinecentral.org/boomerang/',
 		cookie: 'netstats',
 		cookie_exp: 300,
 		timeout: 60000

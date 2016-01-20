@@ -25,18 +25,28 @@ class FeedbackTripsView extends Backbone.View
     $target.siblings().toggle()
 
     tripId = $target.attr("data-trip-id")
+    
     $output = @$el.find(".#{tripId}-result")
     $output.html "<img class='loading' src='images/loading.gif'>"
 
+    Tangerine.$db.view Tangerine.design_doc + "/tutorTrips",
+      key: "trip-"+tripId
+      reduce: false
+      include_docs: true
+      success: (response) => 
+        #console.log "Tutor Trip Results"
+        #console.log response  
+        view = new WorkflowResultView
+          workflow : @workflow
+          trip : @trips.get(tripId)
+          tripAssessments : _.pluck(response.rows, "doc")
+        view.setElement($output)
 
-    view = new WorkflowResultView
-      workflow : @workflow
-      trip : @trips.get(tripId)
-    view.setElement($output)
+        @subViews.push view
+        @["WorkflowResultView-#{tripId}"] = view
 
-
-    @subViews.push view
-    @["WorkflowResultView-#{tripId}"] = view
+        if @$el.find("#hide-feedback-btn-#{tripId}").is(":visible")
+          @$el.find("#hide-feedback-btn-#{tripId}").trigger("click")
 
   hideSurveyData: (event) ->
     $target = $(event.target)
@@ -44,10 +54,9 @@ class FeedbackTripsView extends Backbone.View
     $target.toggle()
     $target.siblings().toggle()
 
-    tripId = $target.attr("trip-id")
-    @$el.find(".show-survey-data, .hide-survey-data").toggle()
+    tripId = $target.attr("data-trip-id")
     @subViews = _(@subViews).without @["WorkflowResultView-#{tripId}"]
-    @["WorkflowResultView-#{tripId}"].close()
+    @["WorkflowResultView-#{tripId}"].$el.empty()
 
   goBack: ->
     Tangerine.router.navigate "", true
@@ -97,6 +106,9 @@ class FeedbackTripsView extends Backbone.View
     @subViews.push view
 
     @$el.find(".#{tripId}").empty().append view.$el
+
+    if @$el.find("#hide-survey-btn-#{tripId}").is(":visible")
+          @$el.find("#hide-survey-btn-#{tripId}").trigger("click")
 
   onClose: ->
     for view in @subViews
@@ -256,8 +268,8 @@ class FeedbackTripsView extends Backbone.View
       tripId = trip.get('tripId')
 
       resultButtonHtml = "
-        <button class='command show-survey-data' data-trip-id='#{tripId}'>Show survey data</button>
-        <button class='command hide-survey-data' data-trip-id='#{tripId}' style='display:none;'>Hide survey data</button>
+        <button id='show-survey-btn-#{tripId}' class='command show-survey-data' data-trip-id='#{tripId}'>Show survey data</button>
+        <button id='hide-survey-btn-#{tripId}' class='command hide-survey-data' data-trip-id='#{tripId}' style='display:none;'>Hide survey data</button>
       "
 
 
@@ -276,8 +288,8 @@ class FeedbackTripsView extends Backbone.View
               " for attribute in sortVariables).join('')
             }
           <td>
-            <button class='command show-feedback' data-trip-id='#{tripId}'>Show feedback</button>
-            <button class='command hide-feedback' data-trip-id='#{tripId}' style='display:none;'>Hide feedback</button>
+            <button id='show-feedback-btn-#{tripId}' class='command show-feedback' data-trip-id='#{tripId}'>Show feedback</button>
+            <button id='hide-feedback-btn-#{tripId}' class='command hide-feedback' data-trip-id='#{tripId}' style='display:none;'>Hide feedback</button>
           </td>
           <td>
             #{resultButtonHtml || ''}
@@ -311,14 +323,21 @@ class WorkflowResultView extends Backbone.View
     self = @
     @[key] = value for key, value of options
 
-    assessmentSteps = _(@workflow.getChildren()).where({"type":"assessment"})
-    assessmentModelBlanks = assessmentSteps.map( (el) -> { "_id" : el.typesId })
+    assessmentModelBlanks = []
+
+    @workflow.collection.sort()
+    @assessmentSteps = _(@workflow.getChildren()).where({"type":"assessment"})
+    for step in @assessmentSteps
+      stepData = _.findWhere(@tripAssessments, {assessmentId:  step.typesId})
+      if stepData
+        assessmentModelBlanks.push {"_id": step.typesId}
+
     loadOne = (assessments) ->
 
       if assessmentModelBlanks.length == 0
         self.render()
       else
-        blank = assessmentModelBlanks.pop()
+        blank = assessmentModelBlanks.shift()
         assessment = new Assessment blank
         assessments.push assessment
         assessment.fetch
@@ -335,52 +354,112 @@ class WorkflowResultView extends Backbone.View
 
   render: ->
     optionsHtml = []
+    headerHtml = ""
     displayHtml = ""
     first = true
 
-    for assessment in @assessments
-      for subtest in assessment.subtests.models
-        if subtest.get("prototype") is "survey"
+    headerHtml += "<h2>Survey Data</h2>"
+    headerHtml += "<h3>#{@workflow.get('name')}</h3>"
 
-          hidden = if not first then "style='display:none;'" else ""
-          first = false if first
-          displayHtml += "<section #{hidden} class='subtest-#{subtest.id} result-display'>"
-          optionsHtml += "<option value='#{subtest.id}'>#{subtest.get('name')}</option>"
+    #console.log "workflow", @workflow
+    #console.log "assessments", @assessments
+    #console.log "trip", @trip
+    #console.log "trip assessments", @tripAssessments
 
-          for question in assessment.questions.models
+    for assessmentData in @tripAssessments
+      assessment = _.findWhere(@assessments, {id:  assessmentData.assessmentId})
+      #console.log "Assessment Data:", assessmentData
+      #console.log "Assessment", assessment 
 
-            tableHtml = ""
+      for subtestData in assessmentData.subtestData
+        if _.isUndefined(subtestData.skipped)
+          subtest = _.findWhere(assessment.subtests.models, {id:  subtestData.subtestId})
+          #console.log "Subtest Data:", subtestData
+          #console.log "Subtest:", subtest
+          
+          instId = Math.floor(Math.random() * 10000)
 
-            type = question.get('type')
+          if subtest
+            if subtest.get("prototype") is "survey"
+              #console.log "-------- Presented Survey Subtest: ", subtest, subtestData
 
-            if type is "multiple" or type is "single"
-              for option in question.get("options")
-                unless @trip.get(question.get('name'))
-                  answer = "<span color='grey'>no data</span>"
+              hidden = if not first then "style='display:none;'" else ""
+              first = false if first
+              displayHtml += "<section #{hidden} class='subtest-#{subtest.id}-#{instId} result-display'>"
+              optionsHtml += "<option value='#{subtest.id}-#{instId}'>#{subtest.get('name')}</option>"
+
+              for question in assessment.questions.models
+
+                if question.get("subtestId") == subtest.id
+
+                  tableHtml = ""
+
+                  type = question.get('type')
+
+                  if type is "multiple" or type is "single"
+                    for option in question.get("options")
+                      unless @trip.get(question.get('name'))
+                        answer = "<span color='grey'>no data</span>"
+                      else
+                        answer = if @trip.get(question.get('name')) is option.value then "<span style='color:green'>checked</span>" else "<span style='color:red'>unchecked</span>"
+                      tableHtml += "
+                        <tr>
+                          <th>#{option.label}</th>
+                          <td>#{answer}</td>
+                        </tr>
+                      "
+                  else
+                    tableHtml += "
+                      <tr>
+                        <td colspan='2'>#{@trip.get(question.get('name'))}</td>
+                      </tr>
+                    "
+                  displayHtml += "
+                    <h3>#{question.get('prompt')}</h3>
+                    <table>#{tableHtml}</table>
+                  "
+
+              displayHtml += "</section>"
+
+            else if subtest.get("prototype") is "grid"
+              #console.log "-------- Presented Grid Subtest: ", subtest, subtestData
+              hidden = if not first then "style='display:none;'" else ""
+              first = false if first
+              # displayHtml += "<section #{hidden} class='subtest-#{subtest.id} result-display'>"
+              optionsHtml += "<option value='#{subtest.id}-#{instId}'>#{subtest.get('name')}</option>"
+              
+              tableHtml = ""
+              tableHtml += "
+                <tr>
+                  <td colspan='2'>#{subtestData.name}</td>
+                </tr>
+              "
+
+              for item in subtestData.data.items
+                answer = ""
+                if item.itemResult == "correct"
+                  answer = "<span style='color:green'>correct</span>"
+                else if item.itemResult == "incorrect"
+                  answer = "<span style='color:red'>incorrect</span>"
                 else
-                  answer = if @trip.get(question.get('name')) is option.value then "<span style='color:green'>checked</span>" else "<span style='color:red'>unchecked</span>"
+                  answer = "<span style='color:grey'>no response</span>"
                 tableHtml += "
                   <tr>
-                    <th>#{option.label}</th>
+                    <th>#{item.itemLabel}</th>
                     <td>#{answer}</td>
                   </tr>
                 "
+
+              displayHtml += "<section #{hidden} class='subtest-#{subtest.id}-#{instId} result-display'><table>#{tableHtml}</table></section>"
+
             else
-              tableHtml += "
-                <tr>
-                  <td colspan='2'>#{@trip.get(question.get('name'))}</td>
-                </tr>
-              "
-            displayHtml += "
-              <h3>#{question.get('prompt')}</h3>
-              <table>#{tableHtml}</table>
-            "
-          displayHtml += "</section>"
+              #console.log "xxxxxxxxxx    Skipped Subtest: ", subtest, subtestData
+
     selectorHtml = "<select>#{optionsHtml}</select>"
 
 
     html = "
-      <h2>Section</h2>
+      #{headerHtml}
       #{selectorHtml}
       #{displayHtml}
     "
@@ -397,8 +476,8 @@ class DropdownView extends Backbone.View
 
     $target = $(event.target)
     value = $target.val()
-    level = parseInt($(event.target.selectedOptions[0]).attr('data-level'))
-    console.log "I found level #{level} and value #{value}"
+    level = parseInt($("#" + event.target.id + " option:selected").attr('data-level'))
+    #console.log "I found level #{level} and value #{value}"
 
     @selected[level] = value
     @selected = @selected[0..level]
@@ -472,7 +551,6 @@ class DropdownView extends Backbone.View
 
   # get values for variable with currently selected values
   getValues: ( variable ) ->
-
     if @selected.length is 0
       variables = @collection.pluck(variable)
     else
@@ -492,7 +570,6 @@ class DropdownView extends Backbone.View
 
   # updates levels, recursive
   update: (options) ->
-
     startLevel = options.startLevel || 0
 
     return if startLevel >= @variables.length # recursive end condition

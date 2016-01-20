@@ -96,9 +96,11 @@ class FeedbackRunView extends Backbone.View
     $notes = @$el.find(".notes")
     if $notes.length > 0
       $notes.each (i, note) =>
+        #console.log i 
+        #console.log note
 
         model = new Result
-          "_id" : @feedback.id + @trip.id
+          "_id" : @feedback.id + @trip.id + $(note).attr("data-model-id")
 
         noteView = new NotesView
           model: model

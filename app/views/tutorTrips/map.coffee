@@ -13,6 +13,11 @@
   emit "year#{year}month#{month}", doc.tripId
 
   #
+  # by tripId
+  #
+  emit("trip-" + doc.tripId, doc._id);
+  
+  #
   # by workflow
   #
 

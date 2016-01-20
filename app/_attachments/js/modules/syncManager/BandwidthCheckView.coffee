@@ -19,7 +19,7 @@ class BandwidthCheckView extends Backbone.View
         upper: 1000
         lower: 1
     settings: # !Important - These must also be set in lib/boomerang-plugin-bw-custom.js @ the bottom
-      base_url: 'http://ntp.tangerinecentral.org/boomerang/'
+      base_url: 'http://malawi.tangerinecentral.org/boomerang/'
       cookie: 'netstats'
       timeout: 6000
 

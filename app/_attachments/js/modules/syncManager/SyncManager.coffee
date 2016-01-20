@@ -33,6 +33,12 @@ class SyncManagerView extends Backbone.View
 
   MAX_RETRIES : 2
 
+  handleTimeout: () ->
+    Utils.sticky "Upload / Sync Failed.<br/>Please tap 'Begin' under the Network Connection Test below to test your connection." 
+
+    # reset display
+    @uploadStatus ""
+    @updateSyncOldProgress()
 
   ensureServerAuth: (callbacks = {}) ->
     sessionUrl = Tangerine.settings.urlSession "group"
@@ -42,15 +48,20 @@ class SyncManagerView extends Backbone.View
       url: sessionUrl
       type: "GET"
       dataType: "json"
+      timeout: 10000
       xhrFields: 
         withCredentials: true
-      error: $.noop
+      error: =>
+          @handleTimeout()
       success: (response) ->
 
         if response.userCtx.name is null
           callbacks.error?() 
         else
           callbacks.success?()
+
+
+  
 
   # download previous trips from server
   # server calls
@@ -167,7 +178,7 @@ class SyncManagerView extends Backbone.View
 
     doOne()
 
-  updateSyncOldProgress: ( options ) ->
+  updateSyncOldProgress: ( options = {} ) ->
 
     if options.message?
       @$el.find('#sync-old-progress').html "
@@ -176,16 +187,22 @@ class SyncManagerView extends Backbone.View
         </tr>
       "
     else if options.percentage?
+      pct = parseInt(options.percentage)
+      pct = if isNaN(pct) then 0 else pct
       @$el.find('#sync-old-progress').html "
         <tr>
-          <th>Complete<th><td>#{parseInt(options.percentage)}%</td>
+          <th>Complete<th><td>#{pct}%</td>
         </tr>
       "
+    else
+      @$el.find('#sync-old-progress').html ""
+
 
   initialize: () ->
     @syncUsers()
     @log = new SyncManager
     @log.setUserKey "sunc-#{Tangerine.user.name()}"
+    
     @userLogKey = 
     @messages = []
     @sunc = null
@@ -258,19 +275,20 @@ class SyncManagerView extends Backbone.View
 
   upload: =>
 
-    if @uploadingNow
-      return alert "Already uploading."
-
-    @uploadingNow = true
     @uploadStatus "Upload initializing"
 
     @ensureServerAuth
-      error: => 
+      error: =>
         @uploadingNow = false
         alert "Logging in to server. Please sync again."
         Tangerine.user.ghostLogin "uploader-"+Tangerine.settings.get("groupName"), Tangerine.settings.get("upPass")
 
       success: =>
+        if @uploadingNow
+          return console.log "Already Uploading"
+
+        @uploadingNow = true
+
         @uploadStatus "Upload starting"
 
         allTrips = _(@syncable).clone().reverse()# all trips, for debugging
