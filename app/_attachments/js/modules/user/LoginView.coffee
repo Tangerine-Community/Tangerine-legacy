@@ -205,7 +205,7 @@ class LoginView extends Backbone.View
           <div class='messages name-message'></div>
           <label>Role
           <select id='role'>
-            <option value='tac-tutor'>TAC Tutor</option>
+            <option value='tac-tutor'>CSO</option>
             <option value='coach'>Coach</option>
             <option value='city-manager'>City Manager</option>
             <option value='rti-staff'>RTI Staff</option>
@@ -220,6 +220,8 @@ class LoginView extends Backbone.View
           <input autocomplete='off' id='tsc-number' type='text' placeholder='#{@text.tsc_number}'>
 
           <input autocomplete='off' id='new-name' type='text' placeholder='#{nameName}'>
+
+          <input autocomplete='off' id='mpesa-phone' type='number' placeholder='M-Pesa Phone'>
 
           <input autocomplete='off' id='challenge-question' type='hidden' value='#{@text.challenge_question}' placeholder='#{@text.challenge_question}' title='#{@text.challenge_explaination}'>
 
@@ -402,6 +404,9 @@ class LoginView extends Backbone.View
     if ( tscNumber  = ( $tscNumber  = @$el.find("#tsc-number")     ).val() ).length is 0
       errors.push " - TSC or Employment number cannot be empty"
 
+    if ( mpesaPhone  = ( $mpesaPhone  = @$el.find("#mpesa-phone")     ).val() ).length is 0
+      errors.push " - M-Pesa Phone Number cannot be empty"
+
     if ( first  = ( $first  = @$el.find("#first")     ).val() ).length is 0
       errors.push " - First name cannot be empty"
 
@@ -438,6 +443,7 @@ class LoginView extends Backbone.View
       "role"      : role
       "roleOther" : roleOther
       "tscNumber" : tscNumber
+      "mpesaPhone": mpesaPhone
       "question"  : question
       "response"  : response
 
