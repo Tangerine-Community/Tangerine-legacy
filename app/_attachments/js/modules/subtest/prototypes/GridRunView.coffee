@@ -208,7 +208,8 @@ class GridRunView extends Backbone.View
 
   updateMode: ( mode = null ) =>
     # dont' change the mode if the time has never been started
-    if (mode==null && @timeElapsed == 0 && not @dataEntry) || mode == "disabled"
+    console.log("updateMode: ", mode)
+    if (mode==null && @timeElapsed == 0 && not @dataEntry && not @untimed) || mode == "disabled"
       @modeButton.setValue null
     else if mode? # manually change the mode
       @mode = mode
@@ -508,6 +509,10 @@ class GridRunView extends Backbone.View
           @lastAttempted = previous.attempted
           $target = @$el.find(".grid_element[data-index=#{@lastAttempted}]")
           $target.addClass "element_last"
+
+    if @untimed
+      @updateMode "mark"
+      @enableGrid()
 
   isValid: ->
     # Stop timer if still running. Issue #240
