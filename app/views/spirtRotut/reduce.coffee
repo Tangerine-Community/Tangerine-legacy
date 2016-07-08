@@ -12,10 +12,7 @@
     for k, v of value
 
       if k is "validTime"
-        if v is true
-          result.validTime = true
-        else
-          return { validTime : false }
+        result.validTime = v
 
       else if k is "subtests"
         result.subtests += v

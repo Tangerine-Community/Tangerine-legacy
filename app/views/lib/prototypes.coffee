@@ -6,6 +6,14 @@ pairsLocation = ( subtest ) ->
   row = []
   for label, i in subtest.data.labels
     row.push cell subtest, label, subtest.data.location[i]
+    zoneIndex     = subtest.data.location[i] if label is "zone"
+    districtIndex = subtest.data.location[i] if label is "district"
+    schoolIndex   = subtest.data.location[i] if label is "school"
+
+  if districtIndex? and zoneIndex? and schoolIndex?
+    row = []
+    row.push cell subtest, 'locationIndex', 'district-' + districtIndex + '-zone-' + zoneIndex + '-school-' + schoolIndex
+
   return row
 
 pairsDatetime = ( subtest, datetimeSuffix ) ->

@@ -177,6 +177,16 @@ Tangerine.bootSequence =
     Tangerine.templates.fetch
       success: callback
 
+  getLocationList : ( callback ) ->    
+    # Grab our system config doc   
+    Tangerine.locationList = new Backbone.Model "_id" : "location-list"    
+   
+    Tangerine.locationList.fetch   
+      error   : ->   
+        console.log "could not fetch location-list..."   
+        callback   
+   
+      success : callback
 
   # if admin user doesn't exist in _users database, create it
   ensureAdmin : (callback) ->
@@ -345,6 +355,10 @@ Tangerine.bootSequence =
             $("body").addClass(Tangerine.settings.get("context"))
 
             Backbone.history.start()
+  
+  initGPS : (callback) ->
+    $ ->
+      Utils.gpsPing
 
 Tangerine.load = (functions) ->
 
@@ -358,14 +372,14 @@ Tangerine.boot = (callback) ->
 
     sequence = [
       Tangerine.bootSequence.pouchCheck
-      #Tangerine.bootSequence.mmlpCheck
       Tangerine.bootSequence.getConfiguration
       Tangerine.bootSequence.getSettings
-      #Tangerine.bootSequence.hitViews
       Tangerine.bootSequence.getTemplates
+      Tangerine.bootSequence.getLocationList
       Tangerine.bootSequence.ensureAdmin
       Tangerine.bootSequence.transitionUsers
       Tangerine.bootSequence.startApp
+      Tangerine.bootSequence.initGPS
     ]
 
     sequence.push callback if callback?

@@ -7,15 +7,16 @@ class LocationRunView extends Backbone.View
     "change select" : "onSelectChange"
 
   initialize: (options) ->
-    
+
     @model  = @options.model
     @parent = @options.parent
-    
+
     @limit  = @options.limit
 
-    @levels       = @model.get("levels")        || []
-    @locationCols = @model.get("locationCols")  || []
-    @locations    = @model.get("locations")     || []
+    @levels       = @model.get("levels")          || []
+    @locationCols = @model.get("locationCols")    || []
+    @locations    = @model.get("locations")       || []
+    @isStandard   = @model.getBoolean("standard")
 
     @selectedLocation = []
 
@@ -43,7 +44,19 @@ class LocationRunView extends Backbone.View
       @$el.find("#level_#{i}").val("")
       if i isnt 0 then @$el.find("#level_#{i}").attr("disabled", true)
 
+
+  renderStandard: ->
+    @$el.html "<div class='loc-container'></div>"
+    @locView = new LocView
+    @locView.setElement @$el.find(".loc-container")
+    @trigger "rendered"
+    @trigger "ready"
+
+
   render: ->
+
+    if @isStandard
+      return @renderStandard()
 
     html = ""
 
@@ -122,7 +135,6 @@ class LocationRunView extends Backbone.View
 
           doneOptions.push location[targetIndex]
           currentOptions.push _(location[targetIndex]).escape()
-    
 
     for locationName in _.sortBy(currentOptions, (el) -> return el)
       levelOptions += "
@@ -136,6 +148,15 @@ class LocationRunView extends Backbone.View
 
 
   getResult: (filtered = false)->
+    if @isStandard
+      result =
+        labels   : []
+        location : []
+      values = @locView.value()
+      result.labels   = Object.keys values
+      result.location = result.labels.map (el) -> values[el]
+      return result
+
     if filtered
       return {
         "labels"   : (level.replace(/[\s-]/g,"_") for level in @levels)
@@ -168,6 +189,9 @@ class LocationRunView extends Backbone.View
     for input in selects
       if _($(input).val()).isEmptyString()
         $(input).after " <span class='message'>#{$('label[for='+$(input).attr('id')+']').text()} must be filled.</span>"
+
+  onClose: ->
+    @locView.remove()
 
   getSum: ->
     counts =

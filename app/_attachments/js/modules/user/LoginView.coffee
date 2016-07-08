@@ -160,6 +160,12 @@ class LoginView extends Backbone.View
         <input autocomplete='off' id='#{id}' placeholder='#{name}'>
       "
 
+    userProfileConfig = Tangerine.config.get("userProfile")
+    rolesHTML = ""
+    if userProfileConfig.roles
+      userProfileConfig.roles.sort (a,b) -> return a.order-b.order 
+      userProfileConfig.roles.forEach (role) ->
+        rolesHTML += "<option value='#{role.id}'>#{role.name}</option>"
 
 
     tabletHtml = "
@@ -191,8 +197,13 @@ class LoginView extends Backbone.View
         <section>
 
           #{verifiableHtml||''}
-
+          
           <div class='messages name-message'></div>
+
+          <label>Role
+          <select id='role'>
+            #{rolesHTML}
+          </select></label>
 
           <input autocomplete='off' id='new-name' type='text' placeholder='#{nameName}'>
 
@@ -208,6 +219,8 @@ class LoginView extends Backbone.View
 
           <input autocomplete='off' id='first' type='text' placeholder='#{@text.first_name}'>
           <input autocomplete='off' id='last' type='text' placeholder='#{@text.last_name}'>
+          
+          <div id='zoneSelector'></div>
 
           <label>Gender<br>
           <select id='gender'>
@@ -218,7 +231,6 @@ class LoginView extends Backbone.View
           <br/><br/>
 
           <input autocomplete='off' id='phone' type='number' placeholder='#{@text.phone}'>
-          <input autocomplete='off' id='email' type='text' placeholder='#{@text.email}'>
           <br>
 
           <button class='sign-up'>#{@text.sign_up}</button>
@@ -239,6 +251,13 @@ class LoginView extends Backbone.View
     @$el.html Tangerine.settings.contextualize
       server: serverHtml
       notServer: tabletHtml
+
+
+    @locView.remove() if @locView?
+    @locView = new LocView
+      levels: ["district", "zone"]
+    @locView.setElement @$el.find("#zoneSelector")
+
 
     @initAutocomplete() if Tangerine.settings.get("context") isnt "server"
 
@@ -359,6 +378,11 @@ class LoginView extends Backbone.View
 
     errors = []
 
+    role      = ($role       = @$el.find("#role")).val()
+
+    if role == "other" && roleOther.length is 0
+      errors.push " - Specify Role cannot be empty"
+
     if ( first  = ( $first  = @$el.find("#first")     ).val() ).length is 0
       errors.push " - First name cannot be empty"
 
@@ -368,35 +392,42 @@ class LoginView extends Backbone.View
     if ( gender = ( $gender = @$el.find("#gender")    ).val() ).length is 0
       errors.push " - Gener cannot be empty"
 
-    if ( phone  = ( $phone  = @$el.find("#phone")     ).val() ).length is 0
-      errors.push " - Phone cannot be empty"
-
-
     if ( question = ($question = @$el.find("#challenge-question")).val() ).length is 0
       errors.push " - Challenge question cannot be empty"
 
     if ( response = ($response = @$el.find("#challenge-response")).val() ).length is 0
       errors.push " - Challenge response cannot be empty"
 
-    email  = ( $email  = @$el.find("#email")     ).val()
-      # do nothing
-    #  errors.push " - Email cannot be empty"
+    if pass1.length is 0 or pass2.length is 0
+      errors.push " - The password cannot be empty"
+
+    if pass1 isnt pass2
+      errors.push " - The passwords do not match"
+
+    # phone is not a required field
+    phone  = ( $phone  = @$el.find("#phone")     ).val()
+
+    location = @locView.value()
+
+    errors.push " - District must be selected" unless location.district?
+    errors.push " - Zone must be selected"   unless location.zone?
 
     attributes =
+      "role"      : role
       "question"  : question
       "response"  : response
 
       "first"  : first
       "last"   : last
+      "location" : location
       "gender" : gender
       "phone"  : phone
-      "email"  : email
 
     if @hasVerifiableAttribute()
       attributes[@verifiableAttribute()] = @verifiableAttributeValue()
 
 
-    return @passError(@text.pass_mismatch) if pass1 isnt pass2
+    #return @passError(@text.pass_mismatch) if pass1 isnt pass2
 
     if errors.length isnt 0
 

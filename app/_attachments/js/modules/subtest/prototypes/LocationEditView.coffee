@@ -10,6 +10,12 @@ class LocationEditView extends Backbone.View
 
 
   updateData: (event) ->
+    if hasTabs
+      @$el.find("#data_format :radio[value='Tabs']").attr("checked", "checked").button("refresh")
+    else
+      @$el.find("#data_format :radio[value='Commas']").attr("checked", "checked").button("refresh")
+
+  updateData: (event) ->
     if event?.type == "click"
       if $(event.target).val() == "Tabs"
         @dataCommaToTab()
@@ -19,7 +25,7 @@ class LocationEditView extends Backbone.View
         @dataTabToComma()
         hasTabs   = false
         hasCommas = true
-      
+
     else
       data = @$el.find("#data").val()
       hasTabs = data.match(/\t/g)?
@@ -40,7 +46,7 @@ class LocationEditView extends Backbone.View
         @levelsTabToComma()
         hasTabs   = false
         hasCommas = true
-      
+
     else
       levels    = @$el.find("#levels").val()
       hasTabs   = levels.match(/\t/g)?
@@ -73,7 +79,7 @@ class LocationEditView extends Backbone.View
     if @$el.find("#levels").val().match(/\t/g)?
       @levelsTabToComma()
       @$el.find("#levels_format :radio[value='Tabs']").attr("checked", "checked").button("refresh")
-      
+
     levels = @$el.find("#levels").val().split(/, */g)
     for level, i in levels
       levels[i] = $.trim(level).replace(/[^a-zA-Z0-9']/g,"")
@@ -90,13 +96,16 @@ class LocationEditView extends Backbone.View
     for location, i in locations
       locations[i] = location.split(/, */g)
 
+    standard = $("input:radio[name='standard']:checked").val()
+
     @model.set
-      "levels"    : levels
+      "levels"       : levels
       "locationCols" : locationCols
-      "locations" : locations
+      "locations"    : locations
+      "standard"     : standard
 
   isValid: ->
-    levels = @model.get("levels")
+    levels       = @model.get("levels")
     locationCols = @model.get("locationCols")
 
     for level in levels
@@ -123,9 +132,10 @@ class LocationEditView extends Backbone.View
       "level_column_match" : "One or more Geographic Levels cannot be matched to valid Location Columns."
 
   render: ->
-    levels    = @model.get("levels")    || []
+    levels    = @model.get("levels")          || []
     locationCols = @model.get("locationCols") || []
-    locations = @model.get("locations") || []
+    locations = @model.get("locations")       || []
+    standard = @model.getBoolean("standard")
 
     levels = _.escape(levels.join(", "))
     locationCols = _.escape(locationCols.join(", "))
@@ -136,6 +146,16 @@ class LocationEditView extends Backbone.View
         locations[i] = _.escape(location.join(", "))
 
     @$el.html  "
+      <div class='label_value'>
+        <label title='This will use the locations provided by your location-list document'>Use standard</label><br>
+        <div id='group_standard' class='buttonset'>
+          <label for='standard_off'>Off</label>
+          <input id='standard_off' name='standard' type='radio' value='false' #{('checked="checked"' if standard is false)||''}>
+          <label for='standard_on'>On</label>
+          <input id='standard_on' name='standard' type='radio' value='true' #{('checked="checked"' if standard is true)||''}>
+        </div>
+      </div>
+
       <div class='label_value'>
         <div class='menu_box'>
           <label for='levels' title='This is a comma separated list of geographic levels. (E.g. Country, Province, District, School Id) These are the levels that you would consider individual fields on the location form.'>Geographic Levels</label>

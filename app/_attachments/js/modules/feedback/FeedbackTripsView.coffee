@@ -4,9 +4,9 @@ class FeedbackTripsView extends Backbone.View
 
   events: ->
 
-    "change #county" : "onCountySelectionChange"
-    "change #zone"   : "onZoneSelectionChange"
-    "change #school" : "onSchoolSelectionChange"
+    "change #district" : "onDistrictSelectionChange"
+    "change #zone"     : "onZoneSelectionChange"
+    "change #school"   : "onSchoolSelectionChange"
 
     "click .show-feedback"    : "showFeedback"
     "click .hide-feedback"    : "hideFeedback"
@@ -66,13 +66,19 @@ class FeedbackTripsView extends Backbone.View
 
     @subViews = []
 
+    @locLevels = ["district", "zone", "school"]
+
     @trips = new TripResultCollection
     @trips.fetch
       resultView : "tutorTrips"
       queryKey   : "workflow-#{@workflow.id}"
       success: =>
-        @isReady = true
-        @render()
+         # get county names
+        Loc.query @locLevels, null, (res) =>
+          @districtNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
+
+          @isReady = true
+          @render()
 
 
   hideFeedback: (event) ->
@@ -145,11 +151,33 @@ class FeedbackTripsView extends Backbone.View
 
     return unless @isReady
 
+    tripsByDistrict = @trips.indexBy("district")
+    districts = _(@trips.pluck("district")).chain().compact().uniq().value().sort()
+    districtOptions = ("<option value='#{_(district).escape()}'>#{_(@districtNames[district]).escape()} (#{tripsByDistrict[district]?.length || 0})</option>" for district in districts).join('')
+    districtOptions = "<option disabled='disabled' selected='selected'>Select a District</option>" + districtOptions
 
     html = "
       <h1>Feedback</h1>
       <h2>Visits</h2>
-      <div id='dropdown-selector'>
+      <div id='district-selection'>
+        <label for='district'>District</label>
+        <select id='district'>
+          #{districtOptions}
+        </select>
+      </div>
+      
+      <div id='zone-selection'>
+        <label for='zone'>Zone</label>
+        <select id='zone'>
+          <option disabled='disabled' selected='selected'></option>
+        </select>
+      </div>
+
+      <div id='school-selection'>
+        <label for='school'>School</label>
+        <select id='school'>
+          <option disabled='disabled' selected='selected'></option>
+        </select>
       </div>
 
       <br>
@@ -160,59 +188,80 @@ class FeedbackTripsView extends Backbone.View
 
     @$el.html html
 
-    @dropdownView = new DropdownView
-      variables : @feedback.get('dropdownVariables')
-      collection : @trips
+    # @dropdownView = new DropdownView
+    #   variables : @feedback.get('dropdownVariables')
+    #   collection : @trips
 
-    @dropdownView.setElement(@$el.find("#dropdown-selector"))
-    @dropdownView.render()
+    # @dropdownView.setElement(@$el.find("#dropdown-selector"))
+    # @dropdownView.render()
 
-    @subViews.push @dropdownView
+    # @subViews.push @dropdownView
 
-    @listenTo @dropdownView, "change", @handleSelection
+    # @listenTo @dropdownView, "change", @handleSelection
 
     @trigger "rendered"
 
-  onCountySelectionChange: (event) ->
+  onDistrictSelectionChange: (event) ->
+    @selectedDistrict = $(event.target).val()
+    tripsByDistrict  = @trips.indexBy("district")
 
-    selectedCounty = $(event.target).val()
-    tripsByCounty  = @trips.indexBy("County")
+    # get zone names in county
+    Loc.query @locLevels, district: @selectedDistrict
+    , (res) =>
+      @zoneNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
+      zones = _(tripsByDistrict[@selectedDistrict]).chain().map((a)->a.attributes['zone']).compact().uniq().value().sort()
 
-    zones = _(tripsByCounty[selectedCounty]).chain().map((a)->a.attributes['Zone']).compact().uniq().value().sort()
-
-    zoneOptions = ''
-    for zone in zones
-      countInZone = tripsByCounty[selectedCounty]?.map?((a)->a.get("Zone")).filter((a)->a is zone)?.length || 0
-      zoneOptions += "<option value='#{_(zone).escape()}'>#{zone} (#{countInZone})</option>"
-    zoneOptions = "<option disabled='disabled' selected='selected'>Select a zone</option>" + zoneOptions
+      zoneOptions = ''
+      for zone in zones
+        countInZone = tripsByDistrict[@selectedDistrict]?.map?((a)->a.get("zone")).filter((a)->a is zone)?.length || 0
+        zoneOptions += "<option value='#{_(zone).escape()}'>#{@zoneNames[zone]} (#{countInZone})</option>"
+      zoneOptions = "<option disabled='disabled' selected='selected'>Select a zone</option>" + zoneOptions
 
 
-    @$el.find("#zone").html zoneOptions
+      @$el.find("#zone").html zoneOptions
 
-    tripsByCounty[selectedCounty]?.map?((a)-> a.get("Zone")).filter?
-    ((a)->a==zone).length || 0
+      tripsByDistrict[@selectedDistrict]?.map?((a)-> a.get("zone")).filter?
+      ((a)->a==zone).length || 0
 
   onZoneSelectionChange: ( event ) ->
-    selectedZone = $(event.target).val()
-    tripsByZone  = @trips.indexBy("Zone")
+    @selectedZone = $(event.target).val()
+    tripsByZone  = @trips.indexBy("zone")
 
-    schools = _(tripsByZone[selectedZone]).chain().map((a)->a.attributes['SchoolName']).compact().uniq().value().sort()
+    schools = _(tripsByZone[@selectedZone]).chain().map((a)->a.attributes['school']).compact().uniq().value().sort()
 
-    schoolOptions = ''
-    for school in schools
-      countInSchool = tripsByZone[selectedZone]?.map?((a)->a.get("SchoolName")).filter((a)->a is school)?.length || 0
-      schoolOptions += "<option value='#{_(school).escape()}'>#{_(school).escape()} (#{countInSchool})</option>"
-    schoolOptions = "<option disabled='disabled' selected='selected'>Select a school</option>" + schoolOptions
+    Loc.query @locLevels, 
+      district : @selectedDistrict
+      zone     : @selectedZone
+    , (res) =>
+      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
-    @$el.find("#school").html schoolOptions
+      schoolOptions = ''
+      for school in schools
+        countInSchool = tripsByZone[@selectedZone]?.map?((a)->a.get("school")).filter((a)->a is school)?.length || 0
+        schoolOptions += "<option value='#{_(school).escape()}'>#{_(@schoolNames[school]).escape()} (#{countInSchool})</option>"
+      schoolOptions = "<option disabled='disabled' selected='selected'>Select a school</option>" + schoolOptions
 
-    tripsByZone[selectedZone]?.map?((a)-> a.get("SchoolName")).filter?
-    ((a)->a==zone).length || 0
+      @$el.find("#school").html schoolOptions
+
+      tripsByZone[@selectedZone]?.map?((a)-> a.get("school")).filter?
+      ((a)->a==zone).length || 0
 
   getSortArrow: (attributeName) ->
     return "&#x25bc;" if @sortAttribute is attributeName and @sortDirection is 1
     return "&#x25b2;" if @sortAttribute is attributeName and @sortDirection is -1
     return ""
+
+  onSchoolSelectionChange: ( event ) ->
+    @selectedSchool = @$el.find("#school").val()
+    @selectedZone   = @$el.find("#zone").val()
+    @selectedCounty = @$el.find("#county").val()
+
+    @selectedTrips = @trips.where
+      county : @selectedCounty
+      zone   : @selectedZone
+      school : @selectedSchool
+
+    @updateFeedbackList()
 
   handleSelection: ( selectionObject ) ->
 
@@ -221,6 +270,7 @@ class FeedbackTripsView extends Backbone.View
     unless allSelectionsMade
       @selectedTrips = @trips.where selectionObject
       @updateFeedbackList()
+      
 
 
 
@@ -243,6 +293,7 @@ class FeedbackTripsView extends Backbone.View
     # sortFunction = (a, b) => ( b.get(@sortAttribute) - a.get(@sortAttribute) ) * @sortDirection
 
     @selectedTrips = @selectedTrips.sort sortFunction
+
 
     sortVariables = @feedback.get("sortVariables").split(/\s*,\s*/)
 
@@ -396,12 +447,25 @@ class WorkflowResultView extends Backbone.View
 
                   type = question.get('type')
 
-                  if type is "multiple" or type is "single"
+                  if type is "single"
                     for option in question.get("options")
                       unless @trip.get(question.get('name'))
                         answer = "<span color='grey'>no data</span>"
                       else
                         answer = if @trip.get(question.get('name')) is option.value then "<span style='color:green'>checked</span>" else "<span style='color:red'>unchecked</span>"
+                      tableHtml += "
+                        <tr>
+                          <th>#{option.label}</th>
+                          <td>#{answer}</td>
+                        </tr>
+                      "
+                  else if type is "multiple"
+                    #console.log "Question: ", question.get('name'), question, @trip
+                    for option in question.get("options")
+                      unless @trip.get("#{question.get('name')}_#{option.value}")
+                        answer = "<span color='grey'>no data</span>"
+                      else
+                        answer = if @trip.get("#{question.get('name')}_#{option.value}") is 1 then "<span style='color:green'>checked</span>" else "<span style='color:red'>unchecked</span>"
                       tableHtml += "
                         <tr>
                           <th>#{option.label}</th>
@@ -485,8 +549,11 @@ class DropdownView extends Backbone.View
     @update
       startLevel : level
 
+    
     if @selected.length is @variables.length
       @trigger "change", @getSelection()
+    else
+      @trigger "change", {}
 
   getSelection: ->
     result = {}

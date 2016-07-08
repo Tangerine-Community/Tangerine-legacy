@@ -2,6 +2,9 @@ class ValidObservationView extends Backbone.View
 
   initialize: ->
 
+    @config = Tangerine.config.get("ValidObservationsView")
+    _.defaults(@config, {targetWorkflows:[]})
+
     @validCount = {
       thisMonth : 0
       lastMonth : 0
@@ -9,9 +12,11 @@ class ValidObservationView extends Backbone.View
 
     @tripIds = {}
 
-    Utils.execute [
-      @fetchTripIds 
-    ], @
+    @workflows = new Workflows
+    @workflows.fetch
+      success: =>
+        @fetchTripIds()
+
 
   fetchTripIds: (callback = $.noop) ->
     d = new Date()
@@ -45,9 +50,7 @@ class ValidObservationView extends Backbone.View
             callback?()
 
       , (callback = $.noop) ->
-        bestPractices = "00b0a09a-2a9f-baca-2acb-c6264d4247cb"
-        fullPrimr     = "c835fc38-de99-d064-59d3-e772ccefcf7d"
-        workflowKeys = [bestPractices, fullPrimr].map (el) -> "workflow-#{el}"
+        workflowKeys = @config.targetWorkflows.map (el) -> "workflow-#{el}"
         Tangerine.$db.view "#{Tangerine.design_doc}/tutorTrips",
           keys    : workflowKeys
           reduce  : false
@@ -70,9 +73,8 @@ class ValidObservationView extends Backbone.View
           success : (response) =>
 
             validTrips = response.rows.filter (row) ->
-              minutes = (parseInt(row.value.maxTime) - parseInt(row['value']['minTime'])) / 1000 / 60
-              result = minutes >= 20
-              return result
+              return Validation.validateObservation(row.value, @workflows.get(row.value.workflowId).get("observationValidation"))
+            , @
 
             @validTrips = validTrips.map (el) -> el.key
             @trigger "valid-update"
@@ -84,11 +86,10 @@ class ValidObservationView extends Backbone.View
           group   : true
           keys    : @tripIds.final.lastMonth
           success : (response) =>
-            
+
             validTrips = response.rows.filter (row) ->
-              minutes = (parseInt(row.value.maxTime) - parseInt(row['value']['minTime'])) / 1000 / 60
-              result = minutes >= 20
-              return result
+              return Validation.validateObservation(row.value, @workflows.get(row.value.workflowId).get("observationValidation"))
+            , @
             @validCount.lastMonth = validTrips.length
             callback?()
       , @render
@@ -105,6 +106,5 @@ class ValidObservationView extends Backbone.View
         <tr><th>This month</th><td>#{@validCount.thisMonth} </td></tr>
         <tr><th>Previous month</th><td>#{@validCount.lastMonth} </td></tr>
       </table>
-      
     "
 

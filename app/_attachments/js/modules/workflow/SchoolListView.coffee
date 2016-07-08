@@ -3,31 +3,30 @@
 class SchoolListView extends Backbone.View
 
 
-  WORKFLOW_NO_BOOKS   : "00b0a09a-2a9f-baca-2acb-c6264d4247cb"
-  WORKFLOW_WITH_BOOKS : "c835fc38-de99-d064-59d3-e772ccefcf7d"
-
-  events: 
+  events:
     "click .schools-left"   : "toggleSchoolList"
 
   toggleSchoolList: ->
     @$el.find(".school-list").toggle()
 
   initialize: (options) ->
+    @locLevels       = ["district", "zone", "school"]
     @geography       = {}
     @visited         = {}
-    @schools         = { left : [] , done : []}
-    @validObservationView = options.validObservationView
+    @schools         = { left : [] , done : [] }
 
+    @config = Tangerine.config.get("SchoolListView")
+    _.defaults(@config, {targetWorkflows:[]})
 
     if Tangerine.user.has("location")
-      @currentLocation = 
-        zone   : Tangerine.user.get('location').Zone.toLowerCase()
-        county : Tangerine.user.get('location').County.toLowerCase()
+      @currentLocation = Tangerine.user.get("location")
+      @invalid = false
     else
       @invalid = true
 
     @locationSubtest = {}
 
+    @validObservationView = new ValidObservationView
     @listenTo @validObservationView, "valid-update", ->
       Utils.execute [
         @fetchLocations
@@ -40,63 +39,31 @@ class SchoolListView extends Backbone.View
   fetchLocations: ( callback = $.noop ) ->
 
     return if @invalid
+    # get school names for specified district and zone
+    #console.log "Current Location: ", @currentLocation 
+    
+    Loc.query @locLevels, 
+      district : @currentLocation.district
+      zone   : @currentLocation.zone
+    , (res) =>
+      @allSchools = res.map (el) -> el.id
 
-    subtestIndex = 0
-    limit = 1
+      #console.log "All School IDs: ", @allSchools
 
-    checkSubtest = =>
+      @schoolNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
+      
+      #get district names
+      Loc.query @locLevels, {}, (res) =>
+        @districtNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
 
-      Tangerine.$db.view("#{Tangerine.design_doc}/byCollection",
-        key   : "subtest"
-        skip  : subtestIndex
-        limit : limit
-        include_docs : true
-        error : $.noop
-        success: (response) =>
+        # get zone names in district
+        Loc.query @locLevels, district: @currentLocation.district
+        , (res) =>
+          @zoneNames = res.reduce ( (obj, cur) -> obj[cur.id]=cur.label; return obj ), {}
+          callback()
 
-          return alert "Failed to find locations" if response.rows.length is 0
-          
-          @locationSubtest = response.rows[0].doc
-
-          if @locationSubtest.prototype? && @locationSubtest.prototype is "location"
-
-            
-            levels = @locationSubtest.levels
-            locationCols = @locationSubtest.locationCols
-
-            levelColMap = []
-            for level, i in levels
-              levelColMap[i] = _.indexOf locationCols, level
-
-            #map the location data to keep only the 'level' columns
-            filteredLocations = @locationSubtest.locations.map (arr) -> arr[level].toLowerCase() for level in levelColMap
-
-            @makeTree(filteredLocations, @geography)
-
-            unless @geography[@currentLocation.county]? and @geography[@currentLocation.county][@currentLocation.zone]?
-              @invalid = true
-            callback?()
-          else
-            subtestIndex++
-            checkSubtest()
-      )
-    checkSubtest()
-
-  makeTree: (rows, tree) ->
-
-    makeBranch = (fragment, node) ->
-      if fragment.length is 0
-        return {}
-      else
-        next = fragment.shift()
-        node[next] = {} unless node[next]?
-        makeBranch fragment, node[next]
-
-    for row in rows
-      makeBranch(row, tree)
 
   fetchTrips: (callback = $.noop) ->
-
     return callback() if @invalid
 
     d = new Date()
@@ -108,7 +75,6 @@ class SchoolListView extends Backbone.View
       resultView : "tutorTrips"
       queryKey   : "year#{year}month#{month}"
       success: =>
-
         rows = []
         zones = {}
 
@@ -117,64 +83,80 @@ class SchoolListView extends Backbone.View
         for workflowId, tripIds of incomplete
           incompleteTrips = incompleteTrips.concat(tripIds)
 
+        schoolIds = []
+
+        #console.log("SchoolListView - TargetWorkflows: ", @config.targetWorkflows)
         for trip in trips.models
+          #console.log("Trip:", trip)
 
-          # skip unless they belong
-
+          # skip unless they belong in this list
           isThisTutor = trip.get("enumerator") in [Tangerine.user.get("name")].concat(Tangerine.user.getArray("previousUsers"))
-          isRightWorkflow = trip.get("workflowId") in [@WORKFLOW_NO_BOOKS, @WORKFLOW_WITH_BOOKS]
+          isRightWorkflow = trip.get("workflowId") in @config.targetWorkflows
+
           isValid = trip.get("tripId") in @validObservationView.validTrips
+          #console.log("----- (isThisTutor, isRightWorkflow, isValid)", isThisTutor, isRightWorkflow, isValid)
           continue unless isThisTutor
           continue unless isRightWorkflow
           continue if trip.get('tripId') in incompleteTrips
-          continue unless isValid
+          #continue unless isValid
 
-          row = []
-          for level in @locationSubtest.levels
-            row.push trip.get(level).toLowerCase()
-          rows.push row
+          schoolIds.push trip.get("school")
 
         @visited = {}
-        @makeTree rows, @visited
 
-        if @visited[@currentLocation.county]? and @visited[@currentLocation.county][@currentLocation.zone]?
-          @schools.done = Object.keys(@visited[@currentLocation.county][@currentLocation.zone]).sort()
-        else
-          @schools.done = []
-        @schools.all  = Object.keys(@geography[@currentLocation.county][@currentLocation.zone]).sort()
-        @schools.left = _(@schools.all).difference(@schools.done)
 
-        callback?()
+        doOne = =>
+          if schoolIds.length is 0
+            return finish()
+
+          schoolId = schoolIds.pop()
+          if _.contains @allSchools, schoolId
+            @visited[schoolId] = true
+            
+          doOne()
+
+        finish = =>
+          if !_.isEmpty @visited
+            @schools.done = Object.keys(@visited).sort()
+          else
+            @schools.done = []
+          # use list of all schools in county/zone
+          @schools.all  = @allSchools
+          @schools.left = _(@allSchools).difference(@schools.done)
+
+          @ready = true
+          callback?()
+
+        doOne()
 
   render: (status) ->
-
     if @invalid
       return @$el.html "
-        <p>School list information unavailable.</p>
+        <p>Location information invalid.</p>
         <p>Your user has no location or an invalid location set. You can create a new user, or click your user name to change your location.</p>
       "
 
-    if status is "loading"
+    if status is "loading" or not @ready
       return @$el.html "<h2>School List</h2><p>Loading...</p>"
-    
+
     @$el.html "
-      
+
       <h2>School List</h2>
       <table class='class_table'>
-        <tr><th>County</th><td>#{@currentLocation.county}</td></tr>
-        <tr><th>Zone</th><td>#{@currentLocation.zone}</td></tr>
+        <tr><th>District</th><td>#{@districtNames[@currentLocation.district]}</td></tr>
+        <tr><th>Zone</th><td>#{@zoneNames[@currentLocation.zone]}</td></tr>
         <tr><th>Schools remaining</th><td><button class='schools-left command'>#{@schools.left.length}</button></td></tr>
       </table>
-      
+
       <table class='class_table school-list start-hidden'>
         <tr><td><b>Remaining</b></td></tr>
-        #{("<tr><td>#{school}</td></tr>" for school in @schools.left).join('')}
+        #{("<tr><td>#{@schoolNames[school]}</td></tr>" for school in @schools.left).join('')}
       </table>
 
       <table class='class_table school-list start-hidden'>
         <tr><td><b>Done</b></td></tr>
-        #{("<tr><td>#{school}</td></tr>" for school in @schools.done).join('')}
+        #{("<tr><td>#{@schoolNames[school]}</td></tr>" for school in @schools.done).join('')}
       </table>
-      
+
     "
 

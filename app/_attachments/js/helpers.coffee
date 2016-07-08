@@ -938,6 +938,45 @@ sks = [ { q : (km["0100ser"[i]] for i in [0..6]), i : 0, c : -> Tangerine.settin
 $(document).keydown (e) -> ( if e.keyCode == sks[j].q[sks[j].i++] then sks[j]['c']() if sks[j].i == sks[j].q.length else sks[j].i = 0 ) for sk, j in sks 
 
 
+class Validation
+
+  @validateObservation: (obj, parms) ->
+
+    timeZone = Tangerine.settings.get("timeZone")
+
+    return true if not parms.enabled
+    return false if not obj.minTime
+    return false if not obj.maxTime
+
+    if timeZone
+      startTime = moment(obj.minTime).utcOffset(timeZone)
+      endTime   = moment(obj.maxTime).utcOffset(timeZone)
+    else
+      startTime = moment(obj.minTime)
+      endTime   = moment(obj.maxTime)
+
+    _.each parms.constraints, (constraint, type) =>
+
+      if type == "timeOfDay"
+        startRange = startTime.clone().hour(constraint.startTime.hour)
+        endRange   = startTime.clone().hour(constraint.endTime.hour)
+        return false if not startTime.isBetween(startRange, endRange, "hour")
+        
+      else if type == "dayOfWeek"
+        return false if constraint.validDays.indexOf(startTime.day()) == -1
+        
+      else if type == "duration"
+        if constraint.hours
+          return false if endTime.diff(startTime, "hours") < constraint.hours
+        else if constraint.minutes
+          return false if endTime.diff(startTime, "minutes") < constraint.minutes
+        else if constraint.seconds
+          return false if endTime.diff(startTime, "seconds") < constraint.seconds
+
+    return true
+
+
+
 
 # Robbert interface
 class Robbert

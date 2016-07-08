@@ -23,7 +23,6 @@
   #
   # by month
   #
-
   year  = docTime.getFullYear()
   month = docTime.getMonth() + 1
   result.month = month
@@ -43,17 +42,19 @@
     if subtest.prototype is "location"
 
       for label, i in subtest.data.labels
-        zoneIndex   = i if label is "Zone"
-        countyIndex = i if label is "County"
-        schoolIndex = i if label is "SchoolName"
+        zoneIndex     = i if label is "zone"
+        districtIndex = i if label is "district"
+        schoolIndex   = i if label is "school"
 
-      zoneKey   = subtest.data.location[zoneIndex]
-      countyKey = subtest.data.location[countyIndex]
-      schoolKey = subtest.data.location[schoolIndex]
+      zoneKey     = subtest.data.location[zoneIndex]
+      districtKey = subtest.data.location[districtIndex]
+      schoolKey   = subtest.data.location[schoolIndex]
 
-      result.zone   = zoneKey   if subtest.data.location[zoneIndex]?
-      result.county = countyKey if subtest.data.location[countyIndex]?
-      result.school = schoolKey if subtest.data.location[schoolIndex]?
+      result.zone     = zoneKey     if subtest.data.location[zoneIndex]?
+      result.district = districtKey if subtest.data.location[districtIndex]?
+      result.school   = schoolKey   if subtest.data.location[schoolIndex]?
+
+      result.school = subtest.data.schoolId if subtest.data.schoolId?
 
     else if subtest.prototype is "survey"
 

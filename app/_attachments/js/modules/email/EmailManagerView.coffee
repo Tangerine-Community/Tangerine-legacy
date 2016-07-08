@@ -3,7 +3,7 @@ class EmailManagerView extends Backbone.View
   className : "EmailManagerView"
 
   events:
-    "click .update " : "update" 
+    "click .update " : "update"
     'change .select-all' : 'selectAll'
     'click .add'      : 'add'
     'click .delete'   : 'delete'
@@ -24,7 +24,7 @@ class EmailManagerView extends Backbone.View
 
   send: ->
     return unless @isOkToSend()
-    
+
     userIds = []
     @$el.find("input.report-user:checked").each ( index, el ) =>
       userIds.push $(el).attr("data-id")
@@ -60,10 +60,9 @@ class EmailManagerView extends Backbone.View
           urlRoute = "email"
           urlEmail = @users.get(userId).get('email')
           urlDatabase = Tangerine.db_name
-          urlWorkflows = "00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d"
           urlYear  = @$el.find('#year').val()
           urlMonth = @$el.find('#month').val()
-          urlCounty = user.get('county')
+          urlLocation = user.get('location')
         ].join("/") + ( urlFormat = ".json" )
 
 
@@ -116,7 +115,7 @@ class EmailManagerView extends Backbone.View
 
   selectAll: ( event ) ->
     checked = $(event.target).is(":checked")
-    @$el.find("input.report-user").each ( index, el ) -> 
+    @$el.find("input.report-user").each ( index, el ) ->
       $(el).prop "checked", checked
 
   MONTHS: [null, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -131,7 +130,11 @@ class EmailManagerView extends Backbone.View
 
     @users = new ReportUsers
     @users.fetch
-      success: => @renderUsers()
+      success: =>
+        Loc.query ["district"], null, (value) =>
+          @locationNameById = value.reduce ((obj, cur) -> obj[cur.id] = cur.label; return obj), {}
+          @locationNameById["All"] = "All"
+          @renderUsers()
 
   render: =>
 
@@ -161,7 +164,7 @@ class EmailManagerView extends Backbone.View
       <thead>
         <tr>
           <th><input type='checkbox' class='select-all'></th>
-          <th>County</th>
+          <th>District</th>
           <th>Office</th>
           <th>Name</th>
           <th>Email</th>
@@ -174,7 +177,7 @@ class EmailManagerView extends Backbone.View
     for user in @users.models
 
       timestamp = "#{@thisYear}-#{@MONTHS[@thisMonth]}"
-      statusClass = if user.getArray('monthsSent').indexOf()
+      statusClass = if user.getArray('monthsSent').indexOf(timestamp)
           "class='report-user-not-current'"
         else
           ''
@@ -182,7 +185,7 @@ class EmailManagerView extends Backbone.View
       html += "
         <tr>
           <td><input type='checkbox' class='report-user' data-id='#{user.id}'></td>
-          <td>#{try capitalize atob(user.get('county')) catch e then capitalize user.get('county')}</td>
+          <td>#{@locationNameById[user.get('location')]}</td>
           <td>#{user.get('title')}</td>
           <td>#{user.get('last')}, #{user.get('first')}</td>
           <td>#{user.get('email')}</td>
@@ -195,7 +198,7 @@ class EmailManagerView extends Backbone.View
 
     @$el.find('#report-users').html(html).DataTable()
 
-  
+
 class ReportUser extends Backbone.Model
 
   className : "ReportUser"
@@ -211,8 +214,8 @@ class ReportUserEditView extends Backbone.View
   className: "ReportUserEditView"
 
   events:
-    "change input" : "save" 
-    "change select" : "save" 
+    "change input" : "save"
+    "change select" : "save"
 
   save: ->
     Utils.working true
@@ -222,7 +225,7 @@ class ReportUserEditView extends Backbone.View
       last   : @$el.find("#user-last").val()   || ''
       first  : @$el.find("#user-first").val()  || ''
       email  : @$el.find("#user-email").val()  || ''
-      county : @$el.find("#user-county option").filter(':selected').val() || ''
+      location : @locationView.value().district || ''
     ,
       success: =>
         Utils.working false
@@ -267,15 +270,26 @@ class ReportUserEditView extends Backbone.View
           <td><input id='user-email' value='#{@user.getEscapedString('email')}'></td>
         </tr>
         <tr>
-          <th>County</th>
+          <th>District</th>
           <td>
-            <select id='user-county'>
-              <option value='#{btoa('all')}'>All</option>
-              #{("<option value='#{btoa(county.toLowerCase())}' #{if county.toLowerCase() is atob(@user.getEscapedString('county')).toLowerCase() then 'selected' else ''}>#{capitalize county.toLowerCase()}</option>" for county in _.keys(Tangerine.schoolList.attributes.counties)).join('')}
-            </select>
+            <div id='district-container'></div>
           </td>
         </tr>
       </table>
     "
 
+    @locationView.remove() if @locationView?
+    @locationView = new LocView
+      showTitles: false
+      levels: ["district"]
+      selected: [@user.get("location")]
+      addedOptions: [[{id:"All",label:"All"}]]
+    @locationView.setElement @$el.find("#district-container")
+
     @trigger "rendered"
+
+  onClose: ->
+    @locationView.remove()
+
+
+

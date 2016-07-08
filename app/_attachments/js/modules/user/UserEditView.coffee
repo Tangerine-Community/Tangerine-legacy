@@ -1,7 +1,6 @@
 class UserEditView extends Backbone.EditView
   
   initialize: ->
-    @fetchLocations => @renderSchoolList("data")
     @models = new Backbone.Collection Tangerine.user
 
   render: ->
@@ -11,17 +10,6 @@ class UserEditView extends Backbone.EditView
       <p id='message'></p>
 
       <table>
-        <tr>
-          <th>TSC/Emp Number</th>
-          <td>#{@getEditable
-            model: Tangerine.user
-            attribute:
-              key : 'tscNumber'
-              escape : true
-            name: 'TSC or Employment Number'
-            placeholder: 'untitled step'
-          }</td>
-        </tr>
         <tr>
           <th>First Name</th>
           <td>#{@getEditable
@@ -45,16 +33,6 @@ class UserEditView extends Backbone.EditView
           }</td>
         </tr>
         <tr>
-          <th>Email</th>
-          <td>#{@getEditable
-            model: Tangerine.user
-            attribute: 
-              key : 'email'
-              escape : true
-            name: 'Email'
-            placeholder: 'me@provider.com'}</td>
-        </tr>
-        <tr>
           <th>Phone</th>
           <td>#{@getEditable
             model: Tangerine.user
@@ -75,93 +53,35 @@ class UserEditView extends Backbone.EditView
             placeholder: 'male or female'}</td>
         </tr>
       </table>
-      <div id='schoolSelector'><p>Loading county and zone list...</p></div>
+      <div id='zoneSelector'></div>
 
     "
-    @renderSchoolList "dom"
+    @locView.remove() if @locView?
+
+    if Tangerine.user.has("location")
+      loc = Tangerine.user.get("location")
+      selected = [loc.district, loc.zone]
+
+    if not Tangerine.user.has("location") or not ( Tangerine.user.get("location").district and Tangerine.user.get("location").zone)
+      @$el.find("#message").html "<img src='images/icon_warn.png' title='Warning'> Warning: Location needs to be set for user."
+
+
+    @locView = new LocView
+      levels: ["district", "zone"]
+      selected: selected || []
+    @locView.setElement @$el.find("#zoneSelector")
+    @listenTo @locView, "change", @onSelectChange
 
     @trigger "rendered"
 
   onSelectChange: =>
-    location = {}
-    rawLocation = @locationView.getResult(true)
-    for label, i in rawLocation.labels
-      location[label] = rawLocation.location[i]
+    location = @locView.value()
 
-    if location.County? and location.Zone?
-      Tangerine.user.save(location:{County:location.County,Zone:location.Zone},{
+    if location.district? and location.zone?
+      Tangerine.user.save(location:location,{
         error:   -> Utils.topAlert "User not saved"
         success: -> Utils.topAlert "User location saved"
       })
 
 
-  # place previous data in select
-  selectRendered: =>
-    location = Tangerine.user.get("location")
-    if location?
 
-      countyIndex = @locationView.levels.indexOf("County")
-      zoneIndex   = @locationView.levels.indexOf("Zone")
-
-      county = location.County
-      zone   = location.Zone
-
-      if @locationView.$el.find("#level_#{countyIndex} option[value='#{county}']").length is 0
-
-        @$el.find("#message").html "<img src='images/icon_warn.png' title='Warning'> Warning: Location needs to be set again."
-
-      else
-
-        @locationView.$el.find("#level_#{countyIndex}").val county
-        @locationView.$el.find("#level_#{countyIndex}").trigger "change"
-
-        if @locationView.$el.find("#level_#{zoneIndex} option[value='#{zone}']").length is 0
-
-          @$el.find("#message").html "<img src='images/icon_warn.png' title='Warning'> Warning: Location needs to be set again."
-
-        else
-
-          @locationView.$el.find("#level_#{zoneIndex}").val zone
-
-    else
-      @$el.find("#message").html "<img src='images/icon_warn.png' title='Warning'> Warning: No location saved for user."
-
-  fetchLocations: ( callback = $.noop ) ->
-    subtestIndex = 0
-    limit = 1
-
-    checkSubtest = =>
-
-      Tangerine.$db.view("#{Tangerine.design_doc}/byCollection",
-        include_docs : true
-        key   : "subtest"
-        skip  : subtestIndex
-        limit : limit
-        error: $.noop
-        success: (response) =>
-          return alert "Failed to find locations" if response.rows.length is 0
-          
-          locationSubtest = response.rows[0].doc
-
-          if locationSubtest.prototype? && locationSubtest.prototype is "location"
-            @locationSubtest = new Subtest locationSubtest
-            @locationView = new LocationRunView model:@locationSubtest, limit:2
-            @listenTo @locationView, 'rendered', @selectRendered
-            @listenTo @locationView, 'select-change', @onSelectChange
-            callback?()
-          else
-            subtestIndex++
-            checkSubtest()
-      )
-    checkSubtest()
-
-  renderSchoolList: (flag) ->
-    requiredFlags = ["dom", "data"]
-    @renderSchoolListFlags = [] unless @renderSchoolListFlags?
-    @renderSchoolListFlags.push flag
-    ready = _(requiredFlags).intersection(@renderSchoolListFlags).length == requiredFlags.length
-    return unless ready
-
-    @locationView.setElement @$el.find("#schoolSelector")
-    @locationView.render()
-    @locationView.$el.find(".clear").remove()

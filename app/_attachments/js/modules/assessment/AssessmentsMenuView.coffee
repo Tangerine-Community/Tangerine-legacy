@@ -121,9 +121,9 @@ class AssessmentsMenuView extends Backbone.View
     year  = d.getFullYear()
     group = Tangerine.settings.get("groupName")
 
-    #moestReportButton   = "<a href='/_csv/report/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}.html'><button class='nav-button'>MoEST reports</button></a>"
-    #financeReportButton = "<a href='/_csv/reimbursement/group-#{group}/00b0a09a-2a9f-baca-2acb-c6264d4247cb,c835fc38-de99-d064-59d3-e772ccefcf7d/#{year}/#{month}/#{btoa('baringo')}/#{btoa('akoret')}.html'><button class='nav-button'>Tusome Finance reports</button></a>"
-    #emailReportButton   = "<a href='#email'><button class='nav-button'>Email reports</button></a>"
+    obsReportButton   = "<a href='/_csv/report/group-#{group}/#{year}/#{month}/jChnK3VJ.html'><button class='nav-button'>Observation Report</button></a>"
+    qualityReportButton = "<a href='/_csv/quality/group-#{group}/#{year}/#{month}/jChnK3VJ.html'><button class='nav-button'>Teaching Quality Report</button></a>"
+    emailReportButton   = "<a href='#email'><button class='nav-button'>Email Manager</button></a>"
 
     groupsButton  = "<button class='nav-button groups'>Groups</button>"
     uploadButton  = "<button class='command universal_upload'>Universal Upload</button>"
@@ -150,17 +150,15 @@ class AssessmentsMenuView extends Backbone.View
 
 
     html = ""
-    ###
-      #{moestReportButton}
-      #{financeReportButton}
-      #{emailReportButton}
-    ###
 
 
     if isAdmin
       html += "
         #{Tangerine.settings.contextualize(
         server : "
+          #{obsReportButton}
+          #{emailReportButton}
+          #{qualityReportButton}<br>
           #{groupsButton}
           #{apkButton}
           #{resultsButton}<br>

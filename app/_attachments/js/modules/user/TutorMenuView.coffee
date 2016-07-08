@@ -14,18 +14,68 @@ class TutorMenuView extends Backbone.View
   initialize: (options) =>
     @[key] = value for key, value of options
     @i18n()
-    @panels = Tangerine.settings.getArray("#{@className}-panels")
+
+    @userRole = Tangerine.user.getString("role")
+    @userRole = Tangerine.config.get("userProfile").defaultRole if @userRole == ""
+
+    @tutorMenu = Tangerine.config.get("tutorMenu")
+    _.defaults(@tutorMenu, {panels:[]}) #ensure that the @tutorMenu eists and that it has the panels attribute
+
+    @panels = @tutorMenu.panels
     if @panels.length is 0
       @panels = [
         {
-          name : "Workflows"
-          views : ["WorkflowMenuView"]
+          name: "workflows"
+          label : "Workflows"
+          restrictToRoles: []
+          views : [
+            {
+              view: "WorkflowMenuView"
+              restrictToRoles: []
+            }
+          ]
         },
         {
-          name : "Sync"
-          views : ["SyncManagerView", "BandwidthCheckView"]
+          name: "sync"
+          label : "Sync"
+          restrictToRoles: []
+          views : [
+            {
+              view: "SyncManagerView"
+              restrictToRoles: []
+            }, 
+            {
+              view: "BandwidthCheckView"
+              restrictToRoles: []
+            }
+          ]
+        },
+        {
+          name: "schools"
+          label : "Schools"
+          restrictToRoles: []
+          views : [
+            {
+              view: "SchoolListView"
+              restrictToRoles: []
+            }, 
+            {
+              view: "ValidObservationView"
+              restrictToRoles: []
+            }
+          ]
         }
       ]
+
+    #Check the panel restrictions against the user roles and remove them if necessary
+    removePanels = []
+    for panel in @panels
+      if panel.restrictToRoles.length > 0
+        removePanels.push panel if panel.restrictToRoles.indexOf(@userRole) == -1
+
+    for panel in removePanels
+      @panels = _.without(@panels, panel)
+
 
 
   handleTabClick: ( event ) =>
@@ -61,7 +111,7 @@ class TutorMenuView extends Backbone.View
       "
     panelDivs: (views) ->
       (
-        "<div id='#{@cssize(view)}'></div>" for view in views
+        "<div id='#{@cssize(viewObj.view)}'></div>" for viewObj in views
       ).join("<hr>")
 
     tabs: (panels) ->
@@ -70,11 +120,11 @@ class TutorMenuView extends Backbone.View
       last  = panels.pop()   if panels.length
       first = panels.shift() if panels.length
 
-      result += @tab(name: first.name, cssClass:"first") if first
+      result += @tab name: first.label, cssClass:"first" if first
       
-      result += @tab name: panel.name for panel, i in panels
+      result += @tab name: panel.label for panel, i in panels
       
-      result += @tab name: last.name, cssClass:"last" if last
+      result += @tab name: last.label, cssClass:"last" if last
       
       result += "</div>"
 
@@ -95,10 +145,16 @@ class TutorMenuView extends Backbone.View
   renderPanels: ->
     @panelViews = {}
     for panel in @panels
-      for view in panel.views
-        @panelViews[view] = new window[view]
-        @panelViews[view].setElement @$el.find "##{@template.cssize(view)}"
-        @panelViews[view].render()
+      for viewObj in panel.views
+        if viewObj.restrictToRoles.length > 0
+          if viewObj.restrictToRoles.indexOf(@userRole) != -1
+            @panelViews[viewObj.view] = new window[viewObj.view]
+            @panelViews[viewObj.view].setElement @$el.find "##{@template.cssize(viewObj.view)}"
+            @panelViews[viewObj.view].render()
+        else
+          @panelViews[viewObj.view] = new window[viewObj.view]
+          @panelViews[viewObj.view].setElement @$el.find "##{@template.cssize(viewObj.view)}"
+          @panelViews[viewObj.view].render()
     
     #init the tabs by showing the selected tabs
     @displayTab(@selectedTab)

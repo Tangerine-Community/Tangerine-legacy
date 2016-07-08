@@ -190,6 +190,9 @@ jsFiles = [
 
   'modules/log/Log.js',
 
+  'modules/loc/Loc.js',
+  'modules/loc/LocView.js',
+
   'modules/template/Template.js',
   'modules/settings/Settings.js',
   'modules/settings/SettingsView.js',
