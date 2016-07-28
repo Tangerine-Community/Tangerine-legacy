@@ -92,6 +92,24 @@ We have not done this yet, so we need help in documenting this section. Some thi
     - <https://github.com/downloads/couchapp/couchapp/couchapp-0.8.1-win.zip>
     - not sure how to do coffeescript
 
+## Build and Run using Docker
+On a machine with Docker and Git, run the following commands to get the code, build it and run it. Note, if you want to persist data between container sessions, use a `--volume` flag to export the `/var/lib/couchdb` directory to your host machine.
+```
+git clone git@github.com:Tangerine-Community/Tangerine-legacy.git
+cd Tangerine-legacy
+git checkout origin/kenya-ntp
+docker build -t tangerine/tangerine-legacy:kenya-ntp .
+docker run -p 80:5984 tangerine/tangerine-legacy:kenya-ntp
+```
+Then go to `https://ip-address-of-machine/tangerine/_design/t/index-dev.html`.
+
+Made a change in the code? Run the following to see it reflected. Note that if you are persisting data across container sessions, we'll need to write something into the entrypoint to couchapp push to all databases so your code in every group is updated.
+```
+docker kill {container name}
+docker build -t tangerine/tangerine-legacy:kenya-ntp .
+docker run -p 80:5984 tangerine/tangerine-legacy:kenya-ntp
+```
+
 ----
 
 Copyright (C) 2012  Michael McKay
