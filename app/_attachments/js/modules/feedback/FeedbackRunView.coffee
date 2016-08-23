@@ -36,6 +36,7 @@ class FeedbackRunView extends Backbone.View
       namespace = new Namespace
         critique : critique
         trip     : @trip
+        rawData  : @rawData
         getDurationMinutes : =>
           maxTime = 0
           minTime = 0
@@ -52,6 +53,19 @@ class FeedbackRunView extends Backbone.View
                   maxTime = Math.max(intValue, maxTime)
                   minTime = Math.min(intValue, minTime)
           return parseInt(( maxTime - minTime ) / 1000 / 60)
+
+        getDurationBetweenVariables : (var1, var2) =>
+          startTime = 0
+          endTime   = 0
+
+          for result in @rawData
+            if result?.doc?.subtestData?
+              for subtest in result.doc.subtestData
+                startTime = parseInt(subtest.timestamp) if subtest.data.hasOwnProperty(var1)
+                endTime   = parseInt(subtest.timestamp) if subtest.data.hasOwnProperty(var2)
+
+          return "Undefined" if (startTime == 0 || endTime == 0)
+          return parseInt((Math.abs(endTime - startTime)) / 1000 / 60)
 
 
       try 

@@ -17,6 +17,8 @@ class TripResultCollection extends Backbone.Collection
       reduce  : reduce
       success : (response) =>
 
+        #console.log "TutorTrips Response: ", response
+
         resultIds = response.rows.filter( (row) ->
           row.value != "assessment" && row.value != "klass"
         ).map (result) -> result.id
@@ -34,6 +36,7 @@ class TripResultCollection extends Backbone.Collection
           keys : Object.keys(resultsByTripId)
           group : true
           success: (response) =>
+            #console.log "SpirtRotut Response: ", response
             workflowIdByTripId = {}
             for row in response.rows
               workflowIdByTripId[row.key] = row.value.workflowId

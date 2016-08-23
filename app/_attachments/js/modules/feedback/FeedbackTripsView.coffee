@@ -149,16 +149,22 @@ class FeedbackTripsView extends Backbone.View
     tripId = $target.attr("data-trip-id")
 
     trip = @trips.get(tripId)
-    
-    view = new FeedbackRunView
-      trip     : trip
-      feedback : @feedback
+    Tangerine.$db.view "#{Tangerine.design_doc}/spirtRotut",
+      key: tripId
+      reduce: false
+      include_docs: true
+      success: (response) =>
 
-    view.render()
+        view = new FeedbackRunView
+          rawData  : response.rows
+          trip     : trip
+          feedback : @feedback
 
-    @subViews.push view
+        view.render()
 
-    @$el.find(".#{tripId}").empty().append view.$el
+        @subViews.push view
+
+        @$el.find(".#{tripId}").empty().append view.$el
 
   onClose: ->
     for view in @subViews

@@ -206,8 +206,8 @@ class LoginView extends Backbone.View
           <div class='messages name-message'></div>
           <label>Role
           <select id='role'>
-            <option value='dicece'>DICECE</option>
-            <option value='chews'>CHEWs</option>
+            <option value='dicece'>Sub-County ECD Cordinator</option>
+            <option value='cha'>CHA</option>
             <option value='rti-tayari-team'>RTI Tayari team</option>
             <option value='national-trainers'>National Trainers</option>
             <option value='other'>Other</option>
