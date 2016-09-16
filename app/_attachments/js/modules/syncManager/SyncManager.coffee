@@ -183,7 +183,7 @@ class SyncManagerView extends Backbone.View
       "
 
   initialize: () ->
-    @syncUsers()
+    #@syncUsers()
     @log = new SyncManager
     @log.setUserKey "sunc-#{Tangerine.user.name()}"
     @userLogKey = 
@@ -218,14 +218,35 @@ class SyncManagerView extends Backbone.View
       error: -> callback?()
       success: ->
         docIds = tabletUsers.pluck "_id"
-        $.couch.replicate Tangerine.db_name, Tangerine.settings.urlDB("group"),
-          {
-            success : ->
-              callback?()
-            error: ->
-              callback?()
-          },
-            doc_ids : docIds
+
+        $.ajax
+          type: "post"
+          url: "/"+Tangerine.db_name+"/_all_docs?include_docs=true"
+          dataType: "json"
+          contentType: "application/json"
+          data: JSON.stringify(
+            keys: _.without(docIds, "user-admin")
+          )
+          error: =>
+            console.log "syncUsers: Unable to reach local server to retrieve users"
+
+          success: (response) =>
+
+            docs = {"docs":response.rows.map((el)->el.doc)}
+            compressedData = LZString.compressToBase64(JSON.stringify(docs))
+            
+            a = document.createElement("a")
+            a.href = Tangerine.settings.get("groupHost")
+            bulkDocsUrl = "#{a.protocol}//#{a.host}/_corsBulkDocs/#{Tangerine.settings.groupDB}/force"
+
+            $.ajax
+              type : "post"
+              url : bulkDocsUrl
+              data : compressedData
+              error: (response) =>
+                console.log "User Upload: Server bulk docs error", response
+              success: (response) =>
+                console.log "Users Uploaded", response
 
   # Counts how many trips are on the tablet from this user and all users previous users
   # removes any trips that are in the incomplete list
@@ -261,6 +282,8 @@ class SyncManagerView extends Backbone.View
     if @uploadingNow
       return alert "Already uploading."
 
+    @syncUsers()
+
     @uploadingNow = true
     @uploadStatus "Upload initializing"
 
@@ -272,6 +295,8 @@ class SyncManagerView extends Backbone.View
 
       success: =>
         @uploadStatus "Upload starting"
+
+
 
         allTrips = _(@syncable).clone().reverse()# all trips, for debugging
         tempTrips = _(_(@syncable).clone()).difference(@sunc) # only unlogged unsunc trips
