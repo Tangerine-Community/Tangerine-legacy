@@ -59,10 +59,15 @@
 
     else if subtest.prototype is "survey"
 
-      result.subject = subtest.data.subject if subtest.data.subject?
-      result.class   = subtest.data.class   if subtest.data.class?
+      result.subject = subtest.data.subject        if subtest.data.subject?
+
+      result.class   = subtest.data.class          if subtest.data.class?
       result.week    = subtest.data.lesson_week    if subtest.data.lesson_week?
       result.day     = subtest.data.lesson_day     if subtest.data.lesson_day?
+
+      result.class   = subtest.data.ls_class       if subtest.data.ls_class?
+      result.week    = subtest.data.ls_wk          if subtest.data.ls_wk?
+      result.day     = subtest.data.ls_dy          if subtest.data.ls_dy?
 
     else if subtest.prototype is "gps" and subtest.data.long? and subtest.data.lat?
 
